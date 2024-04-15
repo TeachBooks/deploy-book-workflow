@@ -141,9 +141,9 @@ jobs:
           if [ "$BRANCHES_TO_DEPLOY" == "*" ] || echo "$BRANCHES_TO_DEPLOY" | tr ' ' '\n' | grep "^$value$"; then
             # Clean branch names of special characters
             clean_key=$(echo "$key" | tr '/":<>|*?\/\\' '-')
-            clean_value=$(echo "$key" | tr '/":<>|*?\/\\' '-')
-            echo link $clean_key "->" $clean_value
-            ln -s "$clean_value" final/"$clean_key"
+            clean_value=$(echo "$value" | tr '/":<>|*?\/\\' '-')
+            echo link "$clean_key" "->" "$clean_value"
+            ln -s "$clean_value" final/"$key"
           fi
         done
 
