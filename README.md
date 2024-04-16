@@ -20,6 +20,6 @@ In `call-deploy-book.yml` itself you can specify the trigger for this workflow. 
 
 Whenever the workflow is triggered, progress can be seen under the `Actions` tab. From this tab, you can also initiate it without any trigger commits.
 
-If you find the default template workflow could be improved, please open an issue at [Issues](https://github.com/TeachBooks/deploy-book-workflow/issues).
+If you find the workflow could be improved, please open an issue at [Issues](https://github.com/TeachBooks/deploy-book-workflow/issues).
 
 
