@@ -10,6 +10,7 @@ on:
 # Configuration variables may be set as explained here:
 # https://docs.github.com/en/actions/learn-github-actions/variables#creating-configuration-variables-for-a-repository
 env:
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   # `main` as primary by default, advised to make it `published` to start using draft-publish-workflow
   PRIMARY_BRANCH: ${{ vars.PRIMARY_BRANCH != '' && vars.PRIMARY_BRANCH || 'main' }}
   # Space-separated list of alias-rules, e.g. 'draft:main alias:really-long-branch-name'
@@ -35,14 +36,32 @@ jobs:
     - id: set-branches
       name: Set branches
       run: |
+        # If all (*), query all remote branches
+        # If not, read from env var
         if [ "$BRANCHES_TO_DEPLOY" == '*' ]; then
           branches=$(git branch -r | sed 's,\s*origin/,,g')
         else
           branches=$(echo "$BRANCHES_TO_DEPLOY" | tr ' ' '\n' | grep -E '\S')
         fi
+
+        # Display raw/clean branch name versions in Actions Summary
+        ## Table headers
+        echo "| Branch :tanabata_tree: | Link :link: |" >> $GITHUB_STEP_SUMMARY
+        echo "| --- | :--- |" >> $GITHUB_STEP_SUMMARY
+
+        ## Fetch the GH Pages URL
+        # https://stackoverflow.com/a/76354104
+        url=$(gh api "repos/$GITHUB_REPOSITORY/pages" --jq '.html_url')
+
+        # Clean branch names
         echo "$branches" > raw.txt
         echo "$branches" | tr '/":<>|*?\/\\' '-' > clean.txt
-        paste -d ' ' raw.txt clean.txt | sed 's/ / -> /g'
+        paste -d ' ' raw.txt clean.txt |
+        while IFS=' ' read -r raw clean; do
+          echo "| $raw | <$url$clean> |" >> $GITHUB_STEP_SUMMARY
+        done
+
+        # Convert to a JSON list
         branches=$(echo "$branches" | jq -Rn '[inputs]')
         echo "branches=$(echo $branches)" >> $GITHUB_OUTPUT
 
