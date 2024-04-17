@@ -45,6 +45,7 @@ jobs:
         fi
 
         # Display raw/clean branch name versions in Actions Summary
+        echo "### Branches deployed" >> $GITHUB_STEP_SUMMARY
         ## Table headers
         echo "| Branch :tanabata_tree: | Link :link: |" >> $GITHUB_STEP_SUMMARY
         echo "| --- | :--- |" >> $GITHUB_STEP_SUMMARY
@@ -60,6 +61,12 @@ jobs:
         while IFS=' ' read -r raw clean; do
           echo "| $raw | <$url$clean> |" >> $GITHUB_STEP_SUMMARY
         done
+
+        # Primary branch
+        echo >> $GITHUB_STEP_SUMMARY
+        echo "Primary branch ($PRIMARY_BRANCH) is at:" >> $GITHUB_STEP_SUMMARY
+        echo "- <$url>" >> $GITHUB_STEP_SUMMARY
+        echo "- and <$url/$PRIMARY_BRANCH>" >> $GITHUB_STEP_SUMMARY
 
         # Convert to a JSON list
         branches=$(echo "$branches" | jq -Rn '[inputs]')
@@ -154,6 +161,11 @@ jobs:
 
     - name: Symlink branch aliases
       run: |
+        echo "### Aliases" >> $GITHUB_STEP_SUMMARY
+        # Summary table headers
+        echo "| Alias :arrow_right: | Target :dart: |" >> $GITHUB_STEP_SUMMARY
+        echo "| :--- | :--- |" >> $GITHUB_STEP_SUMMARY
+
         echo "$BRANCH_ALIASES" | tr ' ' '\n' | grep -E '\S' |
         while IFS=':' read -r key value; do
           # If the target branch is to be deployed, make symlink to it.
@@ -161,7 +173,7 @@ jobs:
             # Clean branch names of special characters
             clean_key=$(echo "$key" | tr '/":<>|*?\/\\' '-')
             clean_value=$(echo "$value" | tr '/":<>|*?\/\\' '-')
-            echo link "$clean_key" "->" "$clean_value"
+            echo "| $clean_key | $clean_value |" >> $GITHUB_STEP_SUMMARY
             ln -s "$clean_value" final/"$key"
           fi
         done
