@@ -167,13 +167,18 @@ jobs:
         echo "| :--- | :--- |" >> $GITHUB_STEP_SUMMARY
 
         echo "$BRANCH_ALIASES" | tr ' ' '\n' | grep -E '\S' |
+        
+        ## Fetch the GH Pages URL again
+        # https://stackoverflow.com/a/76354104
+        url=$(gh api "repos/$GITHUB_REPOSITORY/pages" --jq '.html_url')
+        
         while IFS=':' read -r key value; do
           # If the target branch is to be deployed, make symlink to it.
           if [ "$BRANCHES_TO_DEPLOY" == "*" ] || echo "$BRANCHES_TO_DEPLOY" | tr ' ' '\n' | grep "^$value$"; then
             # Clean branch names of special characters
             clean_key=$(echo "$key" | tr '/":<>|*?\/\\' '-')
             clean_value=$(echo "$value" | tr '/":<>|*?\/\\' '-')
-            echo "| <$url$clean_key> | <$url$clean_value> |" >> $GITHUB_STEP_SUMMARY
+            echo "| $url$clean_key | $url$clean_value |" >> $GITHUB_STEP_SUMMARY
             ln -s "$clean_value" final/"$key"
           fi
         done
