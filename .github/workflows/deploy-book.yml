@@ -31,7 +31,7 @@ jobs:
     - uses: actions/checkout@v4
       with:
         fetch-depth: 0
-        submodules: `recursive`
+        submodules: recursive
 
     - id: set-branches
       name: Set branches
