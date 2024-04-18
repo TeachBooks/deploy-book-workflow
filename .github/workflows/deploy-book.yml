@@ -173,7 +173,7 @@ jobs:
             # Clean branch names of special characters
             clean_key=$(echo "$key" | tr '/":<>|*?\/\\' '-')
             clean_value=$(echo "$value" | tr '/":<>|*?\/\\' '-')
-            echo "| <$url$clean_key> | <$url$clean_value> |" >> $GITHUB_STEP_SUMMARY
+            echo "| $url$clean_key | $url$clean_value |" >> $GITHUB_STEP_SUMMARY
             ln -s "$clean_value" final/"$key"
           fi
         done
