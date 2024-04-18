@@ -28,10 +28,13 @@ jobs:
     permissions:
       contents: read
     steps:
-    - uses: actions/checkout@v4
+    - name: Checkout repository
+      uses: actions/checkout@v4
       with:
         fetch-depth: 0
         submodules: recursive
+    - name: Checkout submodules
+      run: git submodule update --init --recursive
 
     - id: set-branches
       name: Set branches
