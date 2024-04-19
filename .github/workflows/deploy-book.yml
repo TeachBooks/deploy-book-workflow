@@ -10,6 +10,7 @@ on:
 # Configuration variables may be set as explained here:
 # https://docs.github.com/en/actions/learn-github-actions/variables#creating-configuration-variables-for-a-repository
 env:
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   # `main` as primary by default, advised to make it `published` to start using draft-publish-workflow
   PRIMARY_BRANCH: ${{ vars.PRIMARY_BRANCH != '' && vars.PRIMARY_BRANCH || 'main' }}
   # Space-separated list of alias-rules, e.g. 'draft:main alias:really-long-branch-name'
@@ -25,6 +26,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       branches: ${{ steps.set-branches.outputs.branches }}
+      summary: ${{ steps.set-branches.outputs.summary }}
     permissions:
       contents: read
     steps:
@@ -35,16 +37,53 @@ jobs:
     - id: set-branches
       name: Set branches
       run: |
+        # If all (*), query all remote branches
+        # If not, read from env var
         if [ "$BRANCHES_TO_DEPLOY" == '*' ]; then
           branches=$(git branch -r | sed 's,\s*origin/,,g')
         else
           branches=$(echo "$BRANCHES_TO_DEPLOY" | tr ' ' '\n' | grep -E '\S')
         fi
+
+        {
+          # Display raw/clean branch name versions in Actions Summary
+          echo "### Branches deployed"
+          ## Table headers
+          echo "| Branch :tanabata_tree: | Link :link: |"
+          echo "| :--- | :--- |"
+        } >> summary.md
+
+        ## Fetch the GH Pages URL
+        # https://stackoverflow.com/a/76354104
+        url=$(gh api "repos/$GITHUB_REPOSITORY/pages" --jq '.html_url')
+
+        # Clean branch names
         echo "$branches" > raw.txt
         echo "$branches" | tr '/":<>|*?\/\\' '-' > clean.txt
-        paste -d ' ' raw.txt clean.txt | sed 's/ / -> /g'
+        paste -d ' ' raw.txt clean.txt |
+        while IFS=' ' read -r raw clean; do
+          echo "| $raw | <$url$clean> |" >> summary.md
+        done
+
+        {
+          # Primary branch
+          echo
+          echo "Primary branch ($PRIMARY_BRANCH) is at:"
+          echo "- <$url>"
+          echo "- and <$url$PRIMARY_BRANCH>"
+        } >> summary.md
+
+        # https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#example-of-a-multiline-string
+        {
+          echo 'summary<<EOF'
+          cat summary.md
+          echo EOF
+        } >> "$GITHUB_OUTPUT"
+
+        # Convert to a JSON list
         branches=$(echo "$branches" | jq -Rn '[inputs]')
-        echo "branches=$(echo $branches)" >> $GITHUB_OUTPUT
+        echo "branches=$(echo $branches)" >> "$GITHUB_OUTPUT"
+
 
   build-books:
     runs-on: ubuntu-latest
@@ -94,7 +133,6 @@ jobs:
           teachbooks build book/
         fi
 
-
     - name: Clean branch name of disallowed characters
       run: |
         echo "MATRIX_BRANCH_NAME_CLEAN=$(echo ${{ matrix.branch }} | tr '/":<>|*?\/\\' '-')" >> $GITHUB_ENV
@@ -109,6 +147,8 @@ jobs:
     # Run after build-books, even if it failed
     if: always()
     needs: build-books
+    outputs:
+      summary: ${{ steps.symlink-aliases.outputs.summary }}
     runs-on: ubuntu-latest
     permissions:
       pages: write
@@ -135,7 +175,17 @@ jobs:
         ls -a final/
 
     - name: Symlink branch aliases
+      id: symlink-aliases
       run: |
+        {
+          echo "### Aliases"
+          # Summary table headers
+          echo "| Alias :arrow_right: | Target :dart: | Link :link:"
+          echo "| :--- | :--- | :--- |"
+        } >> summary.md
+
+        url=$(gh api "repos/$GITHUB_REPOSITORY/pages" --jq '.html_url')
+
         echo "$BRANCH_ALIASES" | tr ' ' '\n' | grep -E '\S' |
         while IFS=':' read -r key value; do
           # If the target branch is to be deployed, make symlink to it.
@@ -143,10 +193,16 @@ jobs:
             # Clean branch names of special characters
             clean_key=$(echo "$key" | tr '/":<>|*?\/\\' '-')
             clean_value=$(echo "$value" | tr '/":<>|*?\/\\' '-')
-            echo link "$clean_key" "->" "$clean_value"
+            echo "| $clean_key | $clean_value | <$url$clean_key> |" >> summary.md
             ln -s "$clean_value" final/"$key"
           fi
         done
+
+        {
+          echo 'summary<<EOF'
+          cat summary.md
+          echo EOF
+        } >> "$GITHUB_OUTPUT"
 
     - name: Upload final Pages artifact
       uses: actions/upload-pages-artifact@v3
@@ -157,6 +213,15 @@ jobs:
       id: deployment
       uses: actions/deploy-pages@v4
 
+  summarize:
+    needs:
+      - get-branches
+      - deploy-books
+    runs-on: ubuntu-latest
+    steps:
+    - run: |
+        echo "${{ needs.get-branches.outputs.summary }}" >> $GITHUB_STEP_SUMMARY
+        echo "${{ needs.deploy-books.outputs.summary }}" >> $GITHUB_STEP_SUMMARY
 
 permissions:
   contents: read
