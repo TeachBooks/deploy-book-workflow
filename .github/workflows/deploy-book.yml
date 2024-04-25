@@ -90,8 +90,6 @@ jobs:
 
   build-books:
     runs-on: ubuntu-latest
-    outputs:
-      summary: ${{ steps.output-summary.outputs.summary }}
     needs: get-branches
     if: ${{ needs.get-branches.outputs.branches != '[]' }}
     permissions:
@@ -137,18 +135,18 @@ jobs:
         else
           option_publish=''
         fi
-        # suppress grep errorcode 1 on no match
+        # supress grep errorcode 1 on no match
         (teachbooks build $option_publish book/ 2>&1) | tee log
 
         { grep 'WARNING:' log || true; } > warning_lines.log
         # If there are warnings, compose a summary (if not, don't)
         if [ -s warning_lines.log ]; then
           {
-            echo "### Build warnings"
+            echo "### Build warnings on branch ${{ matrix.branch }}"
             echo '```'
             cat warning_lines.log
             echo '```'
-          } >> summary.md
+          } >> $GITHUB_STEP_SUMMARY
         fi
 
     - name: Clean branch name of disallowed characters
@@ -160,16 +158,6 @@ jobs:
       with:
         name: ${{ env.MATRIX_BRANCH_NAME_CLEAN }}
         path: "book/_build/html"
-
-    - name: Output summary
-      id: output-summary
-      run: |
-        touch summary.md
-        {
-          echo 'summary<<EOF'
-          cat summary.md
-          echo EOF
-        } >> "$GITHUB_OUTPUT"
 
   deploy-books:
     # Run after build-books, even if it failed
