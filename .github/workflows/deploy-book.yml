@@ -113,7 +113,10 @@ jobs:
 
     - name: Record if branch is preprocessed, for cache key
       run: |
-        echo "$BRANCHES_TO_PREPROCESS" | tr ' ' '\n' | { grep ${{ matrix.branch }} || true; } > VARS.txt
+        echo "$BRANCHES_TO_PREPROCESS" | tr ' ' '\n' | { grep "^${{ matrix.branch }}$" || true; } > VARS.txt
+        if [ "$BRANCHES_TO_PREPROCESS" == "*" ]; then
+          echo "${{ matrix.branch }}" > VARS.txt
+        fi
 
     - name: Cache page build
       id: cache-html
