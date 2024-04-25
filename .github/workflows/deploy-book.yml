@@ -111,12 +111,16 @@ jobs:
         ref: ${{ matrix.branch }}
         submodules: 'true'
 
+    - name: Record if branch is preprocessed, for cache key
+      run: |
+        echo "$BRANCHES_TO_PREPROCESS" | tr ' ' '\n' | { grep ${{ matrix.branch }} || true; } > VARS.txt
+
     - name: Cache page build
       id: cache-html
       uses: actions/cache@v4
       with:
         path: "book/_build/html"
-        key: html-build-${{ hashFiles('book/**', 'figures/**', 'requirements.txt') }}
+        key: html-build-${{ hashFiles('book/**', 'figures/**', 'requirements.txt', 'VARS.txt') }}
 
     - if: ${{ steps.cache-html.outputs.cache-hit != 'true' }}
       name: Set up Python 3.11
