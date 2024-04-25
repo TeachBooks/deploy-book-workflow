@@ -113,9 +113,10 @@ jobs:
 
     - name: Record if branch is preprocessed, for cache key
       run: |
-        echo "$BRANCHES_TO_PREPROCESS" | tr ' ' '\n' | { grep "^${{ matrix.branch }}$" || true; } > VARS.txt
-        if [ "$BRANCHES_TO_PREPROCESS" == "*" ]; then
-          echo "${{ matrix.branch }}" > VARS.txt
+        if [ "$BRANCHES_TO_PREPROCESS" == "*" ] || echo "$BRANCHES_TO_PREPROCESS" | tr ' ' '\n' | grep "^${{ matrix.branch }}$"; then
+          echo true > VARS.txt
+        else
+          echo false > VARS.txt
         fi
 
     - name: Cache page build
@@ -140,7 +141,7 @@ jobs:
     - if: ${{ steps.cache-html.outputs.cache-hit != 'true' }}
       name: Preprocess & build the book from branch
       run: |
-        if [ "$BRANCHES_TO_PREPROCESS" == "*" ] || echo "$BRANCHES_TO_PREPROCESS" | tr ' ' '\n' | grep "^${{matrix.branch}}$"; then
+        if [ "$BRANCHES_TO_PREPROCESS" == "*" ] || echo "$BRANCHES_TO_PREPROCESS" | tr ' ' '\n' | grep "^${{ matrix.branch }}$"; then
           option_publish='--publish'
         else
           option_publish=''
