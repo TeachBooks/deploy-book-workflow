@@ -20,6 +20,10 @@ env:
   # Space-separated list of branch names, e.g. 'main second third'.
   # By default, deploy all branches. This is indicated by '*'.
   BRANCHES_TO_DEPLOY: ${{ vars.BRANCHES_TO_DEPLOY != '' && vars.BRANCHES_TO_DEPLOY || '*' }}
+  # Space-separated list of branch names, e.g. 'main second third'.
+  # By default, preprocess no branches ('').
+  # Preprocessing no branches can also be set by ' '.
+  BRANCHES_TO_PREPROCESS: ${{ vars.BRANCHES_TO_PREPROCESS }}
 
 jobs:
   get-branches:
@@ -129,8 +133,7 @@ jobs:
     - if: ${{ steps.cache-html.outputs.cache-hit != 'true' }}
       name: Preprocess & build the book from branch
       run: |
-        echo $PATH
-        if [ ${{matrix.branch}} == $PRIMARY_BRANCH ]; then
+        if [ "$BRANCHES_TO_PREPROCESS" == "*" ] || echo "$BRANCHES_TO_PREPROCESS" | tr ' ' '\n' | grep "^${{matrix.branch}}$"; then
           option_publish='--publish'
         else
           option_publish=''
