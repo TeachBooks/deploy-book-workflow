@@ -26,7 +26,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       branches: ${{ steps.set-branches.outputs.branches }}
-      summary: ${{ steps.set-branches.outputs.summary }}
+      summary: ${{ steps.output-summary.outputs.summary }}
     permissions:
       contents: read
     steps:
@@ -73,16 +73,19 @@ jobs:
           echo "- and <$url$PRIMARY_BRANCH>"
         } >> summary.md
 
-        # https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#example-of-a-multiline-string
+        # Convert to a JSON list
+        branches=$(echo "$branches" | jq -Rn '[inputs]')
+        echo "branches=$(echo $branches)" >> "$GITHUB_OUTPUT"
+
+    # https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#example-of-a-multiline-string
+    - name: Output summary
+      id: output-summary
+      run: |
         {
           echo 'summary<<EOF'
           cat summary.md
           echo EOF
         } >> "$GITHUB_OUTPUT"
-
-        # Convert to a JSON list
-        branches=$(echo "$branches" | jq -Rn '[inputs]')
-        echo "branches=$(echo $branches)" >> "$GITHUB_OUTPUT"
 
 
   build-books:
@@ -128,9 +131,22 @@ jobs:
       run: |
         echo $PATH
         if [ ${{matrix.branch}} == $PRIMARY_BRANCH ]; then
-          teachbooks build --publish book/
+          option_publish='--publish'
         else
-          teachbooks build book/
+          option_publish=''
+        fi
+        # supress grep errorcode 1 on no match
+        (teachbooks build $option_publish book/ 2>&1) | tee log
+
+        { grep 'WARNING:' log || true; } > warning_lines.log
+        # If there are warnings, compose a summary (if not, don't)
+        if [ -s warning_lines.log ]; then
+          {
+            echo "### Build warnings on branch ${{ matrix.branch }}"
+            echo '```'
+            cat warning_lines.log
+            echo '```'
+          } >> $GITHUB_STEP_SUMMARY
         fi
 
     - name: Clean branch name of disallowed characters
@@ -148,7 +164,7 @@ jobs:
     if: always()
     needs: build-books
     outputs:
-      summary: ${{ steps.symlink-aliases.outputs.summary }}
+      summary: ${{ steps.output-summary.outputs.summary }}
     runs-on: ubuntu-latest
     permissions:
       pages: write
@@ -198,12 +214,6 @@ jobs:
           fi
         done
 
-        {
-          echo 'summary<<EOF'
-          cat summary.md
-          echo EOF
-        } >> "$GITHUB_OUTPUT"
-
     - name: Upload final Pages artifact
       uses: actions/upload-pages-artifact@v3
       with:
@@ -212,6 +222,15 @@ jobs:
     - name: Deploy to GitHub Pages
       id: deployment
       uses: actions/deploy-pages@v4
+
+    - name: Output summary
+      id: output-summary
+      run: |
+        {
+          echo 'summary<<EOF'
+          cat summary.md
+          echo EOF
+        } >> "$GITHUB_OUTPUT"
 
   summarize:
     needs:
