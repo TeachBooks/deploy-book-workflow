@@ -137,14 +137,18 @@ jobs:
         else
           option_publish=''
         fi
-        (teachbooks build $option_publish book/ 2>&1) | grep 'WARNING:' > warning_lines.log
+        # suppress grep errorcode 1 on no match
+        (teachbooks build $option_publish book/ 2>&1) | tee log
 
+        { grep 'WARNING:' log || true; } > warning_lines.log
         # If there are warnings, compose a summary (if not, don't)
         if [ -s warning_lines.log ]; then
-          echo "### Build warnings" > summary.md
-          echo '```' > summary.md
-          cat warning_lines.log > summary.md
-          echo '```' > summary.md
+          {
+            echo "### Build warnings"
+            echo '```'
+            cat warning_lines.log
+            echo '```'
+          } >> summary.md
         fi
 
     - name: Clean branch name of disallowed characters
