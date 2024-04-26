@@ -10,21 +10,27 @@ on:
 # Configuration variables may be set as explained here:
 # https://docs.github.com/en/actions/learn-github-actions/variables#creating-configuration-variables-for-a-repository
 env:
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   # `main` as primary by default, advised to make it `published` to start using draft-publish-workflow
   PRIMARY_BRANCH: ${{ vars.PRIMARY_BRANCH != '' && vars.PRIMARY_BRANCH || 'main' }}
   # Space-separated list of alias-rules, e.g. 'draft:main alias:really-long-branch-name'
   # By default, `draft` links to `main`. Advised to link `book` to `publish`
   # If no aliases are wanted, BRANCH_ALIASES may be set to ' ' (space).
-  BRANCH_ALIASES: ${{ vars.BRANCH_ALIASES != '' && vars.BRANCH_ALIASES || 'draft:main' }}
+  BRANCH_ALIASES: ${{ vars.BRANCH_ALIASES }}
   # Space-separated list of branch names, e.g. 'main second third'.
   # By default, deploy all branches. This is indicated by '*'.
   BRANCHES_TO_DEPLOY: ${{ vars.BRANCHES_TO_DEPLOY != '' && vars.BRANCHES_TO_DEPLOY || '*' }}
+  # Space-separated list of branch names, e.g. 'main second third'.
+  # By default, preprocess no branches ('').
+  # Preprocessing no branches can also be set by ' '.
+  BRANCHES_TO_PREPROCESS: ${{ vars.BRANCHES_TO_PREPROCESS }}
 
 jobs:
   get-branches:
     runs-on: ubuntu-latest
     outputs:
       branches: ${{ steps.set-branches.outputs.branches }}
+      summary: ${{ steps.output-summary.outputs.summary }}
     permissions:
       contents: read
     steps:
@@ -35,16 +41,90 @@ jobs:
     - id: set-branches
       name: Set branches
       run: |
+        # If all (*), query all remote branches
+        # If not, read from env var
         if [ "$BRANCHES_TO_DEPLOY" == '*' ]; then
           branches=$(git branch -r | sed 's,\s*origin/,,g')
         else
           branches=$(echo "$BRANCHES_TO_DEPLOY" | tr ' ' '\n' | grep -E '\S')
         fi
+
+        {
+          # Display raw/clean branch name versions in Actions Summary
+          echo "### Branches deployed"
+          ## Table headers
+          echo "| Branch :tanabata_tree: | Link :link: |"
+          echo "| :--- | :--- |"
+        } >> summary.md
+
+        ## Fetch the GH Pages URL
+        # https://stackoverflow.com/a/76354104
+        url=$(gh api "repos/$GITHUB_REPOSITORY/pages" --jq '.html_url')
+
+        # Clean branch names
         echo "$branches" > raw.txt
         echo "$branches" | tr '/":<>|*?\/\\' '-' > clean.txt
-        paste -d ' ' raw.txt clean.txt | sed 's/ / -> /g'
+        paste -d ' ' raw.txt clean.txt |
+        while IFS=' ' read -r raw clean; do
+          echo "| $raw | <$url$clean> |" >> summary.md
+        done
+
+        {
+          # Primary branch
+          echo
+          echo "Primary branch ($PRIMARY_BRANCH) is at:"
+          echo "- <$url>"
+          echo "- and <$url$PRIMARY_BRANCH>"
+        } >> summary.md
+
+        # Convert to a JSON list
         branches=$(echo "$branches" | jq -Rn '[inputs]')
-        echo "branches=$(echo $branches)" >> $GITHUB_OUTPUT
+        echo "branches=$(echo $branches)" >> "$GITHUB_OUTPUT"
+
+    - name: Validate aliases
+      run: |
+        # Prepare data
+        mv raw.txt branches.txt
+        echo "$BRANCH_ALIASES" | tr ' ' '\n' > rules.txt
+        cut -d: -f1 rules.txt > aliases.txt
+        cut -d: -f2 rules.txt > targets.txt
+
+        # Alias named as existing branch
+        if grep -E '\S' aliases.txt; then
+          while IFS= read -r alias; do
+            if grep "^$alias$" branches.txt ; then
+              echo "::error ::Alias \"$alias\" given in \$BRANCH_ALIASES conflicts with existing branch."
+              exit 1
+            fi
+          done < aliases.txt
+        fi
+
+        # Non-existent targets
+        if grep -E '\S' targets.txt; then
+          while IFS= read -r target; do
+            if ! grep "^$target$" branches.txt ; then
+              echo "::error ::Branch \"$target\" given in \$BRANCH_ALIASES does not exist."
+              exit 1
+            fi
+          done < targets.txt
+        fi
+
+        # Duplicate aliases
+        if { sort | uniq -d | grep . -qc; } < aliases.txt; then
+          echo "::error ::Duplicate aliases in \$BRANCH_ALIASES: \"$BRANCH_ALIASES\""
+          exit 1
+        fi
+
+    # https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#example-of-a-multiline-string
+    - name: Output summary
+      id: output-summary
+      run: |
+        {
+          echo 'summary<<EOF'
+          cat summary.md
+          echo EOF
+        } >> "$GITHUB_OUTPUT"
+
 
   build-books:
     runs-on: ubuntu-latest
@@ -65,12 +145,20 @@ jobs:
         ref: ${{ matrix.branch }}
         submodules: 'true'
 
+    - name: Record if branch is preprocessed, for cache key
+      run: |
+        if [ "$BRANCHES_TO_PREPROCESS" == "*" ] || echo "$BRANCHES_TO_PREPROCESS" | tr ' ' '\n' | grep "^${{ matrix.branch }}$"; then
+          echo true > VARS.txt
+        else
+          echo false > VARS.txt
+        fi
+
     - name: Cache page build
       id: cache-html
       uses: actions/cache@v4
       with:
         path: "book/_build/html"
-        key: html-build-${{ hashFiles('book/**', 'figures/**', 'requirements.txt') }}
+        key: html-build-${{ hashFiles('book/**', 'figures/**', 'requirements.txt', 'VARS.txt') }}
 
     - if: ${{ steps.cache-html.outputs.cache-hit != 'true' }}
       name: Set up Python 3.11
@@ -87,13 +175,24 @@ jobs:
     - if: ${{ steps.cache-html.outputs.cache-hit != 'true' }}
       name: Preprocess & build the book from branch
       run: |
-        echo $PATH
-        if [ ${{matrix.branch}} == $PRIMARY_BRANCH ]; then
-          teachbooks build --publish book/
+        if [ "$BRANCHES_TO_PREPROCESS" == "*" ] || echo "$BRANCHES_TO_PREPROCESS" | tr ' ' '\n' | grep "^${{ matrix.branch }}$"; then
+          option_publish='--publish'
         else
-          teachbooks build book/
+          option_publish=''
         fi
+        # supress grep errorcode 1 on no match
+        (teachbooks build $option_publish book/ 2>&1) | tee log
 
+        { grep 'WARNING:' log || true; } > warning_lines.log
+        # If there are warnings, compose a summary (if not, don't)
+        if [ -s warning_lines.log ]; then
+          {
+            echo "### Build warnings on branch ${{ matrix.branch }}"
+            echo '```'
+            cat warning_lines.log
+            echo '```'
+          } >> $GITHUB_STEP_SUMMARY
+        fi
 
     - name: Clean branch name of disallowed characters
       run: |
@@ -109,6 +208,8 @@ jobs:
     # Run after build-books, even if it failed
     if: always()
     needs: build-books
+    outputs:
+      summary: ${{ steps.output-summary.outputs.summary }}
     runs-on: ubuntu-latest
     permissions:
       pages: write
@@ -135,7 +236,17 @@ jobs:
         ls -a final/
 
     - name: Symlink branch aliases
+      id: symlink-aliases
       run: |
+        {
+          echo "### Aliases"
+          # Summary table headers
+          echo "| Alias :arrow_right: | Target :dart: | Link :link:"
+          echo "| :--- | :--- | :--- |"
+        } >> summary.md
+
+        url=$(gh api "repos/$GITHUB_REPOSITORY/pages" --jq '.html_url')
+
         echo "$BRANCH_ALIASES" | tr ' ' '\n' | grep -E '\S' |
         while IFS=':' read -r key value; do
           # If the target branch is to be deployed, make symlink to it.
@@ -143,7 +254,7 @@ jobs:
             # Clean branch names of special characters
             clean_key=$(echo "$key" | tr '/":<>|*?\/\\' '-')
             clean_value=$(echo "$value" | tr '/":<>|*?\/\\' '-')
-            echo link "$clean_key" "->" "$clean_value"
+            echo "| $clean_key | $clean_value | <$url$clean_key> |" >> summary.md
             ln -s "$clean_value" final/"$key"
           fi
         done
@@ -156,6 +267,39 @@ jobs:
     - name: Deploy to GitHub Pages
       id: deployment
       uses: actions/deploy-pages@v4
+
+    - name: Output summary
+      id: output-summary
+      run: |
+        {
+          echo 'summary<<EOF'
+          cat summary.md
+          echo EOF
+        } >> "$GITHUB_OUTPUT"
+
+  summarize:
+    needs:
+      - get-branches
+      - deploy-books
+    runs-on: ubuntu-latest
+    steps:
+    - run: |
+
+        echo "${{ needs.get-branches.outputs.summary }}" >> $GITHUB_STEP_SUMMARY
+        echo "${{ needs.deploy-books.outputs.summary }}" >> $GITHUB_STEP_SUMMARY
+
+        # Display config var values
+        {
+          echo "### Repository configuration variables"
+          echo "Variables can be set at ${{ format('{0}/{1}/settings/variables/actions', github.server_url, github.repository) }}"
+          echo '```'
+          echo "PRIMARY_BRANCH=$PRIMARY_BRANCH"
+          echo "BRANCH_ALIASES=$BRANCH_ALIASES"
+          echo "BRANCHES_TO_DEPLOY=$BRANCHES_TO_DEPLOY"
+          echo "BRANCHES_TO_PREPROCESS=$BRANCHES_TO_PREPROCESS"
+          echo '```'
+        } >> $GITHUB_STEP_SUMMARY
+
 
 
 permissions:
