@@ -39,45 +39,30 @@ Whenever the workflow is triggered, progress can be seen under the <svg aria-hid
 
 The workflow show's an summary. It shows error in the build brocess, errors with ill-defined repository variables, where your build book is published (`https://<username/organization_name>.github.io/<repository_name>` (case sensitive)) and how the repository variables are defined during the build. Here's an example for the summary of the template book:
 
-> <table role="table">
-<thead>
-<tr>
-<th align="left">Branch 🎋</th>
-<th align="left">Link 🔗</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td align="left">main</td>
-<td align="left"><a href="https://teachbooks.github.io/template/main" rel="nofollow">https://teachbooks.github.io/template/main</a></td>
-</tr>
-</tbody>
-</table>
-<p>Primary branch (main) is at:</p>
-<ul>
-<li><a href="https://teachbooks.github.io/template/" rel="nofollow">https://teachbooks.github.io/template/</a></li>
-<li>and <a href="https://teachbooks.github.io/template/main" rel="nofollow">https://teachbooks.github.io/template/main</a></li>
-</ul>
-<h3>Aliases</h3>
-<table role="table">
-<thead>
-<tr>
-<th align="left">Alias ➡️</th>
-<th align="left">Target 🎯</th>
-<th align="left">Link 🔗</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td align="left">draft</td>
-<td align="left">main</td>
-<td align="left"><a href="https://teachbooks.github.io/template/draft" rel="nofollow">https://teachbooks.github.io/template/draft</a></td>
-</tr>
-</tbody>
-</table>
-<h3>Repository configuration variables</h3>
-<p>Variables can be set at <a href="https://github.com/TeachBooks/template/settings/variables/actions">https://github.com/TeachBooks/template/settings/variables/actions</a></p>
-<pre class="notranslate"><code class="notranslate">PRIMARY_BRANCH=main
-BRANCH_ALIASES=draft:main
-BRANCHES_TO_DEPLOY=main
-BRANCHES_TO_PREPROCESS=main</code>
+> **Branches deployed**
+> 
+> | Branch 🎋 | Link 🔗 |
+> | --- | --- |
+> | main | [https://teachbooks.github.io/template/main](https://teachbooks.github.io/template/main) |
+> 
+> Primary branch (main) is at:
+> 
+> - [https://teachbooks.github.io/template/](https://teachbooks.github.io/template/)
+> - [https://teachbooks.github.io/template/main](https://teachbooks.github.io/template/main)
+> 
+> **Aliases**
+> 
+> | Alias ➡️ | Target 🎯 | Link 🔗 |
+> | --- | --- | --- |
+> | draft | main | [https://teachbooks.github.io/template/draft](https://teachbooks.github.io/template/draft) |
+> 
+> **Repository configuration variables**
+> 
+> Variables can be set at [https://github.com/TeachBooks/template/settings/variables/actions](https://github.com/TeachBooks/template/settings/variables/actions)
+>
+> ```
+> PRIMARY_BRANCH=main
+> BRANCH_ALIASES=draft:main
+> BRANCHES_TO_DEPLOY=main
+> BRANCHES_TO_PREPROCESS=main
+> ```
