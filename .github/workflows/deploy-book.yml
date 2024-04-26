@@ -16,7 +16,7 @@ env:
   # Space-separated list of alias-rules, e.g. 'draft:main alias:really-long-branch-name'
   # By default, `draft` links to `main`. Advised to link `book` to `publish`
   # If no aliases are wanted, BRANCH_ALIASES may be set to ' ' (space).
-  BRANCH_ALIASES: ${{ vars.BRANCH_ALIASES != '' && vars.BRANCH_ALIASES || 'draft:main' }}
+  BRANCH_ALIASES: ${{ vars.BRANCH_ALIASES }}
   # Space-separated list of branch names, e.g. 'main second third'.
   # By default, deploy all branches. This is indicated by '*'.
   BRANCHES_TO_DEPLOY: ${{ vars.BRANCHES_TO_DEPLOY != '' && vars.BRANCHES_TO_DEPLOY || '*' }}
@@ -80,6 +80,40 @@ jobs:
         # Convert to a JSON list
         branches=$(echo "$branches" | jq -Rn '[inputs]')
         echo "branches=$(echo $branches)" >> "$GITHUB_OUTPUT"
+
+    - name: Validate aliases
+      run: |
+        # Prepare data
+        mv raw.txt branches.txt
+        echo "$BRANCH_ALIASES" | tr ' ' '\n' > rules.txt
+        cut -d: -f1 rules.txt > aliases.txt
+        cut -d: -f2 rules.txt > targets.txt
+
+        # Alias named as existing branch
+        if grep -E '\S' aliases.txt; then
+          while IFS= read -r alias; do
+            if grep "^$alias$" branches.txt ; then
+              echo "::error ::Alias \"$alias\" given in \$BRANCH_ALIASES conflicts with existing branch."
+              exit 1
+            fi
+          done < aliases.txt
+        fi
+
+        # Non-existent targets
+        if grep -E '\S' targets.txt; then
+          while IFS= read -r target; do
+            if ! grep "^$target$" branches.txt ; then
+              echo "::error ::Branch \"$target\" given in \$BRANCH_ALIASES does not exist."
+              exit 1
+            fi
+          done < targets.txt
+        fi
+
+        # Duplicate aliases
+        if { sort | uniq -d | grep . -qc; } < aliases.txt; then
+          echo "::error ::Duplicate aliases in \$BRANCH_ALIASES: \"$BRANCH_ALIASES\""
+          exit 1
+        fi
 
     # https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#example-of-a-multiline-string
     - name: Output summary
