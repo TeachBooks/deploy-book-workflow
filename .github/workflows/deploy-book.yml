@@ -20,6 +20,10 @@ env:
   # Space-separated list of branch names, e.g. 'main second third'.
   # By default, deploy all branches. This is indicated by '*'.
   BRANCHES_TO_DEPLOY: ${{ vars.BRANCHES_TO_DEPLOY != '' && vars.BRANCHES_TO_DEPLOY || '*' }}
+  # Space-separated list of branch names, e.g. 'main second third'.
+  # By default, preprocess no branches ('').
+  # Preprocessing no branches can also be set by ' '.
+  BRANCHES_TO_PREPROCESS: ${{ vars.BRANCHES_TO_PREPROCESS }}
 
 jobs:
   get-branches:
@@ -107,12 +111,20 @@ jobs:
         ref: ${{ matrix.branch }}
         submodules: 'true'
 
+    - name: Record if branch is preprocessed, for cache key
+      run: |
+        if [ "$BRANCHES_TO_PREPROCESS" == "*" ] || echo "$BRANCHES_TO_PREPROCESS" | tr ' ' '\n' | grep "^${{ matrix.branch }}$"; then
+          echo true > VARS.txt
+        else
+          echo false > VARS.txt
+        fi
+
     - name: Cache page build
       id: cache-html
       uses: actions/cache@v4
       with:
         path: "book/_build/html"
-        key: html-build-${{ hashFiles('book/**', 'figures/**', 'requirements.txt') }}
+        key: html-build-${{ hashFiles('book/**', 'figures/**', 'requirements.txt', 'VARS.txt') }}
 
     - if: ${{ steps.cache-html.outputs.cache-hit != 'true' }}
       name: Set up Python 3.11
@@ -129,8 +141,7 @@ jobs:
     - if: ${{ steps.cache-html.outputs.cache-hit != 'true' }}
       name: Preprocess & build the book from branch
       run: |
-        echo $PATH
-        if [ ${{matrix.branch}} == $PRIMARY_BRANCH ]; then
+        if [ "$BRANCHES_TO_PREPROCESS" == "*" ] || echo "$BRANCHES_TO_PREPROCESS" | tr ' ' '\n' | grep "^${{ matrix.branch }}$"; then
           option_publish='--publish'
         else
           option_publish=''
@@ -239,8 +250,23 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - run: |
+
         echo "${{ needs.get-branches.outputs.summary }}" >> $GITHUB_STEP_SUMMARY
         echo "${{ needs.deploy-books.outputs.summary }}" >> $GITHUB_STEP_SUMMARY
+
+        # Display config var values
+        {
+          echo "### Repository configuration variables"
+          echo "Variables can be set at ${{ format('{0}/{1}/settings/variables/actions', github.server_url, github.repository) }}"
+          echo '```'
+          echo "PRIMARY_BRANCH=$PRIMARY_BRANCH"
+          echo "BRANCH_ALIASES=$BRANCH_ALIASES"
+          echo "BRANCHES_TO_DEPLOY=$BRANCHES_TO_DEPLOY"
+          echo "BRANCHES_TO_PREPROCESS=$BRANCHES_TO_PREPROCESS"
+          echo '```'
+        } >> $GITHUB_STEP_SUMMARY
+
+
 
 permissions:
   contents: read
