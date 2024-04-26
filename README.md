@@ -34,7 +34,7 @@ Whenever the workflow is triggered, progress can be seen under the <svg aria-hid
 
 The workflow show's an summary. It shows error in the build brocess, errors with ill-defined repository variables, where your build book is published (`https://<username/organization_name>.github.io/<repository_name>` (case sensitive)) and how the repository variables are defined during the build. Here's an example for the summary of the template book:
 
-> *** Branches deployed ***
+> **Branches deployed**
 > 
 > | Branch 🎋 | Link 🔗 |
 > | --- | --- |
@@ -45,13 +45,13 @@ The workflow show's an summary. It shows error in the build brocess, errors with
 > - [https://teachbooks.github.io/template/](https://teachbooks.github.io/template/)
 > - [https://teachbooks.github.io/template/main](https://teachbooks.github.io/template/main)
 > 
-> *** Aliases ***
+> **Aliases**
 > 
 > | Alias ➡️ | Target 🎯 | Link 🔗 |
 > | --- | --- | --- |
 > | draft | main | [https://teachbooks.github.io/template/draft](https://teachbooks.github.io/template/draft) |
 > 
-> *** Repository configuration variables ***
+> **Repository configuration variables**
 > 
 > Variables can be set at [https://github.com/TeachBooks/template/settings/variables/actions](https://github.com/TeachBooks/template/settings/variables/actions)
 >
