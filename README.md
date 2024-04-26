@@ -70,5 +70,4 @@ The workflow show's an summary. It shows error in the build brocess, errors with
 <pre class="notranslate"><code class="notranslate">PRIMARY_BRANCH=main
 BRANCH_ALIASES=draft:main
 BRANCHES_TO_DEPLOY=main
-BRANCHES_TO_PREPROCESS=main
-</code>
+BRANCHES_TO_PREPROCESS=main</code>
