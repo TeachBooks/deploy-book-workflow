@@ -14,14 +14,61 @@ You can adapt the behaviour by setting repository variables as explained [here](
   - This defines aliases for branches
   - It should be a space-separated list of alias-rules, e.g. 'draft:main alias:really-long-branch-name`
   - It is advised to link `book` to `publish`.
-  - If no aliases are wanted, BRANCH_ALIASES may be set to ' ' (space).
+  - If no aliases are wanted, `BRANCH_ALIASES` may be set to ' ' (space).
 - `BRANCHES_TO_DEPLOY`  which is set to `*` (all branches) whenever it's not defined in the repository variables.
   - This defines the branches to deploy.
-  - It should be a space-separated list of branch names, e.g. 'main second third'.- 
+  - It should be a space-separated list of branch names, e.g. 'main second third'.
+- `BRANCHES_TO_PREPROCESS` which is to to ` ` (space, no branch) whenever it's not defined in the repository variables
+  - This defines the branches to preprocess with the `TeachBooks` package, this removed book-pages defined with `# START REMOVE FROM PUBLISH` and `# END REMOVE FROM PUBLISH`
+  - It should be a space-separated list of branch names, e.g. 'main second third'.
+  - If no preprocessing is required, `BRANCH_TO_PREPROCESS` may be set to ' ' (space).
 
 In `call-deploy-book.yml` itself you can specify the trigger for this workflow. By default, a push to any branch trigger the workflow. You can limit the branches or subdirectories.
 
 Whenever the workflow is triggered, progress can be seen under the <svg aria-hidden="true" height="16" viewBox="0 0 16 16" version="1.1" width="16" data-view-component="true" class="octicon octicon-play UnderlineNav-octicon d-none d-sm-inline">    <path d="M8 0a8 8 0 1 1 0 16A8 8 0 0 1 8 0ZM1.5 8a6.5 6.5 0 1 0 13 0 6.5 6.5 0 0 0-13 0Zm4.879-2.773 4.264 2.559a.25.25 0 0 1 0 .428l-4.264 2.559A.25.25 0 0 1 6 10.559V5.442a.25.25 0 0 1 .379-.215Z"></path></svg>`Actions` tab in GitHub. From this tab, you can also initiate it without any trigger commits.
 
-When the workflow has finished, visit your build book at `https://<username/organization_name>.github.io/<repository_name>` (case sensitive). Eg. for the [template book](https://github.com/TeachBooks/template) it is [https://teachbooks.github.io/template]().
+The workflow show's an summary. It shows error in the build brocess, errors with ill-defined repository variables, where your build book is published (`https://<username/organization_name>.github.io/<repository_name>` (case sensitive)) and how the repository variables are defined during the build. Here's an example for the summary of the template book:
 
+<table role="table">
+<thead>
+<tr>
+<th align="left">Branch 🎋</th>
+<th align="left">Link 🔗</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left">main</td>
+<td align="left"><a href="https://teachbooks.github.io/template/main" rel="nofollow">https://teachbooks.github.io/template/main</a></td>
+</tr>
+</tbody>
+</table>
+<p>Primary branch (main) is at:</p>
+<ul>
+<li><a href="https://teachbooks.github.io/template/" rel="nofollow">https://teachbooks.github.io/template/</a></li>
+<li>and <a href="https://teachbooks.github.io/template/main" rel="nofollow">https://teachbooks.github.io/template/main</a></li>
+</ul>
+<h3>Aliases</h3>
+<table role="table">
+<thead>
+<tr>
+<th align="left">Alias ➡️</th>
+<th align="left">Target 🎯</th>
+<th align="left">Link 🔗</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left">draft</td>
+<td align="left">main</td>
+<td align="left"><a href="https://teachbooks.github.io/template/draft" rel="nofollow">https://teachbooks.github.io/template/draft</a></td>
+</tr>
+</tbody>
+</table>
+<h3>Repository configuration variables</h3>
+<p>Variables can be set at <a href="https://github.com/TeachBooks/template/settings/variables/actions">https://github.com/TeachBooks/template/settings/variables/actions</a></p>
+<pre class="notranslate"><code class="notranslate">PRIMARY_BRANCH=main
+BRANCH_ALIASES=draft:main
+BRANCHES_TO_DEPLOY=main
+BRANCHES_TO_PREPROCESS=main
+</code>
