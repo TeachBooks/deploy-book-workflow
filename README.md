@@ -29,7 +29,7 @@ Whenever the workflow is triggered, progress can be seen under the <svg aria-hid
 
 The workflow show's an summary. It shows error in the build brocess, errors with ill-defined repository variables, where your build book is published (`https://<username/organization_name>.github.io/<repository_name>` (case sensitive)) and how the repository variables are defined during the build. Here's an example for the summary of the template book:
 
-<table role="table">
+> <table role="table">
 <thead>
 <tr>
 <th align="left">Branch 🎋</th>
