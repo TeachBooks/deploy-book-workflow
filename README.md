@@ -14,7 +14,7 @@ This workflow requires a `requirements.txt` file with `teachbooks` in your root 
 
 ## Customize book publishing settings
 
-You can adapt the behaviour by setting repository variables as explained [here](https://docs.github.com/en/actions/learn-github-actions/variables#creating-configuration-variables-for-a-repository). Define the following repository variables:
+You can adapt the behaviour by setting repository variables as explained [here](https://docs.github.com/en/actions/learn-github-actions/variables#creating-configuration-variables-for-a-repository) or using the [VS Code Extension GitHub Actions](https://marketplace.visualstudio.com/items?itemName=GitHub.vscode-github-actions). Define the following repository variables:
 - `PRIMARY_BRANCH` which is set to `main` whenever it's not defined in the repository variables.
   - This sets the branch which is hosted on root.
   - It is advised to make it `published` to start using draft-publish-workflow
