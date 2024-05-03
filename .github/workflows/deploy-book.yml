@@ -181,17 +181,16 @@ jobs:
           option_publish=''
         fi
         set -o pipefail
-        teachbooks build $option_publish book/ 2>&1 | tee log
+        # https://stackoverflow.com/a/692407
+        teachbooks build $option_publish book/ > >(tee stdout.log) 2> >(tee stderr.log >&2)
         set +o pipefail
 
-        # supress grep errorcode 1 on no match
-        { grep 'WARNING:' log || true; } > warning_lines.log
-        # If there are warnings, compose a summary (if not, don't)
-        if [ -s warning_lines.log ]; then
+        # If there are warnings or errors, compose a summary (if not, don't)
+        if [ -s stderr.log ]; then
           {
-            echo "### Build warnings on branch ${{ matrix.branch }}"
+            echo "### Build warnings / errors on branch \`${{ matrix.branch }}\`"
             echo '```'
-            cat warning_lines.log
+            cat stderr.log
             echo '```'
           } >> $GITHUB_STEP_SUMMARY
         fi
