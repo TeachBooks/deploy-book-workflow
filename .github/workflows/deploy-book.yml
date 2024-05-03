@@ -192,7 +192,8 @@ jobs:
         # If there are warnings or errors, compose a summary (if not, don't)
         if [ -s stderr.log ]; then
           {
-            echo "### Build warnings / errors on branch \`${{ matrix.branch }}\`"
+            echo "### Build errors & warning on branch \`${{ matrix.branch }}\`"
+            echo "${{ format('[Jump to log]({0}/{1}/actions/runs/{2}/job/{3})', github.server_url, github.repository, github.run_id, github.job) }}"
             echo '```'
             cat stderr.log
             echo '```'
