@@ -185,6 +185,10 @@ jobs:
         teachbooks build $option_publish book/ > >(tee stdout.log) 2> >(tee stderr.log >&2)
         set +o pipefail
 
+    - name: Make summary of errors, if applicable
+      # run even in case of failure
+      if: always()
+      run: |
         # If there are warnings or errors, compose a summary (if not, don't)
         if [ -s stderr.log ]; then
           {
