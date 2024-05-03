@@ -284,6 +284,7 @@ jobs:
         } >> "$GITHUB_OUTPUT"
 
   summarize:
+    if: always()
     needs:
       - get-branches
       - deploy-books
