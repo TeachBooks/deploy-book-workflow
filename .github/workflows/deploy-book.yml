@@ -242,7 +242,7 @@ jobs:
     - name: Extract summaries from the downloaded artifacts
       run: |
         mkdir _summaries/
-        mv final/_summary-* .
+        mv final/_summary-* _summaries
 
     - name: Copy primary book to root, fail if names conflict
       timeout-minutes: 1
@@ -284,14 +284,14 @@ jobs:
           echo "### Preview of build errors & warnings"
           echo "For more details please see the corresponding \`build-books\` jobs in the left pane."
         } >> summary.md
-        ls _summary-*
-        for fname in $(ls _summary-*); do
+        ls _summaries/
+        for fname in $(ls _summaries/*); do
           echo $fname
           clean_branch_name=$(echo $fname | sed 's/_summary-//g')
           {
             echo "On branch \`$clean_branch_name\`:"
             echo '```'
-            cat "$fname"
+            cat "_summaries/$fname"
             echo '```'
           } >> summary.md
         done
