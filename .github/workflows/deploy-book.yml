@@ -145,32 +145,47 @@ jobs:
         ref: ${{ matrix.branch }}
         submodules: 'true'
 
-    - name: Record if branch is preprocessed, for cache key
+    - name: Record if branch is preprocessed for cache
       run: |
         if [ "$BRANCHES_TO_PREPROCESS" == "*" ] || echo "$BRANCHES_TO_PREPROCESS" | tr ' ' '\n' | grep "^${{ matrix.branch }}$"; then
-          echo true > VARS.txt
+          echo true > EXTRA_CACHE_VARS.txt
         else
-          echo false > VARS.txt
+          echo false > EXTRA_CACHE_VARS.txt
         fi
+
+    - name: Record filenames for cache
+      run: |
+         find book/ -type f >> EXTRA_CACHE_VARS.txt
 
     - name: Cache page build
       id: cache-html
       uses: actions/cache@v4
       with:
         path: "book/_build/html"
-        key: html-build-${{ hashFiles('book/**', 'figures/**', 'requirements.txt', 'VARS.txt') }}
+        key: html-build-${{ hashFiles('book/**', 'requirements.txt', 'EXTRA_CACHE_VARS.txt') }}
 
     - if: ${{ steps.cache-html.outputs.cache-hit != 'true' }}
       name: Set up Python 3.11
       uses: actions/setup-python@v5
+      id: setup-python
       with:
         python-version: 3.11
-        cache: 'pip'
+
+    - if: ${{ steps.cache-html.outputs.cache-hit != 'true' }}
+      name: Cache virtualenv
+      uses: actions/cache@v4
+      with:
+        key: venv-${{ runner.os }}-${{ steps.setup-python.outputs.python-version }}-${{ hashFiles('requirements.txt') }}
+        path: .venv
 
     - if: ${{ steps.cache-html.outputs.cache-hit != 'true' }}
       name: Install dependencies
       run: |
-        pip install -r requirements.txt
+        python -m venv .venv
+        source .venv/bin/activate
+        python -m pip install -r requirements.txt
+        echo "$VIRTUAL_ENV/bin" >> $GITHUB_PATH
+        echo "VIRTUAL_ENV=$VIRTUAL_ENV" >> $GITHUB_ENV
 
     - if: ${{ steps.cache-html.outputs.cache-hit != 'true' }}
       name: Preprocess & build the book from branch
