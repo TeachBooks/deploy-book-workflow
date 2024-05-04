@@ -287,6 +287,9 @@ jobs:
         ls _summaries/
         for fname in $(ls _summaries/*); do
           echo $fname
+          if [ "$fname" == 'summary.md' ]; then
+            continue
+          fi
           clean_branch_name=$(echo $fname | sed 's/_summary-//g')
           {
             echo "On branch \`$clean_branch_name\`:"
