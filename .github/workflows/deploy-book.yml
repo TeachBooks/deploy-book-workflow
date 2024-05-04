@@ -284,6 +284,7 @@ jobs:
           echo "### Preview of build errors & warnings"
           echo "For more details please see the corresponding \`build-books\` jobs in the left pane."
         } >> summary.md
+        ls _summary-*
         for fname in $(ls _summary-*); do
           echo $fname
           clean_branch_name=$(echo $fname | sed 's/_summary-//g')
