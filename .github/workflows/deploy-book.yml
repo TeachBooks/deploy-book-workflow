@@ -193,7 +193,7 @@ jobs:
         touch summary.md
         if [ -s stderr.log ]; then
           {
-            echo "On branch \`${{ matrix.branch }}:\`"
+            echo "On branch ${{ matrix.branch }}:"
             echo '```'
             cat stderr.log
             echo '```'
