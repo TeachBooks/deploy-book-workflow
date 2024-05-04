@@ -294,7 +294,7 @@ jobs:
           {
             echo "On branch \`$clean_branch_name\`:"
             echo '```'
-            cat "_summaries/$fname"
+            cat "$fname"
             echo '```'
           } >> summary.md
         done
