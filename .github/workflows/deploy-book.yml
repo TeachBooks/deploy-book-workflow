@@ -145,32 +145,47 @@ jobs:
         ref: ${{ matrix.branch }}
         submodules: 'true'
 
-    - name: Record if branch is preprocessed, for cache key
+    - name: Record if branch is preprocessed for cache
       run: |
         if [ "$BRANCHES_TO_PREPROCESS" == "*" ] || echo "$BRANCHES_TO_PREPROCESS" | tr ' ' '\n' | grep "^${{ matrix.branch }}$"; then
-          echo true > VARS.txt
+          echo true > EXTRA_CACHE_VARS.txt
         else
-          echo false > VARS.txt
+          echo false > EXTRA_CACHE_VARS.txt
         fi
+
+    - name: Record filenames for cache
+      run: |
+         find book/ -type f >> EXTRA_CACHE_VARS.txt
 
     - name: Cache page build
       id: cache-html
       uses: actions/cache@v4
       with:
         path: "book/_build/html"
-        key: html-build-${{ hashFiles('book/**', 'figures/**', 'requirements.txt', 'VARS.txt') }}
+        key: html-build-${{ hashFiles('book/**', 'requirements.txt', 'EXTRA_CACHE_VARS.txt') }}
 
     - if: ${{ steps.cache-html.outputs.cache-hit != 'true' }}
       name: Set up Python 3.11
       uses: actions/setup-python@v5
+      id: setup-python
       with:
         python-version: 3.11
-        cache: 'pip'
+
+    - if: ${{ steps.cache-html.outputs.cache-hit != 'true' }}
+      name: Cache virtualenv
+      uses: actions/cache@v4
+      with:
+        key: venv-${{ runner.os }}-${{ steps.setup-python.outputs.python-version }}-${{ hashFiles('requirements.txt') }}
+        path: .venv
 
     - if: ${{ steps.cache-html.outputs.cache-hit != 'true' }}
       name: Install dependencies
       run: |
-        pip install -r requirements.txt
+        python -m venv .venv
+        source .venv/bin/activate
+        python -m pip install -r requirements.txt
+        echo "$VIRTUAL_ENV/bin" >> $GITHUB_PATH
+        echo "VIRTUAL_ENV=$VIRTUAL_ENV" >> $GITHUB_ENV
 
     - if: ${{ steps.cache-html.outputs.cache-hit != 'true' }}
       name: Preprocess & build the book from branch
@@ -180,23 +195,37 @@ jobs:
         else
           option_publish=''
         fi
-        # supress grep errorcode 1 on no match
-        (teachbooks build $option_publish book/ 2>&1) | tee log
+        set -o pipefail
+        # https://stackoverflow.com/a/692407
+        teachbooks build $option_publish book/ > >(tee stdout.log) 2> >(tee stderr.log >&2)
+        set +o pipefail
 
-        { grep 'WARNING:' log || true; } > warning_lines.log
-        # If there are warnings, compose a summary (if not, don't)
-        if [ -s warning_lines.log ]; then
+    - name: Make summary of errors, if any
+      # run even in case of failure
+      if: always()
+      run: |
+        # If there are warnings or errors, compose a summary (if not, don't)
+        touch summary.md
+        if [ -s stderr.log ]; then
           {
-            echo "### Build warnings on branch ${{ matrix.branch }}"
-            echo '```'
-            cat warning_lines.log
-            echo '```'
-          } >> $GITHUB_STEP_SUMMARY
+            echo "On branch \\\`${{ matrix.branch }}\\\`:"
+            echo '\`\`\`'
+            cat stderr.log
+            echo '\`\`\`'
+          } >> summary.md
         fi
 
     - name: Clean branch name of disallowed characters
+      if: always()
       run: |
         echo "MATRIX_BRANCH_NAME_CLEAN=$(echo ${{ matrix.branch }} | tr '/":<>|*?\/\\' '-')" >> $GITHUB_ENV
+
+    - name: Upload summary as an artifact
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: _summary-${{ env.MATRIX_BRANCH_NAME_CLEAN }}
+        path: "summary.md"
 
     - name: Upload the built book HTML as an artifact
       uses: actions/upload-artifact@v4
@@ -224,6 +253,11 @@ jobs:
       uses: actions/download-artifact@v4
       with:
         path: "final/"
+
+    - name: Extract summaries from the downloaded artifacts
+      run: |
+        mkdir _summaries/
+        mv final/_summary-* _summaries
 
     - name: Copy primary book to root, fail if names conflict
       timeout-minutes: 1
@@ -259,6 +293,21 @@ jobs:
           fi
         done
 
+    - name: Include summary of errors
+      run: |
+        {
+          echo "### Preview of build errors & warnings"
+          echo "For more details please see the corresponding \\\`build-books\\\` jobs in the left pane."
+        } >> summary.md
+        ls _summaries/
+        for fname in _summaries/*; do
+          echo $fname
+          if [ "$fname" == 'summary.md' ]; then
+            continue
+          fi
+          cat "$fname/summary.md" >> summary.md
+        done
+
     - name: Upload final Pages artifact
       uses: actions/upload-pages-artifact@v3
       with:
@@ -278,6 +327,7 @@ jobs:
         } >> "$GITHUB_OUTPUT"
 
   summarize:
+    if: always()
     needs:
       - get-branches
       - deploy-books
