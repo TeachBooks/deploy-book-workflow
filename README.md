@@ -34,8 +34,7 @@ Whenever the workflow is triggered, progress can be seen under the <svg aria-hid
 
 The workflow show's an summary. It shows errors with ill-defined repository variables, where your build book is published (`https://<username/organization_name>.github.io/<repository_name>` (case sensitive)), errors in the build process and how the repository variables are defined during the build. Here's an example for a summary for the template book:
 
-> **Branches deployed**
-> 
+> ### Branches deployed
 > | Branch 🎋 | Link 🔗 |
 > | --- | --- |
 > | main | [https://teachbooks.github.io/template/main](https://teachbooks.github.io/template/main) |
@@ -46,21 +45,20 @@ The workflow show's an summary. It shows errors with ill-defined repository vari
 > - [https://teachbooks.github.io/template/](https://teachbooks.github.io/template/)
 > - [https://teachbooks.github.io/template/main](https://teachbooks.github.io/template/main)
 > 
-> **Aliases**
-> 
+> ### Aliases
 > | Alias ➡️ | Target 🎯 | Link 🔗 |
 > | --- | --- | --- |
 > | draft | main | [https://teachbooks.github.io/template/draft](https://teachbooks.github.io/template/draft) |
 > 
-> **Preview of build errors & warnings**
+> ### Preview of build errors & warnings
 > For more details please see the corresponding `build-books` jobs in the left pane.
-> On branch `versions2`:
+>
+> On branch `version2`:
 > ```
 > �[91m/home/runner/work/template/template/book/some_content/overview.md:5: WARNING: Non-consecutive header level increase; H1 to H3 [myst.header]�[39;49;00m
 > ``` 
 >
-> **Repository configuration variables**
-> 
+> ### Repository configuration variables
 > Variables can be set at [https://github.com/TeachBooks/template/settings/variables/actions](https://github.com/TeachBooks/template/settings/variables/actions)
 >
 > ```
