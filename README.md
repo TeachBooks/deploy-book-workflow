@@ -32,13 +32,14 @@ In `call-deploy-book.yml` itself you can specify the trigger for this workflow. 
 
 Whenever the workflow is triggered, progress can be seen under the <svg aria-hidden="true" height="16" viewBox="0 0 16 16" version="1.1" width="16" data-view-component="true" class="octicon octicon-play UnderlineNav-octicon d-none d-sm-inline">    <path d="M8 0a8 8 0 1 1 0 16A8 8 0 0 1 8 0ZM1.5 8a6.5 6.5 0 1 0 13 0 6.5 6.5 0 0 0-13 0Zm4.879-2.773 4.264 2.559a.25.25 0 0 1 0 .428l-4.264 2.559A.25.25 0 0 1 6 10.559V5.442a.25.25 0 0 1 .379-.215Z"></path></svg>`Actions` tab in GitHub. From this tab, you can also initiate it without any trigger commits.
 
-The workflow show's an summary. It shows error in the build brocess, errors with ill-defined repository variables, where your build book is published (`https://<username/organization_name>.github.io/<repository_name>` (case sensitive)) and how the repository variables are defined during the build. Here's an example for the summary of the template book:
+The workflow show's an summary. It shows errors with ill-defined repository variables, where your build book is published (`https://<username/organization_name>.github.io/<repository_name>` (case sensitive)), errors in the build process and how the repository variables are defined during the build. Here's an example for a summary for the template book:
 
 > **Branches deployed**
 > 
 > | Branch 🎋 | Link 🔗 |
 > | --- | --- |
 > | main | [https://teachbooks.github.io/template/main](https://teachbooks.github.io/template/main) |
+> | version2 | [https://teachbooks.github.io/template/version2](https://teachbooks.github.io/template/version2) |
 > 
 > Primary branch (main) is at:
 > 
@@ -51,6 +52,13 @@ The workflow show's an summary. It shows error in the build brocess, errors with
 > | --- | --- | --- |
 > | draft | main | [https://teachbooks.github.io/template/draft](https://teachbooks.github.io/template/draft) |
 > 
+> **Preview of build errors & warnings**
+> For more details please see the corresponding `build-books` jobs in the left pane.
+> On branch `versions2`:
+> ```
+> �[91m/home/runner/work/template/template/book/some_content/overview.md:5: WARNING: Non-consecutive header level increase; H1 to H3 [myst.header]�[39;49;00m
+> ``` 
+>
 > **Repository configuration variables**
 > 
 > Variables can be set at [https://github.com/TeachBooks/template/settings/variables/actions](https://github.com/TeachBooks/template/settings/variables/actions)
@@ -58,6 +66,6 @@ The workflow show's an summary. It shows error in the build brocess, errors with
 > ```
 > PRIMARY_BRANCH=main
 > BRANCH_ALIASES=draft:main
-> BRANCHES_TO_DEPLOY=main
+> BRANCHES_TO_DEPLOY=*
 > BRANCHES_TO_PREPROCESS=main
 > ```
