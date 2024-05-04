@@ -193,7 +193,7 @@ jobs:
         touch summary.md
         if [ -s stderr.log ]; then
           {
-            echo "### Build errors & warning on branch \`${{ matrix.branch }}\`"
+            echo "On branch \`${{ matrix.branch }}:\`"
             echo '```'
             cat stderr.log
             echo '```'
@@ -291,12 +291,7 @@ jobs:
             continue
           fi
           clean_branch_name=$(echo $fname | sed 's/_summary-//g')
-          {
-            echo "On branch \`$clean_branch_name\`:"
-            echo '```'
-            cat "$fname/summary.md"
-            echo '```'
-          } >> summary.md
+          cat "$fname/summary.md" >> summary.md
         done
 
     - name: Upload final Pages artifact
