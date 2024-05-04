@@ -289,7 +289,7 @@ jobs:
             continue
           fi
           clean_branch_name=$(echo $fname | sed 's/_summary-//g')
-          cat "$fname/summary.md" >> summary.md
+          cat "$fname/summary.md" | tee -a summary.md
         done
 
     - name: Upload final Pages artifact
@@ -304,6 +304,7 @@ jobs:
     - name: Output summary
       id: output-summary
       run: |
+        cat summary.md
         {
           echo 'summary<<EOF'
           cat summary.md
