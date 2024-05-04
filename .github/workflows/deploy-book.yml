@@ -185,6 +185,14 @@ jobs:
         teachbooks build $option_publish book/ > >(tee stdout.log) 2> >(tee stderr.log >&2)
         set +o pipefail
 
+    - name: Get current job log URL
+      uses: Tiryoh/gha-jobid-action@v1
+      id: get-job-log-url
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        job_name: "build-books (${{ matrix.branch }})" # input job.<job-id>.name and matrix here.
+        per_page: 50
+
     - name: Make summary of errors, if applicable
       # run even in case of failure
       if: always()
@@ -193,7 +201,7 @@ jobs:
         if [ -s stderr.log ]; then
           {
             echo "### Build errors & warning on branch \`${{ matrix.branch }}\`"
-            echo "${{ format('[Jump to log]({0}/{1}/actions/runs/{2}/job/{3})', github.server_url, github.repository, github.run_id, github.job) }}"
+            echo ${{ steps.get-job-log-url.outputs.html_url }}
             echo '```'
             cat stderr.log
             echo '```'
