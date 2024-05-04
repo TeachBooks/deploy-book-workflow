@@ -282,9 +282,10 @@ jobs:
       run: |
         {
           echo "### Preview of build errors & warnings"
-          echo "For more details please see the corresponding `build-books` jobs in the left pane."
+          echo "For more details please see the corresponding \`build-books\` jobs in the left pane."
         } >> summary.md
         for fname in $(ls _summary-*); do
+          echo $fname
           clean_branch_name=$(echo $fname | sed 's/_summary-//g')
           {
             echo "On branch \`$clean_branch_name\`:"
