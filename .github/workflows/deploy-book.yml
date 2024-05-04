@@ -285,7 +285,7 @@ jobs:
           echo "For more details please see the corresponding \`build-books\` jobs in the left pane."
         } >> summary.md
         ls _summaries/
-        for fname in $(ls _summaries/*); do
+        for fname in _summaries/*; do
           echo $fname
           if [ "$fname" == 'summary.md' ]; then
             continue
