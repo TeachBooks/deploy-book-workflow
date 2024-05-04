@@ -194,9 +194,9 @@ jobs:
         if [ -s stderr.log ]; then
           {
             echo "On branch ${{ matrix.branch }}:"
-            echo '```'
+            echo '\`\`\`'
             cat stderr.log
-            echo '```'
+            echo '\`\`\`'
           } >> summary.md
         fi
 
@@ -282,7 +282,7 @@ jobs:
       run: |
         {
           echo "### Preview of build errors & warnings"
-          echo "For more details please see the corresponding \`build-books\` jobs in the left pane."
+          echo "For more details please see the corresponding \\\`build-books\\\` jobs in the left pane."
         } >> summary.md
         ls _summaries/
         for fname in _summaries/*; do
