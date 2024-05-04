@@ -193,7 +193,7 @@ jobs:
         touch summary.md
         if [ -s stderr.log ]; then
           {
-            echo "On branch ${{ matrix.branch }}:"
+            echo "On branch \\\`${{ matrix.branch }}:\\\`"
             echo '\`\`\`'
             cat stderr.log
             echo '\`\`\`'
@@ -290,9 +290,7 @@ jobs:
           if [ "$fname" == 'summary.md' ]; then
             continue
           fi
-          clean_branch_name=$(echo $fname | sed 's/_summary-//g')
           cat "$fname/summary.md" >> summary.md
-          cat summary.md
         done
 
     - name: Upload final Pages artifact
@@ -307,7 +305,6 @@ jobs:
     - name: Output summary
       id: output-summary
       run: |
-        cat summary.md
         {
           echo 'summary<<EOF'
           cat summary.md
