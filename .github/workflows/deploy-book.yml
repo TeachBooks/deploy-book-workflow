@@ -73,7 +73,7 @@ jobs:
           # Primary branch
           echo
           echo '#### Primary book at root'
-          echo "The book published at the website root <$url> is from the primary branch \\`$PRIMARY_BRANCH\\`."
+          echo "The book published at the website root <$url> is from the primary branch \\\`$PRIMARY_BRANCH\\\`."
         } >> summary.md
 
         # Convert to a JSON list
