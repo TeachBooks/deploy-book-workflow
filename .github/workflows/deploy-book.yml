@@ -236,7 +236,7 @@ jobs:
         path: "summary.md"
 
     - name: Upload the built book HTML as an artifact
-      if: success() || jobs.attempt-restore.result == 'success'
+      if: ${{ success() || jobs.attempt-restore.result == 'success' }}
       uses: actions/upload-artifact@v4
       with:
         name: ${{ env.MATRIX_BRANCH_NAME_CLEAN }}
