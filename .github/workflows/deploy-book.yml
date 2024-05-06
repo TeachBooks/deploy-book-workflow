@@ -201,6 +201,7 @@ jobs:
 
     - name: If failed, restore a book for this branch from cache
       if: failure()
+      id: attempt-restore
       uses: actions/cache/restore@v4
       with:
         key: none
@@ -234,8 +235,8 @@ jobs:
         name: _summary-${{ env.MATRIX_BRANCH_NAME_CLEAN }}
         path: "summary.md"
 
-
     - name: Upload the built book HTML as an artifact
+      if: success() || jobs.attempt-restore.result == 'success'
       uses: actions/upload-artifact@v4
       with:
         name: ${{ env.MATRIX_BRANCH_NAME_CLEAN }}
