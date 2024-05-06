@@ -45,10 +45,8 @@ The workflow show's an summary. It shows errors with ill-defined repository vari
 > | main | [https://teachbooks.github.io/template/main](https://teachbooks.github.io/template/main) |
 > | version2 | [https://teachbooks.github.io/template/version2](https://teachbooks.github.io/template/version2) |
 > 
-> Primary branch (main) is at:
-> 
-> - [https://teachbooks.github.io/template/](https://teachbooks.github.io/template/)
-> - [https://teachbooks.github.io/template/main](https://teachbooks.github.io/template/main)
+> #### Primary book at root
+> The book published at the website root [https://teachbooks.github.io/template](https://teachbooks.github.io/template) is from the primary branch `main`.
 > 
 > ### Aliases
 > | Alias ➡️ | Target 🎯 | Link 🔗 |
