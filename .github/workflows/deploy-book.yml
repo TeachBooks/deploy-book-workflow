@@ -346,7 +346,11 @@ jobs:
         echo "${{ needs.deploy-books.outputs.summary }}" >> $GITHUB_STEP_SUMMARY
 
         isdefault() {
-          echo $([ $1 == '' && '(default value used)' || '' ])
+          if [ "$1" == '' ]; then
+            echo '(default value used)'
+          else
+            echo ''
+          fi
         }
 
         # Display config var values
