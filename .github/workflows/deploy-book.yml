@@ -278,6 +278,8 @@ jobs:
             # Summary table headers
             echo "| Alias :arrow_right: | Target :dart: | Link :link:"
             echo "| :--- | :--- | :--- |"
+          else
+            echo "No aliases defined."
           fi
         } >> summary.md
 
