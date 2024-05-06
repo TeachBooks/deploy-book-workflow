@@ -72,9 +72,8 @@ jobs:
         {
           # Primary branch
           echo
-          echo "Primary branch ($PRIMARY_BRANCH) is at:"
-          echo "- <$url>"
-          echo "- and <$url$PRIMARY_BRANCH>"
+          echo '#### Primary book at root'
+          echo "The book published at the website root <$url> is from the primary branch \\\`$PRIMARY_BRANCH\\\`."
         } >> summary.md
 
         # Convert to a JSON list
@@ -195,23 +194,37 @@ jobs:
         else
           option_publish=''
         fi
-        # supress grep errorcode 1 on no match
-        (teachbooks build $option_publish book/ 2>&1) | tee log
+        set -o pipefail
+        # https://stackoverflow.com/a/692407
+        teachbooks build $option_publish book/ > >(tee stdout.log) 2> >(tee stderr.log >&2)
+        set +o pipefail
 
-        { grep 'WARNING:' log || true; } > warning_lines.log
-        # If there are warnings, compose a summary (if not, don't)
-        if [ -s warning_lines.log ]; then
+    - name: Make summary of errors, if any
+      # run even in case of failure
+      if: always()
+      run: |
+        # If there are warnings or errors, compose a summary (if not, don't)
+        touch summary.md
+        if [ -s stderr.log ]; then
           {
-            echo "### Build warnings on branch ${{ matrix.branch }}"
-            echo '```'
-            cat warning_lines.log
-            echo '```'
-          } >> $GITHUB_STEP_SUMMARY
+            echo "On branch \\\`${{ matrix.branch }}\\\`:"
+            echo '\`\`\`'
+            cat stderr.log
+            echo '\`\`\`'
+          } >> summary.md
         fi
 
     - name: Clean branch name of disallowed characters
+      if: always()
       run: |
         echo "MATRIX_BRANCH_NAME_CLEAN=$(echo ${{ matrix.branch }} | tr '/":<>|*?\/\\' '-')" >> $GITHUB_ENV
+
+    - name: Upload summary as an artifact
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: _summary-${{ env.MATRIX_BRANCH_NAME_CLEAN }}
+        path: "summary.md"
 
     - name: Upload the built book HTML as an artifact
       uses: actions/upload-artifact@v4
@@ -240,6 +253,11 @@ jobs:
       with:
         path: "final/"
 
+    - name: Extract summaries from the downloaded artifacts
+      run: |
+        mkdir _summaries/
+        mv final/_summary-* _summaries
+
     - name: Copy primary book to root, fail if names conflict
       timeout-minutes: 1
       run: |
@@ -255,9 +273,13 @@ jobs:
       run: |
         {
           echo "### Aliases"
-          # Summary table headers
-          echo "| Alias :arrow_right: | Target :dart: | Link :link:"
-          echo "| :--- | :--- | :--- |"
+          if echo "$BRANCH_ALIASES" | grep -E '\S'; then
+            # Summary table headers
+            echo "| Alias :arrow_right: | Target :dart: | Link :link:"
+            echo "| :--- | :--- | :--- |"
+          else
+            echo "No aliases defined."
+          fi
         } >> summary.md
 
         url=$(gh api "repos/$GITHUB_REPOSITORY/pages" --jq '.html_url')
@@ -273,6 +295,26 @@ jobs:
             ln -s "$clean_value" final/"$key"
           fi
         done
+
+    - name: Include summary of errors
+      run: |
+        {
+          echo "### Preview of build errors & warnings"
+          echo "For more details please see the corresponding \\\`build-books\\\` jobs in the left pane."
+        } >> summary.md
+        ls _summaries/
+        for fname in _summaries/*; do
+          echo $fname
+          if [ "$fname" == 'summary.md' ]; then
+            continue
+          fi
+          cat "$fname/summary.md" >> tmp.md
+        done
+        if [ -s tmp.md ]; then
+          cat tmp.md >> summary.md
+        else
+          echo "No build errors or warnings encountered." >> summary.md
+        fi
 
     - name: Upload final Pages artifact
       uses: actions/upload-pages-artifact@v3
@@ -293,6 +335,7 @@ jobs:
         } >> "$GITHUB_OUTPUT"
 
   summarize:
+    if: always()
     needs:
       - get-branches
       - deploy-books
@@ -303,15 +346,23 @@ jobs:
         echo "${{ needs.get-branches.outputs.summary }}" >> $GITHUB_STEP_SUMMARY
         echo "${{ needs.deploy-books.outputs.summary }}" >> $GITHUB_STEP_SUMMARY
 
+        isdefault() {
+          if [ "$1" == '' ]; then
+            echo '(default value used)'
+          else
+            echo ''
+          fi
+        }
+
         # Display config var values
         {
           echo "### Repository configuration variables"
           echo "Variables can be set at ${{ format('{0}/{1}/settings/variables/actions', github.server_url, github.repository) }}"
           echo '```'
-          echo "PRIMARY_BRANCH=$PRIMARY_BRANCH"
-          echo "BRANCH_ALIASES=$BRANCH_ALIASES"
-          echo "BRANCHES_TO_DEPLOY=$BRANCHES_TO_DEPLOY"
-          echo "BRANCHES_TO_PREPROCESS=$BRANCHES_TO_PREPROCESS"
+          echo "PRIMARY_BRANCH=$PRIMARY_BRANCH $(isdefault ${{ vars.PRIMARY_BRANCH }})"
+          echo "BRANCH_ALIASES=$BRANCH_ALIASES $(isdefault ${{ vars.BRANCH_ALIASES }})"
+          echo "BRANCHES_TO_DEPLOY=$BRANCHES_TO_DEPLOY $(isdefault ${{ vars.BRANCHES_TO_DEPLOY }})"
+          echo "BRANCHES_TO_PREPROCESS=$BRANCHES_TO_PREPROCESS $(isdefault ${{ vars.BRANCHES_TO_PREPROCESS }})"
           echo '```'
         } >> $GITHUB_STEP_SUMMARY
 
