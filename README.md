@@ -1,5 +1,10 @@
 # GitHub workflow to publish online to GitHub Pages
 
+```{admonition} User types
+:class: tip
+This page is useful for user type 3, 4 and 5.
+```
+
 We developed a workflow which builds the Jupyter books in your repository for all branches, and publishes them online via GitHub Pages. The GitHub template book uses this functionality for example: The workflow `call-deploy-book.yml` calls the `deploy-book.yml` workflow, which builds the Jupyter books at the calling repository for all branches, and deploys them via GitHub Pages.
 
 ## How to import this workflow
