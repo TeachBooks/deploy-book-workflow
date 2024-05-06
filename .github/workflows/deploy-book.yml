@@ -72,9 +72,8 @@ jobs:
         {
           # Primary branch
           echo
-          echo "Primary branch ($PRIMARY_BRANCH) is at:"
-          echo "- <$url>"
-          echo "- and <$url$PRIMARY_BRANCH>"
+          echo '#### Primary book at root'
+          echo "The book published at the website root <$url> is from the primary branch \\`$PRIMARY_BRANCH\\`."
         } >> summary.md
 
         # Convert to a JSON list
