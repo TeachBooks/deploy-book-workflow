@@ -311,13 +311,11 @@ jobs:
           fi
           cat "$fname/summary.md" >> tmp.md
         done
-        echo 'tmp.md:'
-        cat tmp.md
-        wc tmp.md
-        if ! [ -s tmp.md ]; then
-          echo "No build errors or warnings encountered."
+        if [ -s tmp.md ]; then
+          cat tmp.md >> summary.md
+        else
+          echo "No build errors or warnings encountered." >> summary.md
         fi
-        cat tmp.md >> summary.md
 
     - name: Upload final Pages artifact
       uses: actions/upload-pages-artifact@v3
