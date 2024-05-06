@@ -67,8 +67,8 @@ The workflow show's an summary. It shows errors with ill-defined repository vari
 > Variables can be set at [https://github.com/TeachBooks/template/settings/variables/actions](https://github.com/TeachBooks/template/settings/variables/actions)
 >
 > ```
-> PRIMARY_BRANCH=main
+> PRIMARY_BRANCH=main (default value used)
 > BRANCH_ALIASES=draft:main
-> BRANCHES_TO_DEPLOY=*
+> BRANCHES_TO_DEPLOY=* (default value used)
 > BRANCHES_TO_PREPROCESS=main
 > ```
