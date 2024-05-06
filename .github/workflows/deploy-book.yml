@@ -203,6 +203,7 @@ jobs:
       if: failure()
       uses: actions/cache/restore@v4
       with:
+        key: none
         restore-keys: html-build-${{ matrix.branch }}
 
     - name: Make summary of errors, if any
