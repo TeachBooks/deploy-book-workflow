@@ -1,5 +1,10 @@
 # GitHub workflow to publish online to GitHub Pages
 
+```{admonition} User types
+:class: tip
+This page is useful for user type 3, 4 and 5.
+```
+
 We developed a workflow which builds the Jupyter books in your repository for all branches, and publishes them online via GitHub Pages. The GitHub template book uses this functionality for example: The workflow `call-deploy-book.yml` calls the `deploy-book.yml` workflow, which builds the Jupyter books at the calling repository for all branches, and deploys them via GitHub Pages.
 
 ## How to import this workflow
@@ -40,10 +45,8 @@ The workflow show's an summary. It shows errors with ill-defined repository vari
 > | main | [https://teachbooks.github.io/template/main](https://teachbooks.github.io/template/main) |
 > | version2 | [https://teachbooks.github.io/template/version2](https://teachbooks.github.io/template/version2) |
 > 
-> Primary branch (main) is at:
-> 
-> - [https://teachbooks.github.io/template/](https://teachbooks.github.io/template/)
-> - [https://teachbooks.github.io/template/main](https://teachbooks.github.io/template/main)
+> #### Primary book at root
+> The book published at the website root [https://teachbooks.github.io/template](https://teachbooks.github.io/template) is from the primary branch `main`.
 > 
 > ### Aliases
 > | Alias ➡️ | Target 🎯 | Link 🔗 |
@@ -62,8 +65,8 @@ The workflow show's an summary. It shows errors with ill-defined repository vari
 > Variables can be set at [https://github.com/TeachBooks/template/settings/variables/actions](https://github.com/TeachBooks/template/settings/variables/actions)
 >
 > ```
-> PRIMARY_BRANCH=main
+> PRIMARY_BRANCH=main (default value used)
 > BRANCH_ALIASES=draft:main
-> BRANCHES_TO_DEPLOY=*
+> BRANCHES_TO_DEPLOY=* (default value used)
 > BRANCHES_TO_PREPROCESS=main
 > ```
