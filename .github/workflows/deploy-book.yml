@@ -310,7 +310,7 @@ jobs:
           fi
           cat "$fname/summary.md" >> summary.md
         done
-        hash_0=$(sha1sum summary.md)
+        hash_1=$(sha1sum summary.md)
         if [ "$hash_0" == "$hash_1" ]; then
           echo "No build errors or warnings encountered."
         fi
@@ -346,7 +346,6 @@ jobs:
         echo "${{ needs.deploy-books.outputs.summary }}" >> $GITHUB_STEP_SUMMARY
 
         isdefault() {
-          echo "arg isdefault: $1"
           if [ "$1" == '' ]; then
             echo '(default value used)'
           else
