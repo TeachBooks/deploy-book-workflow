@@ -204,6 +204,7 @@ jobs:
       uses: actions/cache/restore@v4
       with:
         key: none
+        path: "book/_build/html"
         restore-keys: html-build-${{ matrix.branch }}
 
     - name: Make summary of errors, if any
