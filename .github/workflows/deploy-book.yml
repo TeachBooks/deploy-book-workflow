@@ -201,7 +201,7 @@ jobs:
 
     - name: If failed, restore a book for this branch from cache
       if: failure()
-      uses: actions/restore@v4
+      uses: actions/cache/restore@v4
       with:
         restore-keys: html-build-${{ matrix.branch }}
 
