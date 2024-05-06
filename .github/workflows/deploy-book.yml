@@ -274,9 +274,11 @@ jobs:
       run: |
         {
           echo "### Aliases"
-          # Summary table headers
-          echo "| Alias :arrow_right: | Target :dart: | Link :link:"
-          echo "| :--- | :--- | :--- |"
+          if echo "$BRANCH_ALIASES" | grep -E '\S'; then
+            # Summary table headers
+            echo "| Alias :arrow_right: | Target :dart: | Link :link:"
+            echo "| :--- | :--- | :--- |"
+          fi
         } >> summary.md
 
         url=$(gh api "repos/$GITHUB_REPOSITORY/pages" --jq '.html_url')
@@ -299,6 +301,7 @@ jobs:
           echo "### Preview of build errors & warnings"
           echo "For more details please see the corresponding \\\`build-books\\\` jobs in the left pane."
         } >> summary.md
+        hash_0=$(sha1sum summary.md)
         ls _summaries/
         for fname in _summaries/*; do
           echo $fname
@@ -307,6 +310,10 @@ jobs:
           fi
           cat "$fname/summary.md" >> summary.md
         done
+        hash_0=$(sha1sum summary.md)
+        if [ "$hash_0" == "$hash_1" ]; then
+          echo "No build errors or warnings encountered."
+        fi
 
     - name: Upload final Pages artifact
       uses: actions/upload-pages-artifact@v3
@@ -338,15 +345,19 @@ jobs:
         echo "${{ needs.get-branches.outputs.summary }}" >> $GITHUB_STEP_SUMMARY
         echo "${{ needs.deploy-books.outputs.summary }}" >> $GITHUB_STEP_SUMMARY
 
+        isdefault() {
+          echo $([ $1 == '' && '(default value used)' || '' ])
+        }
+
         # Display config var values
         {
           echo "### Repository configuration variables"
           echo "Variables can be set at ${{ format('{0}/{1}/settings/variables/actions', github.server_url, github.repository) }}"
           echo '```'
-          echo "PRIMARY_BRANCH=$PRIMARY_BRANCH"
-          echo "BRANCH_ALIASES=$BRANCH_ALIASES"
-          echo "BRANCHES_TO_DEPLOY=$BRANCHES_TO_DEPLOY"
-          echo "BRANCHES_TO_PREPROCESS=$BRANCHES_TO_PREPROCESS"
+          echo "PRIMARY_BRANCH=$PRIMARY_BRANCH $(isdefault ${{ vars.PRIMARY_BRANCH }})"
+          echo "BRANCH_ALIASES=$BRANCH_ALIASES $(isdefault ${{ vars.BRANCH_ALIASES }})"
+          echo "BRANCHES_TO_DEPLOY=$BRANCHES_TO_DEPLOY $(isdefault ${{ vars.BRANCHES_TO_DEPLOY }})"
+          echo "BRANCHES_TO_PREPROCESS=$BRANCHES_TO_PREPROCESS $(isdefault ${{ vars.BRANCHES_TO_PREPROCESS }})"
           echo '```'
         } >> $GITHUB_STEP_SUMMARY
 
