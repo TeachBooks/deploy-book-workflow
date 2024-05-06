@@ -303,19 +303,18 @@ jobs:
           echo "### Preview of build errors & warnings"
           echo "For more details please see the corresponding \\\`build-books\\\` jobs in the left pane."
         } >> summary.md
-        hash_0=$(sha1sum summary.md)
         ls _summaries/
         for fname in _summaries/*; do
           echo $fname
           if [ "$fname" == 'summary.md' ]; then
             continue
           fi
-          cat "$fname/summary.md" >> summary.md
+          cat "$fname/summary.md" >> tmp.md
         done
-        hash_1=$(sha1sum summary.md)
-        if [ "$hash_0" == "$hash_1" ]; then
+        if ! [ -s tmp.md ]; then
           echo "No build errors or warnings encountered."
         fi
+        cat tmp.md >> summary.md
 
     - name: Upload final Pages artifact
       uses: actions/upload-pages-artifact@v3
