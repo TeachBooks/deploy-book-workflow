@@ -175,7 +175,7 @@ jobs:
       run: |
         echo ${{ steps.attempt-restore.outputs.cache-hit }}
         echo ${{ steps.attempt-restore.outputs.cache-primary-key }}
-        echo ${{ steps.attempt-restore.outputs.matched-key }}
+        echo ${{ steps.attempt-restore.outputs.cache-matched-key }}
 
 
     - name: If cache hit, indicate book is re-published
