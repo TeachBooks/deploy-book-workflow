@@ -30,7 +30,6 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       branches: ${{ steps.set-branches.outputs.branches }}
-      summary: ${{ steps.output-summary.outputs.summary }}
     permissions:
       contents: read
     steps:
@@ -49,41 +48,15 @@ jobs:
           branches=$(echo "$BRANCHES_TO_DEPLOY" | tr ' ' '\n' | grep -E '\S')
         fi
 
-        {
-          # Display raw/clean branch name versions in Actions Summary
-          echo "### Branches deployed"
-          ## Table headers
-          echo "| Branch :tanabata_tree: | Link :link: |"
-          echo "| :--- | :--- |"
-        } >> summary.md
-
-        ## Fetch the GH Pages URL
-        # https://stackoverflow.com/a/76354104
-        url=$(gh api "repos/$GITHUB_REPOSITORY/pages" --jq '.html_url')
-
-        # Clean branch names
-        echo "$branches" > raw.txt
-        echo "$branches" | tr '/":<>|*?\/\\' '-' > clean.txt
-        paste -d ' ' raw.txt clean.txt |
-        while IFS=' ' read -r raw clean; do
-          echo "| $raw | <$url$clean> |" >> summary.md
-        done
-
-        {
-          # Primary branch
-          echo
-          echo '#### Primary book at root'
-          echo "The book published at the website root <$url> is from the primary branch \\\`$PRIMARY_BRANCH\\\`."
-        } >> summary.md
-
         # Convert to a JSON list
         branches=$(echo "$branches" | jq -Rn '[inputs]')
         echo "branches=$(echo $branches)" >> "$GITHUB_OUTPUT"
 
     - name: Validate aliases
       run: |
+        echo "$branches" > branches.txt
+
         # Prepare data
-        mv raw.txt branches.txt
         echo "$BRANCH_ALIASES" | tr ' ' '\n' > rules.txt
         cut -d: -f1 rules.txt > aliases.txt
         cut -d: -f2 rules.txt > targets.txt
@@ -113,16 +86,6 @@ jobs:
           echo "::error ::Duplicate aliases in \$BRANCH_ALIASES: \"$BRANCH_ALIASES\""
           exit 1
         fi
-
-    # https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#example-of-a-multiline-string
-    - name: Output summary
-      id: output-summary
-      run: |
-        {
-          echo 'summary<<EOF'
-          cat summary.md
-          echo EOF
-        } >> "$GITHUB_OUTPUT"
 
 
   build-books:
@@ -208,6 +171,20 @@ jobs:
         path: "book/_build/html"
         restore-keys: html-build-${{ matrix.branch }}
 
+    - name; If cache hit, indicate book is re-published
+      if: ${{ failure() && steps.attempt-restore.outputs.cache-hit == true }}
+      run: |
+        echo "Build failed (1)" >> buildstatus.txt
+
+    - name: If cache miss, indicate no book is published
+      if: ${{ failure() && steps.attempt-restore.outputs.cache-hit == false }}
+      run: |
+        echo "Build failed (2)" >> buildstatus.txt
+
+    - if: success()
+      run: |
+        echo "Published" >> buildstatus.txt
+
     - name: Make summary of errors, if any
       # run even in case of failure
       if: always()
@@ -234,6 +211,13 @@ jobs:
       with:
         name: _summary-${{ env.MATRIX_BRANCH_NAME_CLEAN }}
         path: "summary.md"
+
+    - name: Upload build status as an artifact
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: _buildstatus-${{ env.MATRIX_BRANCH_NAME_CLEAN }}
+        path: "buildstatus.txt"
 
     - name: Upload the built book HTML as an artifact
       if: always()
@@ -263,10 +247,12 @@ jobs:
       with:
         path: "final/"
 
-    - name: Extract summaries from the downloaded artifacts
+    - name: Extract extras from the downloaded artifacts
       run: |
         mkdir _summaries/
+        mkdir _buildstatus/
         mv final/_summary-* _summaries
+        mv final/_buildstatus-* _/buildstatus
 
     - name: Copy primary book to root, fail if names conflict
       timeout-minutes: 1
@@ -277,6 +263,42 @@ jobs:
           cp -irv final/"$PRIMARY_BRANCH"/* final/
         fi
         ls -a final/
+
+    - name: Include overview summary
+      run: |
+        if [ "$BRANCHES_TO_DEPLOY" == '*' ]; then
+          branches=$(git branch -r | sed 's,\s*origin/,,g')
+        else
+          branches=$(echo "$BRANCHES_TO_DEPLOY" | tr ' ' '\n' | grep -E '\S')
+        fi
+
+        {
+          # Display raw/clean branch name versions in Actions Summary
+          echo "### Branches deployed"
+          ## Table headers
+          echo "| Branch :tanabata_tree: | Link :link: |"
+          echo "| :--- | :--- |"
+        } >> summary.md
+
+        ## Fetch the GH Pages URL
+        # https://stackoverflow.com/a/76354104
+        url=$(gh api "repos/$GITHUB_REPOSITORY/pages" --jq '.html_url')
+
+        # Clean branch names
+        echo "$branches" > raw.txt
+        echo "$branches" | tr '/":<>|*?\/\\' '-' > clean.txt
+        cat clean.txt | xargs -I{} cat _buildstatus-{}.txt > status.txt
+        paste -d ' ' raw.txt clean.txt status.txt |
+        while IFS=' ' read -r raw clean status; do
+          echo "| $raw | <$url$clean> | " >> summary.md
+        done
+
+        {
+          # Primary branch
+          echo
+          echo '#### Primary book at root'
+          echo "The book published at the website root <$url> is from the primary branch \\\`$PRIMARY_BRANCH\\\`."
+        } >> summary.md
 
     - name: Symlink branch aliases
       id: symlink-aliases
@@ -335,6 +357,7 @@ jobs:
       id: deployment
       uses: actions/deploy-pages@v4
 
+    # source: https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#example-of-a-multiline-string
     - name: Output summary
       id: output-summary
       run: |
