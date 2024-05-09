@@ -183,16 +183,16 @@ jobs:
       run: |
         if [ -z "${{ steps.attempt-restore.outputs.cache-matched-key }}" ]; then
           # Cache miss
-          echo "Build failed (2)" | tee buildstatus.txt
+          echo ":o: \\\`Build failed [2]\\\`" | tee buildstatus.txt
         else
           # (Partial) cache hit
-          echo "Build failed (1)" | tee buildstatus.txt
+          echo ":red_circle: \\\`Build failed [1]\\\`" | tee buildstatus.txt
         fi
 
     - name: Record build success
       if: success()
       run: |
-        echo "Published" >> buildstatus.txt
+        echo ":white_check_mark: \\\`Published\\\`" >> buildstatus.txt
 
     - name: Make summary of errors, if any
       # run even in case of failure
@@ -285,9 +285,14 @@ jobs:
           # Display raw/clean branch name versions in Actions Summary
           echo "### Branches deployed"
           ## Table headers
-          echo "| Branch :tanabata_tree: | Link :link: | Status :ballot_box_with_check:"
+          echo "| Branch :tanabata_tree: | Link :link: | Build status :ballot_box_with_check:"
           echo "| :--- | :--- | :--- |"
         } >> summary.md
+
+        echo "#### Legend for build status"
+        echo ":white_check_mark: \\\`Published\\\`: build succeess, new version published."
+        echo ":red_circle: \\\`Build failed [1]\\\`: build failure, previous version of the book reused."
+        echo ":o: \\\`Build failed [2]\\\`: build failure, no previous version found."
 
         ## Fetch the GH Pages URL
         # https://stackoverflow.com/a/76354104
