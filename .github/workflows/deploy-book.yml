@@ -178,15 +178,13 @@ jobs:
         echo cache-primary-key: ${{ steps.attempt-restore.outputs.cache-primary-key }}
         echo cache-matched-key: ${{ steps.attempt-restore.outputs.cache-matched-key }}
 
-    - name: If (partial) cache hit, indicate book is re-published
-      if: ${{ steps.attempt-restore.outputs.cache-matched-key != '' }}
+    - if: failure()
       run: |
-        echo "Build failed (1)" >> buildstatus.txt
-
-    - name: If cache miss, indicate no book is published
-      if: ${{ steps.attempt-restore.outputs.cache-matched-key == '' }}
-      run: |
-        echo "Build failed (2)" >> buildstatus.txt
+        if [ -z "${{ steps.attempt-restore.outputs.cache-matched-key != '' }}" ]; then
+          echo "Build failed (1)" | tee buildstatus.txt
+        else
+          echo "Build failed (2)" | tee buildstatus.txt
+        fi
 
     - if: success()
       run: |
