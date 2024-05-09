@@ -296,7 +296,7 @@ jobs:
         # Clean branch names
         echo "$branches" > raw.txt
         echo "$branches" | tr '/":<>|*?\/\\' '-' > clean.txt
-        cat clean.txt | xargs -I{} cat _buildstatus-{}.txt > status.txt
+        cat clean.txt | xargs -I{} cat _buildstatus/_buildstatus-{}.txt > status.txt
         paste -d ' ' raw.txt clean.txt status.txt |
         while IFS=' ' read -r raw clean status; do
           echo "| $raw | <$url$clean> | " >> summary.md
