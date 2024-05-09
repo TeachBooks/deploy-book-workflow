@@ -289,11 +289,6 @@ jobs:
           echo "| :--- | :--- | :--- |"
         } >> summary.md
 
-        echo "#### Legend for build status"
-        echo ":white_check_mark: \\\`Published\\\`: build succeess, new version published."
-        echo ":red_circle: \\\`Build failed [1]\\\`: build failure, previous version of the book reused."
-        echo ":o: \\\`Build failed [2]\\\`: build failure, no previous version found."
-
         ## Fetch the GH Pages URL
         # https://stackoverflow.com/a/76354104
         url=$(gh api "repos/$GITHUB_REPOSITORY/pages" --jq '.html_url')
@@ -308,7 +303,12 @@ jobs:
         done
 
         {
-          # Primary branch
+          echo
+          echo "#### Legend for build status"
+          echo ":white_check_mark: \\\`Published\\\`: build succeess, new version published."
+          echo ":red_circle: \\\`Build failed [1]\\\`: build failure, previous version of the book reused."
+          echo ":o: \\\`Build failed [2]\\\`: build failure, no previous version found."
+
           echo
           echo '#### Primary book at root'
           echo "The book published at the website root <$url> is from the primary branch \\\`$PRIMARY_BRANCH\\\`."
