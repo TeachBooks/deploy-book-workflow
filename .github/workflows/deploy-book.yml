@@ -171,20 +171,13 @@ jobs:
         path: "book/_build/html"
         restore-keys: html-build-${{ matrix.branch }}
 
-    - if: failure()
-      run: |
-        echo ${{ steps.attempt-restore.outputs.cache-hit }}
-        echo ${{ steps.attempt-restore.outputs.cache-primary-key }}
-        echo ${{ steps.attempt-restore.outputs.cache-matched-key }}
-
-
-    - name: If cache hit, indicate book is re-published
-      if: ${{ steps.attempt-restore.outputs.cache-hit == true }}
+    - name: If (partial) cache hit, indicate book is re-published
+      if: ${{ steps.attempt-restore.outputs.cache-matched-key != '' }}
       run: |
         echo "Build failed (1)" >> buildstatus.txt
 
     - name: If cache miss, indicate no book is published
-      if: ${{ steps.attempt-restore.outputs.cache-hit == false }}
+      if: ${{ steps.attempt-restore.outputs.cache-matched-key == '' }}
       run: |
         echo "Build failed (2)" >> buildstatus.txt
 
