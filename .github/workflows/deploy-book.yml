@@ -180,10 +180,12 @@ jobs:
 
     - if: failure()
       run: |
-        if [ -z "${{ steps.attempt-restore.outputs.cache-matched-key != '' }}" ]; then
-          echo "Build failed (1)" | tee buildstatus.txt
-        else
+        if [ -z "${{ steps.attempt-restore.outputs.cache-matched-key }}" ]; then
+          # Cache miss
           echo "Build failed (2)" | tee buildstatus.txt
+        else
+          # (Partial) cache hit
+          echo "Build failed (1)" | tee buildstatus.txt
         fi
 
     - if: success()
