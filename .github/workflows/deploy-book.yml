@@ -285,8 +285,8 @@ jobs:
           # Display raw/clean branch name versions in Actions Summary
           echo "### Branches deployed"
           ## Table headers
-          echo "| Branch :tanabata_tree: | Link :link: |"
-          echo "| :--- | :--- |"
+          echo "| Branch :tanabata_tree: | Link :link: | Status :ballot_box_with_check:"
+          echo "| :--- | :--- | :--- |"
         } >> summary.md
 
         ## Fetch the GH Pages URL
@@ -299,7 +299,7 @@ jobs:
         cat clean.txt | xargs -I{} cat _buildstatus/_buildstatus-{}/buildstatus.txt > status.txt
         paste -d ' ' raw.txt clean.txt status.txt |
         while IFS=' ' read -r raw clean status; do
-          echo "| $raw | <$url$clean> | " >> summary.md
+          echo "| $raw | <$url$clean> | $status |" >> summary.md
         done
 
         {
