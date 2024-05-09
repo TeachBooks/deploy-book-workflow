@@ -172,12 +172,12 @@ jobs:
         restore-keys: html-build-${{ matrix.branch }}
 
     - name: If cache hit, indicate book is re-published
-      if: ${{ failure() && steps.attempt-restore.outputs.cache-hit == true }}
+      if: ${{ steps.attempt-restore.outputs.cache-hit == true }}
       run: |
         echo "Build failed (1)" >> buildstatus.txt
 
     - name: If cache miss, indicate no book is published
-      if: ${{ failure() && steps.attempt-restore.outputs.cache-hit == false }}
+      if: ${{ steps.attempt-restore.outputs.cache-hit == false }}
       run: |
         echo "Build failed (2)" >> buildstatus.txt
 
