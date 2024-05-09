@@ -171,6 +171,10 @@ jobs:
         path: "book/_build/html"
         restore-keys: html-build-${{ matrix.branch }}
 
+    - if: failure()
+      run: echo ${{ steps.attempt-restore.outputs.cache-hit }}
+
+
     - name: If cache hit, indicate book is re-published
       if: ${{ steps.attempt-restore.outputs.cache-hit == true }}
       run: |
