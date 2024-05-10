@@ -277,7 +277,7 @@ jobs:
 
     - name: Include overview summary
       run: |
-        echo "${{ needs.get-branches.outputs.branches }}" > jq -r '.[]' > raw.txt
+        echo "${{ needs.get-branches.outputs.branches }}" | jq -r '.[]' > raw.txt
         echo raw.txt:
         cat raw.txt
         echo
@@ -316,7 +316,7 @@ jobs:
           echo "#### Legend for build status"
           echo ":white_check_mark: \\\`Published\\\` - build succeess, new version published."
           echo ":red_circle: \\\`Build failed [1]\\\` - build failure, previous version of the book reused."
-          echo ":o: \\\`Build failed [2]\\\` - build failure, no previous version reused."
+          echo ":o: \\\`Build failed [2]\\\` - build failure, did not reuse any previous version of the book."
 
           echo
           echo '#### Primary book at root'
