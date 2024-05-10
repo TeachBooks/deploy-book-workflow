@@ -50,12 +50,11 @@ jobs:
 
         # Convert to a JSON list
         branches=$(echo "$branches" | jq -Rn '[inputs]')
+        echo "$branches" > branches.txt
         echo "branches=$(echo $branches)" >> "$GITHUB_OUTPUT"
 
     - name: Validate aliases
       run: |
-        echo "$branches" > branches.txt
-
         # Prepare data
         echo "$BRANCH_ALIASES" | tr ' ' '\n' > rules.txt
         cut -d: -f1 rules.txt > aliases.txt
