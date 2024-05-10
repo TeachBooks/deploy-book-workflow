@@ -238,7 +238,9 @@ jobs:
   deploy-books:
     # Run after build-books, even if it failed
     if: always()
-    needs: build-books
+    needs:
+    - get-branches
+    - build-books
     outputs:
       summary: ${{ steps.output-summary.outputs.summary }}
     runs-on: ubuntu-latest
@@ -275,14 +277,10 @@ jobs:
 
     - name: Include overview summary
       run: |
-        echo stuff:
-        if [ "$BRANCHES_TO_DEPLOY" == '*' ]; then
-          git branch -r
-          branches=$(git branch -r | sed 's,\s*origin/,,g')
-        else
-          echo $BRANCHES_TO_DEPLOY
-          branches=$(echo "$BRANCHES_TO_DEPLOY" | tr ' ' '\n' | grep -E '\S')
-        fi
+        echo "${{ needs.get-branches.outputs.branches }}" > jq -r '.[]' > raw.txt
+        echo raw.txt:
+        cat raw.txt
+        echo
 
         {
           # Display raw/clean branch name versions in Actions Summary
