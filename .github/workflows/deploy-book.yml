@@ -279,10 +279,6 @@ jobs:
       run: |
         # Restore "raw" branch names
         echo '${{ needs.get-branches.outputs.branches }}' | jq -r '.[]' > raw.txt
-        echo raw.txt:
-        cat raw.txt
-        echo
-
         {
           # Display raw/clean branch name versions in Actions Summary
           echo "### Branches deployed"
@@ -298,14 +294,6 @@ jobs:
         # Clean branch names
         cat raw.txt | tr '/":<>|*?\/\\' '-' > clean.txt
         cat clean.txt | xargs -I{} cat _buildstatus/_buildstatus-{}/buildstatus.txt > status.txt
-        echo branches:
-        echo $branches
-        echo
-        echo raw.txt:
-        cat raw.txt
-        echo
-        echo status.txt:
-        cat status.txt
         paste -d ' ' raw.txt clean.txt status.txt |
         while IFS=' ' read -r raw clean status; do
           echo "| $raw | <$url$clean> | $status |" >> summary.md
@@ -330,7 +318,7 @@ jobs:
           echo "### Aliases"
           if echo "$BRANCH_ALIASES" | grep -E '\S'; then
             # Summary table headers
-            echo "| Alias :arrow_right: | Target :dart: | Link :link:"
+            echo "| Alias :arrow_right: | Target :dart: | Link :link: | Build status :ballot_box_with_check: |"
             echo "| :--- | :--- | :--- |"
           else
             echo "No aliases defined."
@@ -339,6 +327,8 @@ jobs:
 
         url=$(gh api "repos/$GITHUB_REPOSITORY/pages" --jq '.html_url')
 
+        paste -d ' ' clean.txt status.txt > lookup_status.txt
+
         echo "$BRANCH_ALIASES" | tr ' ' '\n' | grep -E '\S' |
         while IFS=':' read -r key value; do
           # If the target branch is to be deployed, make symlink to it.
@@ -346,7 +336,8 @@ jobs:
             # Clean branch names of special characters
             clean_key=$(echo "$key" | tr '/":<>|*?\/\\' '-')
             clean_value=$(echo "$value" | tr '/":<>|*?\/\\' '-')
-            echo "| $clean_key | $clean_value | <$url$clean_key> |" >> summary.md
+            status=$(grep "^$clean_value " lookup_status.txt | cut -d\  -f2)
+            echo "| $clean_key | $clean_value | <$url$clean_key> | $status |" >> summary.md
             ln -s "$clean_value" final/"$key"
           fi
         done
