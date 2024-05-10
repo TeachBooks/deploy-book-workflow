@@ -277,7 +277,7 @@ jobs:
 
     - name: Include overview summary
       run: |
-        echo "${{ needs.get-branches.outputs.branches }}" | jq -r '.[]' > raw.txt
+        echo '${{ needs.get-branches.outputs.branches }}' | jq -r '.[]' > raw.txt
         echo raw.txt:
         cat raw.txt
         echo
