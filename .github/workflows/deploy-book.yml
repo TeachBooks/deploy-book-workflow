@@ -277,6 +277,7 @@ jobs:
 
     - name: Include overview summary
       run: |
+        # Restore "raw" branch names
         echo '${{ needs.get-branches.outputs.branches }}' | jq -r '.[]' > raw.txt
         echo raw.txt:
         cat raw.txt
@@ -295,8 +296,7 @@ jobs:
         url=$(gh api "repos/$GITHUB_REPOSITORY/pages" --jq '.html_url')
 
         # Clean branch names
-        echo "$branches" > raw.txt
-        echo "$branches" | tr '/":<>|*?\/\\' '-' > clean.txt
+        cat raw.txt | tr '/":<>|*?\/\\' '-' > clean.txt
         cat clean.txt | xargs -I{} cat _buildstatus/_buildstatus-{}/buildstatus.txt > status.txt
         echo branches:
         echo $branches
