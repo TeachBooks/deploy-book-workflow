@@ -328,16 +328,16 @@ jobs:
     - name: Symlink branch aliases
       id: symlink-aliases
       run: |
-        {
-          echo "### Aliases"
-          if echo "$BRANCH_ALIASES" | grep -E '\S'; then
+        echo "### Aliases" >> summary.md
+        if echo "$BRANCH_ALIASES" | grep -E '\S'; then
             # Summary table headers
-            echo "| Alias :arrow_right: | Target :dart: | Link :link: | Build status :ballot_box_with_check: |"
-            echo "| :--- | :--- | :--- |"
-          else
-            echo "No aliases defined."
-          fi
-        } >> summary.md
+            {
+              echo "| Alias :arrow_right: | Target :dart: | Link :link: | Build status :ballot_box_with_check: |"
+              echo "| :--- | :--- | :--- |"
+            } >> summary.md
+        else
+            echo "No aliases defined." >> summary.md
+        fi
 
         url=$(gh api "repos/$GITHUB_REPOSITORY/pages" --jq '.html_url')
 
@@ -350,7 +350,7 @@ jobs:
             # Clean branch names of special characters
             clean_key=$(echo "$key" | tr '/":<>|*?\/\\' '-')
             clean_value=$(echo "$value" | tr '/":<>|*?\/\\' '-')
-            status=$(grep "^$clean_value " lookup_status.txt | cut -d\  -f2)
+            status=$(grep "^$clean_value " lookup_status.txt | cut -d\  -f2,3)
             echo "| $clean_key | $clean_value | <$url$clean_key> | $status |" >> summary.md
             ln -s "$clean_value" final/"$key"
           fi
