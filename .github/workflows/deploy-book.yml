@@ -48,6 +48,7 @@ jobs:
           branches=$(echo "$BRANCHES_TO_DEPLOY" | tr ' ' '\n' | grep -E '\S')
         fi
 
+        # Record branch names (one per line) for alias validation
         echo "$branches" | tr ' ' '\n' > branches.txt
 
         # Convert to a JSON list
@@ -73,12 +74,7 @@ jobs:
 
         # Non-existent targets
         if grep -E '\S' targets.txt; then
-          echo branches.txt:
-          cat branches.txt
-          echo
-
           while IFS= read -r target; do
-            echo target: $target
             if ! grep "^$target$" branches.txt ; then
               echo "::error ::Branch \"$target\" given in \$BRANCH_ALIASES does not exist."
               exit 1
@@ -258,7 +254,7 @@ jobs:
     - run: |
         mkdir final/
 
-    - name: Download all book artifacts
+    - name: Download all artifacts
       uses: actions/download-artifact@v4
       with:
         path: "final/"
@@ -269,6 +265,16 @@ jobs:
         mkdir _buildstatus/
         mv final/_summary-* _summaries
         mv final/_buildstatus-* _buildstatus
+
+    - name: Clean artifacts (1)
+      uses: GeekyEggo/delete-artifact@v5.0.0
+      with:
+        name: "_summary-*"
+
+    - name: Clean artifacts (2)
+      uses: GeekyEggo/delete-artifact@v5.0.0
+      with:
+        name: "_buildstatus-*"
 
     - name: Copy primary book to root, fail if names conflict
       timeout-minutes: 1
