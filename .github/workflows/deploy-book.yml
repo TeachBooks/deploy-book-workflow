@@ -311,7 +311,7 @@ jobs:
           echo "| $raw | <$url$clean> | $status |" >> summary.md
         done
 
-        primary_status=$(grep "^$PRIMARY_BRANCH " pasted.txt | cut -d\  -f3,4)
+        primary_status=$(grep "^$PRIMARY_BRANCH " pasted.txt | cut -d\  -f4)
 
         {
           echo
@@ -322,7 +322,7 @@ jobs:
 
           echo
           echo '#### Primary book at root'
-          echo "The book published at the website root <$url> is from the primary branch \\\`$PRIMARY_BRANCH\\\` ($primary_status)."
+          echo "The book at the website root <$url> is from the primary branch \\\`$PRIMARY_BRANCH\\\` (status: $primary_status)."
         } >> summary.md
 
     - name: Symlink branch aliases
