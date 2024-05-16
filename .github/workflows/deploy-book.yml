@@ -305,10 +305,13 @@ jobs:
         # Clean branch names
         cat raw.txt | tr '/":<>|*?\/\\' '-' > clean.txt
         cat clean.txt | xargs -I{} cat _buildstatus/_buildstatus-{}/buildstatus.txt > status.txt
-        paste -d ' ' raw.txt clean.txt status.txt |
+        paste -d ' ' raw.txt clean.txt status.txt > pasted.txt
+        cat pasted.txt |
         while IFS=' ' read -r raw clean status; do
           echo "| $raw | <$url$clean> | $status |" >> summary.md
         done
+
+        primary_status=$(grep "^$PRIMARY_BRANCH " pasted.txt | cut -d\  -f3)
 
         {
           echo
@@ -319,7 +322,7 @@ jobs:
 
           echo
           echo '#### Primary book at root'
-          echo "The book published at the website root <$url> is from the primary branch \\\`$PRIMARY_BRANCH\\\`."
+          echo "The book published at the website root <$url> is from the primary branch \\\`$PRIMARY_BRANCH\\\` ($primary_status)."
         } >> summary.md
 
     - name: Symlink branch aliases
@@ -399,7 +402,8 @@ jobs:
       - deploy-books
     runs-on: ubuntu-latest
     steps:
-    - run: |
+    - name: Summarize
+      run: |
 
         echo "${{ needs.get-branches.outputs.summary }}" >> $GITHUB_STEP_SUMMARY
         echo "${{ needs.deploy-books.outputs.summary }}" >> $GITHUB_STEP_SUMMARY
