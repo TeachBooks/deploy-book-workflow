@@ -333,7 +333,7 @@ jobs:
             # Summary table headers
             {
               echo "| Alias :arrow_right: | Target :dart: | Link :link: | Build status :ballot_box_with_check: |"
-              echo "| :--- | :--- | :--- |"
+              echo "| :--- | :--- | :--- | :--- |"
             } >> summary.md
         else
             echo "No aliases defined." >> summary.md
