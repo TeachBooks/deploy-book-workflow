@@ -322,7 +322,7 @@ jobs:
 
           echo
           echo '#### Primary book at root'
-          echo "The book published at the website root <$url> is from the primary branch \\\`$PRIMARY_BRANCH\\\` ($primary_status)."
+          echo "The book published at the website root <$url> is from the primary branch \\\`$PRIMARY_BRANCH\\\` (${primary_status@Q})."
         } >> summary.md
 
     - name: Symlink branch aliases
