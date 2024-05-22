@@ -65,7 +65,7 @@ Here's an example for a summary for the template book:
 > | :--- | :--- | :--- |
 > | main | [https://teachbooks.github.io/template/main](https://teachbooks.github.io/template/main) | ✅ `Published` |
 > | version2 | [https://teachbooks.github.io/template/version2](https://teachbooks.github.io/template/version2) | 🔴 `Build failed [1]` |
-> | version3 | | [https://teachbooks.github.io/template/version3](https://teachbooks.github.io/template/version3) | ⭕ `Build failed [2]` |
+> | version3 | [https://teachbooks.github.io/template/version3](https://teachbooks.github.io/template/version3) | ⭕ `Build failed [2]` |
 > 
 > #### Legend for build status
 > ✅ `Published` - build succeess, new version published.
