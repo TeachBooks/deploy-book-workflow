@@ -316,7 +316,7 @@ jobs:
         {
           echo
           echo "#### Legend for build status"
-          echo ":white_check_mark: \\\`Published\\\` - build succeess, new version published."
+          echo ":white_check_mark: \\\`Published\\\` - build success, new version published."
           echo ":red_circle: \\\`Build failed [1]\\\` - build failure, previous version of the book reused."
           echo ":o: \\\`Build failed [2]\\\` - build failure, no previous version reused."
 
