@@ -31,7 +31,7 @@ You can adapt the behaviour by setting repository variables as explained [here](
 - `PRIMARY_BRANCH` which is set to `main` whenever it's not defined in the repository variables.
   - This sets the branch which is hosted on root.
   - It is advised to make it `published` to start using draft-publish-workflow
-- `BRANCH_ALIASES` which is set to `draft:main` whenever it's not defined in the repository variables.
+- `BRANCH_ALIASES` which is set to ` `(space) whenever it's not defined in the repository variables.
   - This defines an alias for a branch
   - It should be an alias-rule, e.g. 'alias:really-long-branch-name`
   - If no alias is wanted, `BRANCH_ALIASES` may be set to ' ' (space).

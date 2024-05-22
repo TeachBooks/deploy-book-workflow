@@ -14,7 +14,7 @@ env:
   # `main` as primary by default, advised to make it `published` to start using draft-publish-workflow
   PRIMARY_BRANCH: ${{ vars.PRIMARY_BRANCH != '' && vars.PRIMARY_BRANCH || 'main' }}
   # alias-rule, e.g. 'draft:main'
-  # By default, `draft` links to `main`. 
+  # By default, no aliases are defined (''). 
   # If no alias is wanted, BRANCH_ALIASES may be set to ' ' (space).
   BRANCH_ALIASES: ${{ vars.BRANCH_ALIASES }}
   # Space-separated list of branch names, e.g. 'main second third'.
