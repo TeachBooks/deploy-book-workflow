@@ -5,14 +5,14 @@ We developed a workflow which builds the Jupyter Books in your repository for al
 It has the following features:
 - Publishing of your [Jupyter Book](https://github.com/executablebooks/jupyter-book)-repository to GitHub Pages
 - Publishing all or a selection of branches, allowing to build draft version of the book online preventing local builds
-- A summary describing where the book is published, errors in the build process and how the publish step is configured
+- A summary describing where the book is published, errors in the build process per branch and how the publish step is configured
 - Caching of build books so that it can be reused when another branch is published or the next build contains critical errors
 - Caching of python environment to speed up the workflow
 - Allowing to use submodules within your book
 - Customizable trigger for the workflow itself
 - Optionally preprocess branches using the [`teachbooks` package](https://github.com/TeachBooks/TeachBooks).
 - Converting branch-names to well-defined URLs
-- Customizable settings on where the books should be deployed including alias for branch-names and selection of one branch to be deployed on root. The workflow will gives warnings if these setting are ill-defined or conflicting.
+- Customizable settings on where the books should be deployed including alias for branch-names and selection of one branch to be deployed on root. The workflow will gives warnings if these setting are ill-defined or conflicting. Although aliases are not allowed by GitHub Pages, it seems you can use one alias, but not more.
 
 The [TeachBooks template book](https://github.com/TeachBooks/template) uses this functionality for example: The workflow `call-deploy-book.yml` calls the `deploy-book.yml` workflow, which builds the Jupyter books at the calling repository for all branches, and deploys them via GitHub Pages.
 
@@ -31,11 +31,10 @@ You can adapt the behaviour by setting repository variables as explained [here](
 - `PRIMARY_BRANCH` which is set to `main` whenever it's not defined in the repository variables.
   - This sets the branch which is hosted on root.
   - It is advised to make it `published` to start using draft-publish-workflow
-- `BRANCH_ALIASES` which is set to `draft:main` whenever it's not defined in the repository variables.
-  - This defines aliases for branches
-  - It should be a space-separated list of alias-rules, e.g. 'draft:main alias:really-long-branch-name`
-  - It is advised to link `book` to `publish`.
-  - If no aliases are wanted, `BRANCH_ALIASES` may be set to ' ' (space).
+- `BRANCH_ALIASES` which is set to ` `(space) whenever it's not defined in the repository variables.
+  - This defines an alias for a branch
+  - It should be an alias-rule, e.g. 'alias:really-long-branch-name`
+  - If no alias is wanted, `BRANCH_ALIASES` may be set to ' ' (space).
 - `BRANCHES_TO_DEPLOY`  which is set to `*` (all branches) whenever it's not defined in the repository variables.
   - This defines the branches to deploy.
   - It should be a space-separated list of branch names, e.g. 'main second third'.
@@ -57,18 +56,26 @@ Whenever the workflow is triggered, progress and a summary can be seen under the
 Here's an example for a summary for the template book:
 
 > ### Branches deployed
-> | Branch 🎋 | Link 🔗 |
-> | --- | --- |
-> | main | [https://teachbooks.github.io/template/main](https://teachbooks.github.io/template/main) |
-> | version2 | [https://teachbooks.github.io/template/version2](https://teachbooks.github.io/template/version2) |
+> | Branch 🎋 | Link 🔗 | Build status ☑️ |
+> | :--- | :--- | :--- |
+> | main | [https://teachbooks.github.io/template/main](https://teachbooks.github.io/template/main) | ✅ `Published` |
+> | version2 | [https://teachbooks.github.io/template/version2](https://teachbooks.github.io/template/version2) | 🔴 `Build failed [1]` |
+> | version3 | [https://teachbooks.github.io/template/version3](https://teachbooks.github.io/template/version3) | ⭕ `Build failed [2]` |
 > 
+> #### Legend for build status
+> ✅ `Published` - build success, new version published.
+>
+> 🔴 `Build failed [1]` - build failure, previous version of the book reused.
+>
+> ⭕ `Build failed [2]` - build failure, no previous version reused.
+>
 > #### Primary book at root
-> The book published at the website root [https://teachbooks.github.io/template](https://teachbooks.github.io/template) is from the primary branch `main`.
+> The book at the website root <https://teachbooks.github.io/testable-template/> is from the primary branch `main` (status: `Published`).
 > 
 > ### Aliases
-> | Alias ➡️ | Target 🎯 | Link 🔗 |
-> | --- | --- | --- |
-> | draft | main | [https://teachbooks.github.io/template/draft](https://teachbooks.github.io/template/draft) |
+> | Alias ➡️ | Target 🎯 | Link 🔗 |  Build status ☑️ |
+> | :--- | :--- | :--- | :---- |
+> | draft | main | [https://teachbooks.github.io/template/draft](https://teachbooks.github.io/template/draft) | ✅ `Published` |
 > 
 > ### Preview of build errors & warnings
 > For more details please see the corresponding `build-books` jobs in the left pane.
@@ -77,6 +84,11 @@ Here's an example for a summary for the template book:
 > ```
 > �[91m/home/runner/work/template/template/book/some_content/overview.md:5: WARNING: Non-consecutive header level increase; H1 to H3 [myst.header]�[39;49;00m
 > ``` 
+>
+> On branch `version3`:
+> ```
+> /home/runner/work/_temp/ff8c8325-8d8b-4c0b-a2b2-32d2169c55bc.sh: line 8: teachbooks: command not found
+> ```
 >
 > ### Repository configuration variables
 > Variables can be set at [https://github.com/TeachBooks/template/settings/variables/actions](https://github.com/TeachBooks/template/settings/variables/actions)
