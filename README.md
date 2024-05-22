@@ -63,7 +63,7 @@ Here's an example for a summary for the template book:
 > | version3 | [https://teachbooks.github.io/template/version3](https://teachbooks.github.io/template/version3) | ⭕ `Build failed [2]` |
 > 
 > #### Legend for build status
-> ✅ `Published` - build succeess, new version published.
+> ✅ `Published` - build success, new version published.
 >
 > 🔴 `Build failed [1]` - build failure, previous version of the book reused.
 >
