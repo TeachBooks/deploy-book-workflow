@@ -32,10 +32,9 @@ You can adapt the behaviour by setting repository variables as explained [here](
   - This sets the branch which is hosted on root.
   - It is advised to make it `published` to start using draft-publish-workflow
 - `BRANCH_ALIASES` which is set to `draft:main` whenever it's not defined in the repository variables.
-  - This defines aliases for branches
-  - It should be a space-separated list of alias-rules, e.g. 'draft:main alias:really-long-branch-name`
-  - It is advised to link `book` to `publish`.
-  - If no aliases are wanted, `BRANCH_ALIASES` may be set to ' ' (space).
+  - This defines an alias for a branch
+  - It should be an alias-rule, e.g. 'alias:really-long-branch-name`
+  - If no alias is wanted, `BRANCH_ALIASES` may be set to ' ' (space).
 - `BRANCHES_TO_DEPLOY`  which is set to `*` (all branches) whenever it's not defined in the repository variables.
   - This defines the branches to deploy.
   - It should be a space-separated list of branch names, e.g. 'main second third'.
