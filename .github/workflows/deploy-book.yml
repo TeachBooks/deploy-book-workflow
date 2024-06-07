@@ -284,7 +284,6 @@ jobs:
         if [ -d final/"$PRIMARY_BRANCH" ]; then
           cp -irv final/"$PRIMARY_BRANCH"/* final/
         fi
-        ls -a final/
 
     - name: Include overview summary
       run: |
@@ -305,13 +304,13 @@ jobs:
         # Clean branch names
         cat raw.txt | tr '/":<>|*?\/\\' '-' > clean.txt
         cat clean.txt | xargs -I{} cat _buildstatus/_buildstatus-{}/buildstatus.txt > status.txt
-        paste -d ' ' raw.txt clean.txt status.txt > pasted.txt
+        paste -d ';' raw.txt clean.txt status.txt > pasted.txt
         cat pasted.txt |
-        while IFS=' ' read -r raw clean status; do
+        while IFS=';' read -r raw clean status; do
           echo "| $raw | <$url$clean> | $status |" >> summary.md
         done
 
-        primary_status=$(grep "^$PRIMARY_BRANCH " pasted.txt | cut -d\  -f4)
+        primary_status=$(grep "^$PRIMARY_BRANCH;" pasted.txt | cut -d ';' -f3)
 
         {
           echo
@@ -322,7 +321,8 @@ jobs:
 
           echo
           echo '#### Primary book at root'
-          echo "The book at the website root <$url> is from the primary branch \\\`$PRIMARY_BRANCH\\\` (status: $primary_status)."
+          echo "The book at the website root <$url> is from the primary branch \\\`$PRIMARY_BRANCH\\\`."
+          echo "Status: $primary_status"
         } >> summary.md
 
     - name: Symlink branch aliases
@@ -362,7 +362,6 @@ jobs:
           echo "### Preview of build errors & warnings"
           echo "For more details please see the corresponding \\\`build-books\\\` jobs in the left pane."
         } >> summary.md
-        ls _summaries/
         for fname in _summaries/*; do
           echo $fname
           if [ "$fname" == 'summary.md' ]; then
