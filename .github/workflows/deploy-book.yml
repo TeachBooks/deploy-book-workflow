@@ -284,7 +284,6 @@ jobs:
         if [ -d final/"$PRIMARY_BRANCH" ]; then
           cp -irv final/"$PRIMARY_BRANCH"/* final/
         fi
-        ls -a final/
 
     - name: Include overview summary
       run: |
@@ -303,9 +302,6 @@ jobs:
         url=$(gh api "repos/$GITHUB_REPOSITORY/pages" --jq '.html_url')
 
         # Clean branch names
-        ls final
-        echo
-        ls _buildstatus
         cat raw.txt | tr '/":<>|*?\/\\' '-' > clean.txt
         cat clean.txt | xargs -I{} cat _buildstatus/_buildstatus-{}/buildstatus.txt > status.txt
         paste -d ';' raw.txt clean.txt status.txt > pasted.txt
@@ -366,7 +362,6 @@ jobs:
           echo "### Preview of build errors & warnings"
           echo "For more details please see the corresponding \\\`build-books\\\` jobs in the left pane."
         } >> summary.md
-        ls _summaries/
         for fname in _summaries/*; do
           echo $fname
           if [ "$fname" == 'summary.md' ]; then
