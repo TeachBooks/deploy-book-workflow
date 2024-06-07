@@ -305,13 +305,13 @@ jobs:
         # Clean branch names
         cat raw.txt | tr '/":<>|*?\/\\' '-' > clean.txt
         cat clean.txt | xargs -I{} cat _buildstatus/_buildstatus-{}/buildstatus.txt > status.txt
-        paste -d ' ' raw.txt clean.txt status.txt > pasted.txt
+        paste -d ';' raw.txt clean.txt status.txt > pasted.txt
         cat pasted.txt |
-        while IFS=' ' read -r raw clean status; do
+        while IFS=';' read -r raw clean status; do
           echo "| $raw | <$url$clean> | $status |" >> summary.md
         done
 
-        primary_status=$(grep "^$PRIMARY_BRANCH " pasted.txt | cut -d\  -f4)
+        primary_status=$(grep "^$PRIMARY_BRANCH " pasted.txt | cut -d ';' -f3)
 
         {
           echo
