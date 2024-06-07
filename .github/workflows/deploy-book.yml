@@ -303,6 +303,9 @@ jobs:
         url=$(gh api "repos/$GITHUB_REPOSITORY/pages" --jq '.html_url')
 
         # Clean branch names
+        ls final
+        echo
+        ls _buildstatus
         cat raw.txt | tr '/":<>|*?\/\\' '-' > clean.txt
         cat clean.txt | xargs -I{} cat _buildstatus/_buildstatus-{}/buildstatus.txt > status.txt
         paste -d ';' raw.txt clean.txt status.txt > pasted.txt
