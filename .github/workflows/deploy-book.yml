@@ -311,7 +311,7 @@ jobs:
           echo "| $raw | <$url$clean> | $status |" >> summary.md
         done
 
-        primary_status=$(grep "^$PRIMARY_BRANCH " pasted.txt | cut -d ';' -f3)
+        primary_status=$(grep "^$PRIMARY_BRANCH;" pasted.txt | cut -d ';' -f3)
 
         {
           echo
