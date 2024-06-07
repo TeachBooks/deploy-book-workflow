@@ -134,11 +134,13 @@ jobs:
       with:
         python-version: 3.11
 
+    - run: WEEK=$(date +%V)
+
     - if: ${{ steps.cache-html.outputs.cache-hit != 'true' }}
       name: Cache virtualenv
       uses: actions/cache@v4
       with:
-        key: venv-${{ runner.os }}-${{ steps.setup-python.outputs.python-version }}-${{ hashFiles('requirements.txt') }}
+        key: venv-${{ runner.os }}-${{ steps.setup-python.outputs.python-version }}-${{ hashFiles('requirements.txt') }}-week${{ env.WEEK }}
         path: .venv
 
     - if: ${{ steps.cache-html.outputs.cache-hit != 'true' }}
