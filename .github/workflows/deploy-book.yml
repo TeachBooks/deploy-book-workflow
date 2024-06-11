@@ -380,9 +380,7 @@ jobs:
 
     - name: Add custom 404 if any
       run: |
-        if [ -f 404.md ]; then
-          mv 404.md final/
-        elif [ -f 404.html ]; then
+        if [ -f 404.html ]; then
           mv 404.html final/
         fi
 
