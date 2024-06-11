@@ -378,6 +378,12 @@ jobs:
           echo "No build errors or warnings encountered." >> summary.md
         fi
 
+    - name: Add custom 404 if any
+      run: |
+        if [ -f 404.html ]; then
+          mv 404.html final/
+        fi
+
     - name: Upload final Pages artifact
       uses: actions/upload-pages-artifact@v3
       with:
