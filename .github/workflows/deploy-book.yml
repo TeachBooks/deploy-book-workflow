@@ -26,6 +26,10 @@ env:
   BRANCHES_TO_PREPROCESS: ${{ vars.BRANCHES_TO_PREPROCESS }}
   # If to copy the primary page to root
   COPY: ${{ vars.COPY != '' && vars.COPY || 'false' }}
+  # Space-separated list of branch names
+  # Note: does not support '*'
+  BRANCHES_ARCHIVED: ${{ vars.BRANCHES_ARCHIVED }}
+
 
 jobs:
   get-branches:
@@ -110,17 +114,22 @@ jobs:
         ref: ${{ matrix.branch }}
         submodules: 'true'
 
-    - name: Record if branch is preprocessed for cache
+    - name: Record extra cache info
       run: |
+        # Record filenames listing -- this updates the cache on filename change
+        find book/ -type f >> EXTRA_CACHE_VARS.txt
+        # Record if branch is preprocessed
         if [ "$BRANCHES_TO_PREPROCESS" == "*" ] || echo "$BRANCHES_TO_PREPROCESS" | tr ' ' '\n' | grep "^${{ matrix.branch }}$"; then
-          echo true > EXTRA_CACHE_VARS.txt
+          echo true >> EXTRA_CACHE_VARS.txt
         else
-          echo false > EXTRA_CACHE_VARS.txt
+          echo false >> EXTRA_CACHE_VARS.txt
         fi
-
-    - name: Record filenames for cache
-      run: |
-         find book/ -type f >> EXTRA_CACHE_VARS.txt
+        # Record if branch is archived
+        if echo "$BRANCHES_ARCHIVED" | tr ' ' '\n' | grep "^${{ matrix.branch }}$"; then
+          echo true >> EXTRA_CACHE_VARS.txt
+        else
+          echo false >> EXTRA_CACHE_VARS.txt
+        fi
 
     - name: Cache page build
       id: cache-html
@@ -136,13 +145,15 @@ jobs:
       with:
         python-version: 3.11
 
-    - run: |
+    - name: Record current date for cache
+      run: |
         echo "WEEK=$(date +%V)" >> $GITHUB_ENV
 
     - if: ${{ steps.cache-html.outputs.cache-hit != 'true' }}
       name: Cache virtualenv
       uses: actions/cache@v4
       with:
+        # Note: the cache expires at least once every week to keep the deps up-to-date
         key: venv-${{ runner.os }}-${{ steps.setup-python.outputs.python-version }}-${{ hashFiles('requirements.txt') }}-week${{ env.WEEK }}
         path: .venv
 
@@ -154,6 +165,15 @@ jobs:
         python -m pip install -r requirements.txt
         echo "$VIRTUAL_ENV/bin" >> $GITHUB_PATH
         echo "VIRTUAL_ENV=$VIRTUAL_ENV" >> $GITHUB_ENV
+
+    - name: Place banner if archived
+      run: |
+        if echo "$BRANCHES_ARCHIVED" | tr ' ' '\n' | grep "^${{ matrix.branch }}$"; then
+          {
+            echo 'html:'
+            echo "  annotation: 'You are viewing an archived version of the book. Click <a href=\"/$PRIMARY_BRANCH\">here</a> for the latest version.'"
+          } >> book/_config.yml
+        fi
 
     - if: ${{ steps.cache-html.outputs.cache-hit != 'true' }}
       name: Preprocess & build the book from branch
@@ -407,9 +427,9 @@ jobs:
               document.body.innerHTML = "<h1>Page Not Found</h1>";
           }
           </script>
-        HTML_TEMPLATE_404_TRUE: |
-          <!DOCTYPE html><title>404 Not Found</title>
-          404 Not Found
+        # HTML_TEMPLATE_404_TRUE: |
+        #   <!DOCTYPE html><title>404 Not Found</title>
+        #   404 Not Found
       run: |
         # echo "$HTML_TEMPLATE_404_TRUE" > final/404-not-found.html
         echo "$HTML_TEMPLATE_404_REDIRECT" | envsubst | tee final/404.html
