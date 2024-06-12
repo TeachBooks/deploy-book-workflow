@@ -395,7 +395,7 @@ jobs:
           // if urlParts.len < 4, this is undefined
           let bname = urlParts[4];
           console.log("bname", bname);
-          let branches = '$BRANCHES'.split(' ');
+          let branches = $BRANCHES
           console.log("branches", branches);
           if (!(bname in branches)) {
               urlParts.splice(4, 0, '$PRIMARY_BRANCH');
@@ -409,7 +409,7 @@ jobs:
           404 Not Found
       run: |
         echo $HTML_TEMPLATE_404_TRUE > final/404-not-found.html
-        echo $HTML_TEMPLATE_404_REDIRECT | envsubst | tee > final/404.html
+        echo $HTML_TEMPLATE_404_REDIRECT | envsubst | tee final/404.html
 
     - name: Upload final Pages artifact
       uses: actions/upload-pages-artifact@v3
