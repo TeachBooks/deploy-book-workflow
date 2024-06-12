@@ -378,11 +378,23 @@ jobs:
           echo "No build errors or warnings encountered." >> summary.md
         fi
 
-    - name: Add custom 404 if any
+    - name: Add a custom 404 to redirect
+      env:
+        HTML_TEMPLATE: |
+          <!DOCTYPE html><title>Redirecting...</title>
+          <script>
+          let currentUrl = window.location.href;
+          let urlParts = currentUrl.split('/');
+          console.log(urlParts);
+          if (urlParts.length > 4) {
+              urlParts.splice(4, 0, '$PRIMARY_BRANCH');
+          }
+          console.log(urlParts);
+          let newUrl = urlParts.join('/');
+          window.location.href = newUrl;
+          </script>
       run: |
-        if [ -f 404.html ]; then
-          mv 404.html final/
-        fi
+        echo $HTML_TEMPLATE | envsubst > final/404.html
 
     - name: Upload final Pages artifact
       uses: actions/upload-pages-artifact@v3
