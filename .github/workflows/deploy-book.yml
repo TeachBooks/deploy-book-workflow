@@ -390,14 +390,16 @@ jobs:
           <script>
           let currentUrl = window.location.href;
           let urlParts = currentUrl.split('/');
-          console.log(urlParts);
+          console.log("urlParts before", urlParts);
           // https:(0)/(1)/uname.github.io(2)/rname(3)/bname(4)
           // if urlParts.len < 4, this is undefined
           let bname = urlParts[4];
+          console.log("bname", bname)
           branches = '$BRANCHES'.split(' ')
+          console.log("branches", branches)
           if (!(bname in branches)) {
               urlParts.splice(4, 0, '$PRIMARY_BRANCH');
-              console.log(urlParts);
+              console.log("urlParts after", urlParts);
               let newUrl = urlParts.join('/');
               window.location.href = newUrl;
           }
@@ -458,6 +460,7 @@ jobs:
           echo "BRANCH_ALIASES=$BRANCH_ALIASES $(isdefault ${{ vars.BRANCH_ALIASES }})"
           echo "BRANCHES_TO_DEPLOY=$BRANCHES_TO_DEPLOY $(isdefault ${{ vars.BRANCHES_TO_DEPLOY }})"
           echo "BRANCHES_TO_PREPROCESS=$BRANCHES_TO_PREPROCESS $(isdefault ${{ vars.BRANCHES_TO_PREPROCESS }})"
+          echo "COPY=$COPY $(isdefault ${{vars.BRANCHES_TO_PREPROCESS}})"
           echo '```'
         } >> $GITHUB_STEP_SUMMARY
 
