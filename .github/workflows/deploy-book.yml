@@ -409,6 +409,7 @@ jobs:
         # if urlParts.len < 4, bname is undefined */
         HTML_TEMPLATE_404_REDIRECT: |
           <!DOCTYPE html><title>Redirecting...</title>
+          <body></body>
           <script>
           let currentUrl = window.location.href;
           let urlParts = currentUrl.split('/');
