@@ -402,6 +402,9 @@ jobs:
               console.log("urlParts after", urlParts);
               let newUrl = urlParts.join('/');
               window.location.href = newUrl;
+          } else {
+              document.title = "Page Not Found";
+              document.body.innerHTML = "<h1>Page Not Found</h1>";
           }
           </script>
         HTML_TEMPLATE_404_TRUE: |
