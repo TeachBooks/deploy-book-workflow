@@ -397,7 +397,7 @@ jobs:
           console.log("bname", bname);
           let branches = $BRANCHES;
           console.log("branches", branches);
-          if (!(bname in branches)) {
+          if (!branches.includes(bname)) {
               urlParts.splice(4, 0, '$PRIMARY_BRANCH');
               console.log("urlParts after", urlParts);
               let newUrl = urlParts.join('/');
