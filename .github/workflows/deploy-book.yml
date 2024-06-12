@@ -394,9 +394,9 @@ jobs:
           // https:(0)/(1)/uname.github.io(2)/rname(3)/bname(4)
           // if urlParts.len < 4, this is undefined
           let bname = urlParts[4];
-          console.log("bname", bname)
-          branches = '$BRANCHES'.split(' ')
-          console.log("branches", branches)
+          console.log("bname", bname);
+          let branches = '$BRANCHES'.split(' ');
+          console.log("branches", branches);
           if (!(bname in branches)) {
               urlParts.splice(4, 0, '$PRIMARY_BRANCH');
               console.log("urlParts after", urlParts);
