@@ -24,6 +24,8 @@ env:
   # By default, preprocess no branches ('').
   # Preprocessing no branches can also be set by ' '.
   BRANCHES_TO_PREPROCESS: ${{ vars.BRANCHES_TO_PREPROCESS }}
+  # If to copy the primary page to root
+  COPY: ${{ vars.COPY != '' && vars.COPY || 'false' }}
 
 jobs:
   get-branches:
@@ -283,6 +285,7 @@ jobs:
 
     - name: Copy primary book to root, fail if names conflict
       timeout-minutes: 1
+      if: ${{ env.COPY == 'true' }}
       run: |
         GLOBIGNORE=".:.."
         # -i leads to a prompt in case of conflict, => a timeout
