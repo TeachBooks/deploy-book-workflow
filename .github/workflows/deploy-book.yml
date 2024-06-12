@@ -251,6 +251,8 @@ jobs:
     permissions:
       pages: write
       id-token: write
+    env:
+      BRANCHES: ${{ needs.get-branches.outputs.branches }}
     steps:
     - uses: actions/checkout@v4
 
@@ -386,12 +388,16 @@ jobs:
           let currentUrl = window.location.href;
           let urlParts = currentUrl.split('/');
           console.log(urlParts);
-          if (urlParts[4] !== '$PRIMARY_BRANCH') {
+          // https:(0)/(1)/uname.github.io(2)/rname(3)/bname(4)
+          // if urlParts.len < 4, this is undefined
+          let bname = urlParts[4];
+          branches = '$BRANCHES'.split(' ')
+          if (!(bname in branches)) {
               urlParts.splice(4, 0, '$PRIMARY_BRANCH');
+              console.log(urlParts);
+              let newUrl = urlParts.join('/');
+              window.location.href = newUrl;
           }
-          console.log(urlParts);
-          let newUrl = urlParts.join('/');
-          window.location.href = newUrl;
           </script>
         HTML_TEMPLATE_404_TRUE: |
           <!DOCTYPE html><title>404 Not Found</title>
