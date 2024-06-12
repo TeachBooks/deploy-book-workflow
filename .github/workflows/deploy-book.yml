@@ -380,21 +380,25 @@ jobs:
 
     - name: Add a custom 404 to redirect
       env:
-        HTML_TEMPLATE: |
+        HTML_TEMPLATE_404_REDIRECT: |
           <!DOCTYPE html><title>Redirecting...</title>
           <script>
           let currentUrl = window.location.href;
           let urlParts = currentUrl.split('/');
           console.log(urlParts);
-          if (urlParts.length > 4) {
+          if (urlParts[4] !== '$PRIMARY_BRANCH') {
               urlParts.splice(4, 0, '$PRIMARY_BRANCH');
           }
           console.log(urlParts);
           let newUrl = urlParts.join('/');
           window.location.href = newUrl;
           </script>
+        HTML_TEMPLATE_404_TRUE: |
+          <!DOCTYPE html><title>404 Not Found</title>
+          404 Not Found
       run: |
-        echo $HTML_TEMPLATE | envsubst > final/404.html
+        echo $HTML_TEMPLATE_404_TRUE > final/404-not-found.html
+        echo $HTML_TEMPLATE_404_REDIRECT | envsubst > final/404.html
 
     - name: Upload final Pages artifact
       uses: actions/upload-pages-artifact@v3
