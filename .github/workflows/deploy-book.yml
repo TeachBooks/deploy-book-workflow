@@ -385,14 +385,14 @@ jobs:
 
     - name: Add a custom 404 to redirect
       env:
+        # https:(0)/(1)/uname.github.io(2)/rname(3)/bname(4) */
+        # if urlParts.len < 4, bname is undefined */
         HTML_TEMPLATE_404_REDIRECT: |
           <!DOCTYPE html><title>Redirecting...</title>
           <script>
           let currentUrl = window.location.href;
           let urlParts = currentUrl.split('/');
           console.log("urlParts before", urlParts);
-          /* https:(0)/(1)/uname.github.io(2)/rname(3)/bname(4) */
-          /* if urlParts.len < 4, this is undefined */
           let bname = urlParts[4];
           console.log("bname", bname);
           let branches = $BRANCHES;
@@ -408,8 +408,8 @@ jobs:
           <!DOCTYPE html><title>404 Not Found</title>
           404 Not Found
       run: |
-        echo $HTML_TEMPLATE_404_TRUE > final/404-not-found.html
-        echo $HTML_TEMPLATE_404_REDIRECT | envsubst | tee final/404.html
+        # echo "$HTML_TEMPLATE_404_TRUE" > final/404-not-found.html
+        echo "$HTML_TEMPLATE_404_REDIRECT" | envsubst | tee final/404.html
 
     - name: Upload final Pages artifact
       uses: actions/upload-pages-artifact@v3
