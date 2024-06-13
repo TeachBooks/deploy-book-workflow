@@ -173,6 +173,7 @@ jobs:
             echo 'html:'
             echo "  annotation: 'You are viewing an archived version of the book. Click <a href=\"/$PRIMARY_BRANCH\">here</a> for the latest version.'"
           } >> book/_config.yml
+          cat book/_config.yml
         fi
 
     - if: ${{ steps.cache-html.outputs.cache-hit != 'true' }}
@@ -485,6 +486,7 @@ jobs:
           echo "BRANCHES_TO_DEPLOY=$BRANCHES_TO_DEPLOY $(isdefault ${{ vars.BRANCHES_TO_DEPLOY }})"
           echo "BRANCHES_TO_PREPROCESS=$BRANCHES_TO_PREPROCESS $(isdefault ${{ vars.BRANCHES_TO_PREPROCESS }})"
           echo "COPY=$COPY $(isdefault ${{vars.BRANCHES_TO_PREPROCESS}})"
+          echo "BRANCHES_ARCHIVED=$BRANCHES_ARCHIVED $(isdefault ${{ vars.BRANCHES_ARCHIVED }})"
           echo '```'
         } >> $GITHUB_STEP_SUMMARY
 
