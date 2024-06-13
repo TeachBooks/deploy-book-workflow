@@ -130,6 +130,7 @@ jobs:
         else
           echo false >> EXTRA_CACHE_VARS.txt
         fi
+        cat EXTRA_CACHE_VARS.txt
 
     - name: Cache page build
       id: cache-html
@@ -138,18 +139,19 @@ jobs:
         path: "book/_build/html"
         key: html-build-${{ matrix.branch }}-${{ hashFiles('book/**', 'requirements.txt', 'EXTRA_CACHE_VARS.txt') }}
 
-    - if: ${{ steps.cache-html.outputs.cache-hit != 'true' }}
+    - if: ${{ steps.cache-html.outputs.cache-hit == 'false' }}
       name: Set up Python 3.11
       uses: actions/setup-python@v5
       id: setup-python
       with:
         python-version: 3.11
 
-    - name: Record current date for cache
+    - if: ${{ steps.cache-html.outputs.cache-hit == 'false' }}
+      name: Record current date for cache
       run: |
         echo "WEEK=$(date +%V)" >> $GITHUB_ENV
 
-    - if: ${{ steps.cache-html.outputs.cache-hit != 'true' }}
+    - if: ${{ steps.cache-html.outputs.cache-hit == 'false' }}
       name: Cache virtualenv
       uses: actions/cache@v4
       with:
@@ -157,7 +159,7 @@ jobs:
         key: venv-${{ runner.os }}-${{ steps.setup-python.outputs.python-version }}-${{ hashFiles('requirements.txt') }}-week${{ env.WEEK }}
         path: .venv
 
-    - if: ${{ steps.cache-html.outputs.cache-hit != 'true' }}
+    - if: ${{ steps.cache-html.outputs.cache-hit == 'false' }}
       name: Install dependencies
       run: |
         python -m venv .venv
@@ -166,7 +168,8 @@ jobs:
         echo "$VIRTUAL_ENV/bin" >> $GITHUB_PATH
         echo "VIRTUAL_ENV=$VIRTUAL_ENV" >> $GITHUB_ENV
 
-    - name: Place banner if archived
+    - if: ${{ steps.cache-html.outputs.cache-hit == 'false' }}
+      name: Insert banner if archived
       run: |
         if echo "$BRANCHES_ARCHIVED" | tr ' ' '\n' | grep "^${{ matrix.branch }}$"; then
           {
@@ -176,7 +179,7 @@ jobs:
           cat book/_config.yml
         fi
 
-    - if: ${{ steps.cache-html.outputs.cache-hit != 'true' }}
+    - if: ${{ steps.cache-html.outputs.cache-hit == 'false' }}
       name: Preprocess & build the book from branch
       run: |
         if [ "$BRANCHES_TO_PREPROCESS" == "*" ] || echo "$BRANCHES_TO_PREPROCESS" | tr ' ' '\n' | grep "^${{ matrix.branch }}$"; then
