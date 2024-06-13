@@ -173,8 +173,9 @@ jobs:
       run: |
         if echo "$BRANCHES_ARCHIVED" | tr ' ' '\n' | grep "^${{ matrix.branch }}$"; then
           {
+            url=$(gh api "repos/$GITHUB_REPOSITORY/pages" --jq '.html_url')
             echo 'html:'
-            echo "  announcement: 'You are viewing an archived version of the book. Click <a href=\"/$PRIMARY_BRANCH\">here</a> for the latest version.'"
+            echo "  announcement: 'You are viewing an archived version of the book. Click <a href=\"$url$PRIMARY_BRANCH\">here</a> for the latest version.'"
           } >> book/_config.yml
           cat book/_config.yml
         fi
