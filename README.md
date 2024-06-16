@@ -35,7 +35,7 @@ This workflow is used in `TeachBooks/template`. Feel free to juse it for your Te
 
 You can adapt the behaviour by setting repository variables as explained [here](https://docs.github.com/en/actions/learn-github-actions/variables#creating-configuration-variables-for-a-repository) or using the [VS Code Extension GitHub Actions](https://marketplace.visualstudio.com/items?itemName=GitHub.vscode-github-actions). Define the following repository variables:
 - `PRIMARY_BRANCH` which is set to `main` whenever it's not defined in the repository variables.
-  - This sets the branch which is shown on root.
+  - This sets the branch or alias (when using 'redirect' for `BEHAVIOR_PRIMARY`) which is shown on root.
   - It is advised to show your most recent branch on root.
 - `BEHAVIOR_PRIMARY` which is set to `redirect` whenever it's not defined in the repository variables.
   - This indicates whether to copy the PRIMARY_BRANCH to root ('copy') or redirect from root to the PRIMARY_BRANCH ('redirect')
