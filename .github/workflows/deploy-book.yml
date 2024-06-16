@@ -18,6 +18,7 @@ env:
 
   # If to copy the PRIMARY_BRANCH to root ('copy') or redirect from root to the PRIMARY_BRANCH ('redirect')
   # By default, redirects to PRIMARY_BRANCH ('redirect')
+  # Advised to use redirect if you expect to archive a version in the future so that the URL doesn't change for the reader
   BEHAVIOR_PRIMARY: ${{ vars.BEHAVIOR_PRIMARY != '' && vars.BEHAVIOR_PRIMARY || 'redirect' }}
 
   # Publish branch to custom url with an alias
@@ -37,7 +38,8 @@ env:
   # Preprocessing no branches can also be set by ' '.
   BRANCHES_TO_PREPROCESS: ${{ vars.BRANCHES_TO_PREPROCESS }}
 
-  # Space-separated list of branch names
+  # Add banner to published branch: You are viewing an archived version of the book. Click here (link to root) for the latest version.
+  # Space-separated list of branch names, e.g. 'main second third'.
   # By default, archives no branches (' ')
   # Note: does not support '*'
   BRANCHES_ARCHIVED: ${{ vars.BRANCHES_ARCHIVED }}
