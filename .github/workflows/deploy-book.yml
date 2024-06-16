@@ -55,6 +55,7 @@ jobs:
     steps:
     - uses: actions/checkout@v4
       with:
+        token: ${{ secrets.GH_PAT }}
         fetch-depth: 0
 
     - id: set-branches
@@ -126,6 +127,7 @@ jobs:
       uses: actions/checkout@v4
       with:
         ref: ${{ matrix.branch }}
+        token: ${{ secrets.GH_PAT }}
         submodules: 'true'
 
     - name: Record extra cache info
@@ -295,6 +297,8 @@ jobs:
       BRANCHES: ${{ needs.get-branches.outputs.branches }}
     steps:
     - uses: actions/checkout@v4
+      with:
+        token: ${{ secrets.GH_PAT }}
 
     - run: |
         mkdir final/
