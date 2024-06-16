@@ -11,7 +11,7 @@ on:
 # https://docs.github.com/en/actions/learn-github-actions/variables#creating-configuration-variables-for-a-repository
 env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  GH_TOKEN: ${{ secrets.GH_PAT }} # for gh cli tool
+  GH_TOKEN: ${{ secrets.GH_PAT != '' && secrets.GH_PAT || secrets.GITHUB_TOKEN }} # for gh cli tool
   
   # Branch shown on root (eg. teachbooks.github.io/template/).
   # `main` as primary by default, advised to use branch with most recent content.
@@ -128,7 +128,7 @@ jobs:
       uses: actions/checkout@v4
       with:
         ref: ${{ matrix.branch }}
-        token: ${{ secrets.GH_PAT }}
+        token: ${{ secrets.GH_TOKEN }}
         submodules: 'true'
 
     - name: Record extra cache info
@@ -299,7 +299,7 @@ jobs:
     steps:
     - uses: actions/checkout@v4
       with:
-        token: ${{ secrets.GH_PAT }}
+        token: ${{ secrets.GH_TOKEN }}
 
     - run: |
         mkdir final/
