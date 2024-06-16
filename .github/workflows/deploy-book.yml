@@ -128,7 +128,7 @@ jobs:
       uses: actions/checkout@v4
       with:
         ref: ${{ matrix.branch }}
-        token: ${{ secrets.GH_TOKEN }}
+        token: ${{ env.GH_TOKEN }}
         submodules: 'true'
 
     - name: Record extra cache info
@@ -299,7 +299,7 @@ jobs:
     steps:
     - uses: actions/checkout@v4
       with:
-        token: ${{ secrets.GH_TOKEN }}
+        token: ${{ env.GH_TOKEN }}
 
     - run: |
         mkdir final/
