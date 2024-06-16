@@ -11,17 +11,21 @@ on:
 # https://docs.github.com/en/actions/learn-github-actions/variables#creating-configuration-variables-for-a-repository
 env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  # Branch published on root (eg. teachbooks.github.io/template/).
   # `main` as primary by default, advised to make it `published` to start using draft-publish-workflow
   PRIMARY_BRANCH: ${{ vars.PRIMARY_BRANCH != '' && vars.PRIMARY_BRANCH || 'main' }}
-  # alias-rule, e.g. 'draft:main'
+  # Publish branch to custom url with an alias
+  # Space-separated list of branch names, e.g. 'draft:main'
   # By default, no aliases are defined (''). 
   # If no alias is wanted, BRANCH_ALIASES may be set to ' ' (space).
   BRANCH_ALIASES: ${{ vars.BRANCH_ALIASES }}
+  # Which branches to publish
   # Space-separated list of branch names, e.g. 'main second third'.
   # By default, deploy all branches. This is indicated by '*'.
   BRANCHES_TO_DEPLOY: ${{ vars.BRANCHES_TO_DEPLOY != '' && vars.BRANCHES_TO_DEPLOY || '*' }}
+  # Preprocessing is described here: (as described here: https://teachbooks.github.io/TeachBooks/cli/cli.html#cmdoption-teachbooks-build-publish)
   # Space-separated list of branch names, e.g. 'main second third'.
-  # By default, preprocess (as described here: https://teachbooks.github.io/TeachBooks/cli/cli.html#cmdoption-teachbooks-build-publish) no branches ('').
+  # By default, preprocess no branches ('').
   # Preprocessing no branches can also be set by ' '.
   BRANCHES_TO_PREPROCESS: ${{ vars.BRANCHES_TO_PREPROCESS }}
 
