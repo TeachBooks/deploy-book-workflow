@@ -12,8 +12,8 @@ on:
 env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   
-  # Branch published on root (eg. teachbooks.github.io/template/).
-  # `main` as primary by default, advised to make it `published` to start using draft-publish-workflow
+  # Branch shown on root (eg. teachbooks.github.io/template/).
+  # `main` as primary by default, advised to use branch with most recent content.
   PRIMARY_BRANCH: ${{ vars.PRIMARY_BRANCH != '' && vars.PRIMARY_BRANCH || 'main' }}
 
   # If to copy the PRIMARY_BRANCH to root ('copy') or redirect from root to the PRIMARY_BRANCH ('redirect')
