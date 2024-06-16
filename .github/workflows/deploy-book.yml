@@ -55,7 +55,7 @@ jobs:
     steps:
     - uses: actions/checkout@v4
       with:
-        token: ${{ secrets.GH_PAT }}
+        token: ${{ secrets.GITHUB_TOKEN }}
         fetch-depth: 0
 
     - id: set-branches
@@ -127,7 +127,7 @@ jobs:
       uses: actions/checkout@v4
       with:
         ref: ${{ matrix.branch }}
-        token: ${{ secrets.GH_PAT }}
+        token: ${{ secrets.GITHUB_TOKEN }}
         submodules: 'true'
 
     - name: Record extra cache info
@@ -298,7 +298,7 @@ jobs:
     steps:
     - uses: actions/checkout@v4
       with:
-        token: ${{ secrets.GH_PAT }}
+        token: ${{ secrets.GITHUB_TOKEN }}
 
     - run: |
         mkdir final/
