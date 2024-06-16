@@ -13,7 +13,8 @@ It has the following features:
 - Optionally preprocess branches using the [`teachbooks` package](https://github.com/TeachBooks/TeachBooks).
 - Converting branch-names to well-defined URLs
 - Customizable settings on where the books should be deployed including alias for branch-names and selection of one branch to be deployed on root. The workflow will gives warnings if these setting are ill-defined or conflicting. Although aliases are not allowed by GitHub Pages, it seems you can use one alias, but not more.
-- Redirects the root directory to one of the branches or copy one of the brnaches to root.
+- Redirects the root directory to one of the branches or copy one of the branches to root.
+- Adds an 'archived'-banner to old branches / branches of previous years.
 
 The [TeachBooks template book](https://github.com/TeachBooks/template) uses this functionality for example: The workflow `call-deploy-book.yml` calls the `deploy-book.yml` workflow, which builds the Jupyter books at the calling repository for all branches, and deploys them via GitHub Pages.
 
@@ -34,7 +35,7 @@ You can adapt the behaviour by setting repository variables as explained [here](
   - It is advised to show your most recent branch on root.
 - `BEHAVIOR_PRIMARY` which is set to `redirect` whenever it's not defined in the repository variables.
   - This indicates whether to copy the PRIMARY_BRANCH to root ('copy') or redirect from root to the PRIMARY_BRANCH ('redirect')
-  - Advised to use redirect if you expect to archive a version in the future so that the URL doesn't change for the reader.
+  - Advised to use 'redirect' if you expect to archive a version in the future so that the URL doesn't change for the reader.
 - `BRANCH_ALIASES` which is set to ` `(space) whenever it's not defined in the repository variables.
   - This defines an alias (custom URL) for a branch
   - Variable should be an Space-separated list of branch names, e.g. 'alias:really-long-branch-name`
@@ -46,7 +47,7 @@ You can adapt the behaviour by setting repository variables as explained [here](
   - This defines the branches to preprocess with the [`TeachBooks` package](https://teachbooks.github.io/TeachBooks/cli/cli.html#cmdoption-teachbooks-build-publish), which removed book-pages and config lines defined with `# START REMOVE FROM PUBLISH` and `# END REMOVE FROM PUBLISH`
   - It should be a space-separated list of branch names, e.g. 'main second third'.
   - If no preprocessing is required, `BRANCH_TO_PREPROCESS` may be set to ' ' (space).
-- `BRANCHES_ARCHIVED` which is set to ` ` (space, no branch) whenever it's not defined in the repository varibles
+- `BRANCHES_ARCHIVED` which is set to ` ` (space, no branch) whenever it's not defined in the repository variables
   - This adds a banner to the published branch: You are viewing an archived version of the book. Click here for the latest version.
   - It should be a space-separate list of branch names, e.g. 'main second third'.
 
