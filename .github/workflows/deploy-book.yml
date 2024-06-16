@@ -350,7 +350,7 @@ jobs:
 
         ## Fetch the GH Pages URL
         # https://stackoverflow.com/a/76354104
-        # url=$(gh api "repos/$GITHUB_REPOSITORY/pages" --jq '.html_url')
+        url=$(gh api "repos/$GITHUB_REPOSITORY/pages" --jq '.html_url')
 
         # Clean branch names
         cat raw.txt | tr '/":<>|*?\/\\' '-' > clean.txt
