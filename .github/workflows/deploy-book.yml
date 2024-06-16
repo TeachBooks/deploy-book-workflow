@@ -11,19 +11,39 @@ on:
 # https://docs.github.com/en/actions/learn-github-actions/variables#creating-configuration-variables-for-a-repository
 env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  # `main` as primary by default, advised to make it `published` to start using draft-publish-workflow
+  
+  # Branch shown on root (eg. teachbooks.github.io/template/).
+  # `main` as primary by default, advised to use branch with most recent content.
   PRIMARY_BRANCH: ${{ vars.PRIMARY_BRANCH != '' && vars.PRIMARY_BRANCH || 'main' }}
-  # alias-rule, e.g. 'draft:main'
+
+  # If to copy the PRIMARY_BRANCH to root ('copy') or redirect from root to the PRIMARY_BRANCH ('redirect')
+  # By default, redirects to PRIMARY_BRANCH ('redirect')
+  # Advised to use redirect if you expect to archive a version in the future so that the URL doesn't change for the reader
+  BEHAVIOR_PRIMARY: ${{ vars.BEHAVIOR_PRIMARY != '' && vars.BEHAVIOR_PRIMARY || 'redirect' }}
+
+  # Publish branch to custom url with an alias
+  # Space-separated list of branch names, e.g. 'draft:main'
   # By default, no aliases are defined (''). 
   # If no alias is wanted, BRANCH_ALIASES may be set to ' ' (space).
   BRANCH_ALIASES: ${{ vars.BRANCH_ALIASES }}
+
+  # Which branches to publish
   # Space-separated list of branch names, e.g. 'main second third'.
   # By default, deploy all branches. This is indicated by '*'.
   BRANCHES_TO_DEPLOY: ${{ vars.BRANCHES_TO_DEPLOY != '' && vars.BRANCHES_TO_DEPLOY || '*' }}
+
+  # Preprocessing is described here: (as described here: https://teachbooks.github.io/TeachBooks/cli/cli.html#cmdoption-teachbooks-build-publish)
   # Space-separated list of branch names, e.g. 'main second third'.
   # By default, preprocess no branches ('').
   # Preprocessing no branches can also be set by ' '.
   BRANCHES_TO_PREPROCESS: ${{ vars.BRANCHES_TO_PREPROCESS }}
+
+  # Add banner to published branch: You are viewing an archived version of the book. Click here (link to root) for the latest version.
+  # Space-separated list of branch names, e.g. 'main second third'.
+  # By default, archives no branches (' ')
+  # Note: does not support '*'
+  BRANCHES_ARCHIVED: ${{ vars.BRANCHES_ARCHIVED }}
+
 
 jobs:
   get-branches:
@@ -108,17 +128,23 @@ jobs:
         ref: ${{ matrix.branch }}
         submodules: 'true'
 
-    - name: Record if branch is preprocessed for cache
+    - name: Record extra cache info
       run: |
+        # Record filenames listing -- this updates the cache on filename change
+        find book/ -type f >> EXTRA_CACHE_VARS.txt
+        # Record if branch is preprocessed
         if [ "$BRANCHES_TO_PREPROCESS" == "*" ] || echo "$BRANCHES_TO_PREPROCESS" | tr ' ' '\n' | grep "^${{ matrix.branch }}$"; then
-          echo true > EXTRA_CACHE_VARS.txt
+          echo true >> EXTRA_CACHE_VARS.txt
         else
-          echo false > EXTRA_CACHE_VARS.txt
+          echo false >> EXTRA_CACHE_VARS.txt
         fi
-
-    - name: Record filenames for cache
-      run: |
-         find book/ -type f >> EXTRA_CACHE_VARS.txt
+        # Record if branch is archived
+        if echo "$BRANCHES_ARCHIVED" | tr ' ' '\n' | grep "^${{ matrix.branch }}$"; then
+          echo true >> EXTRA_CACHE_VARS.txt
+        else
+          echo false >> EXTRA_CACHE_VARS.txt
+        fi
+        cat EXTRA_CACHE_VARS.txt
 
     - name: Cache page build
       id: cache-html
@@ -135,10 +161,15 @@ jobs:
         python-version: 3.11
 
     - if: ${{ steps.cache-html.outputs.cache-hit != 'true' }}
+      name: Record current date for cache
+      run: |
+        echo "WEEK=$(date +%V)" >> $GITHUB_ENV
+
+    - if: ${{ steps.cache-html.outputs.cache-hit != 'true' }}
       name: Cache virtualenv
       uses: actions/cache@v4
       with:
-        key: venv-${{ runner.os }}-${{ steps.setup-python.outputs.python-version }}-${{ hashFiles('requirements.txt') }}
+        key: venv-${{ runner.os }}-${{ steps.setup-python.outputs.python-version }}-${{ hashFiles('requirements.txt') }}-week${{ env.WEEK }}-${{ github.repository }}
         path: .venv
 
     - if: ${{ steps.cache-html.outputs.cache-hit != 'true' }}
@@ -149,6 +180,18 @@ jobs:
         python -m pip install -r requirements.txt
         echo "$VIRTUAL_ENV/bin" >> $GITHUB_PATH
         echo "VIRTUAL_ENV=$VIRTUAL_ENV" >> $GITHUB_ENV
+
+    - if: ${{ steps.cache-html.outputs.cache-hit != 'true' }}
+      name: Insert banner if archived
+      run: |
+        if echo "$BRANCHES_ARCHIVED" | tr ' ' '\n' | grep "^${{ matrix.branch }}$"; then
+          {
+            url=$(gh api "repos/$GITHUB_REPOSITORY/pages" --jq '.html_url')
+            echo 'html:'
+            echo "  announcement: 'You are viewing an archived version of the book. Click <a href=\"$url$PRIMARY_BRANCH\">here</a> for the latest version.'"
+          } >> book/_config.yml
+          cat book/_config.yml
+        fi
 
     - if: ${{ steps.cache-html.outputs.cache-hit != 'true' }}
       name: Preprocess & build the book from branch
@@ -248,6 +291,8 @@ jobs:
     permissions:
       pages: write
       id-token: write
+    env:
+      BRANCHES: ${{ needs.get-branches.outputs.branches }}
     steps:
     - uses: actions/checkout@v4
 
@@ -278,13 +323,13 @@ jobs:
 
     - name: Copy primary book to root, fail if names conflict
       timeout-minutes: 1
+      if: ${{ env.BEHAVIOR_PRIMARY == 'copy' }}
       run: |
         GLOBIGNORE=".:.."
         # -i leads to a prompt in case of conflict, => a timeout
         if [ -d final/"$PRIMARY_BRANCH" ]; then
           cp -irv final/"$PRIMARY_BRANCH"/* final/
         fi
-        ls -a final/
 
     - name: Include overview summary
       run: |
@@ -305,13 +350,13 @@ jobs:
         # Clean branch names
         cat raw.txt | tr '/":<>|*?\/\\' '-' > clean.txt
         cat clean.txt | xargs -I{} cat _buildstatus/_buildstatus-{}/buildstatus.txt > status.txt
-        paste -d ' ' raw.txt clean.txt status.txt > pasted.txt
+        paste -d ';' raw.txt clean.txt status.txt > pasted.txt
         cat pasted.txt |
-        while IFS=' ' read -r raw clean status; do
+        while IFS=';' read -r raw clean status; do
           echo "| $raw | <$url$clean> | $status |" >> summary.md
         done
 
-        primary_status=$(grep "^$PRIMARY_BRANCH " pasted.txt | cut -d\  -f4)
+        primary_status=$(grep "^$PRIMARY_BRANCH;" pasted.txt | cut -d ';' -f3)
 
         {
           echo
@@ -322,7 +367,12 @@ jobs:
 
           echo
           echo '#### Primary book at root'
-          echo "The book at the website root <$url> is from the primary branch \\\`$PRIMARY_BRANCH\\\` (status: $primary_status)."
+          if [ ${{ env.BEHAVIOR_PRIMARY  }} == 'copy' ]; then
+            echo "The book at the website root <$url> is from the primary branch \\\`$PRIMARY_BRANCH\\\`."
+          elif [ ${{ env.BEHAVIOR_PRIMARY  }} == 'redirect' ]; then
+            echo "The book at the website root <$url> redirects to the primary branch \\\`$PRIMARY_BRANCH\\\`."
+          fi
+          echo "Status: $primary_status"
         } >> summary.md
 
     - name: Symlink branch aliases
@@ -362,7 +412,6 @@ jobs:
           echo "### Preview of build errors & warnings"
           echo "For more details please see the corresponding \\\`build-books\\\` jobs in the left pane."
         } >> summary.md
-        ls _summaries/
         for fname in _summaries/*; do
           echo $fname
           if [ "$fname" == 'summary.md' ]; then
@@ -375,6 +424,38 @@ jobs:
         else
           echo "No build errors or warnings encountered." >> summary.md
         fi
+
+    - name: Add a custom 404 to redirect
+      env:
+        # https:(0)/(1)/uname.github.io(2)/rname(3)/bname(4) */
+        # if urlParts.len < 4, bname is undefined */
+        HTML_TEMPLATE_404_REDIRECT: |
+          <!DOCTYPE html><title>Redirecting...</title>
+          <body></body>
+          <script>
+          let currentUrl = window.location.href;
+          let urlParts = currentUrl.split('/');
+          console.log("urlParts before", urlParts);
+          let bname = urlParts[4];
+          console.log("bname", bname);
+          let branches = $BRANCHES;
+          console.log("branches", branches);
+          if (!branches.includes(bname)) {
+              urlParts.splice(4, 0, '$PRIMARY_BRANCH');
+              console.log("urlParts after", urlParts);
+              let newUrl = urlParts.join('/');
+              window.location.href = newUrl;
+          } else {
+              document.title = "Page Not Found";
+              document.body.innerHTML = "<h1>Page Not Found</h1>";
+          }
+          </script>
+        # HTML_TEMPLATE_404_TRUE: |
+        #   <!DOCTYPE html><title>404 Not Found</title>
+        #   404 Not Found
+      run: |
+        # echo "$HTML_TEMPLATE_404_TRUE" > final/404-not-found.html
+        echo "$HTML_TEMPLATE_404_REDIRECT" | envsubst | tee final/404.html
 
     - name: Upload final Pages artifact
       uses: actions/upload-pages-artifact@v3
@@ -408,6 +489,14 @@ jobs:
         echo "${{ needs.get-branches.outputs.summary }}" >> $GITHUB_STEP_SUMMARY
         echo "${{ needs.deploy-books.outputs.summary }}" >> $GITHUB_STEP_SUMMARY
 
+        if [[ "${{ needs.get-branches.outputs.summary }}" == "" || "${{ needs.deploy-books.outputs.summary }}" == "" ]]; then
+          {
+            echo "An unknown error has occurred, cannot display summary. It may be there were too many errors or warnings in the book build process."
+            echo
+            echo "- You can try building the books locally, or inspecting the workflow run logs to troubleshoot the issue."
+          } >> $GITHUB_STEP_SUMMARY
+        fi
+
         isdefault() {
           if [ "$1" == '' ]; then
             echo '(default value used)'
@@ -422,9 +511,11 @@ jobs:
           echo "Variables can be set at ${{ format('{0}/{1}/settings/variables/actions', github.server_url, github.repository) }}"
           echo '```'
           echo "PRIMARY_BRANCH=$PRIMARY_BRANCH $(isdefault ${{ vars.PRIMARY_BRANCH }})"
+          echo "BEHAVIOR_PRIMARY=$BEHAVIOR_PRIMARY $(isdefault ${{vars.BRANCHES_TO_PREPROCESS}})"
           echo "BRANCH_ALIASES=$BRANCH_ALIASES $(isdefault ${{ vars.BRANCH_ALIASES }})"
           echo "BRANCHES_TO_DEPLOY=$BRANCHES_TO_DEPLOY $(isdefault ${{ vars.BRANCHES_TO_DEPLOY }})"
           echo "BRANCHES_TO_PREPROCESS=$BRANCHES_TO_PREPROCESS $(isdefault ${{ vars.BRANCHES_TO_PREPROCESS }})"
+          echo "BRANCHES_ARCHIVED=$BRANCHES_ARCHIVED $(isdefault ${{ vars.BRANCHES_ARCHIVED }})"
           echo '```'
         } >> $GITHUB_STEP_SUMMARY
 

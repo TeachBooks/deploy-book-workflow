@@ -18,6 +18,7 @@ It has the following features:
 - Optionally preprocess branches using the [`teachbooks` package](https://github.com/TeachBooks/TeachBooks).
 - Converting branch-names to well-defined URLs
 - Customizable settings on where the books should be deployed including alias for branch-names and selection of one branch to be deployed on root. The workflow will gives warnings if these setting are ill-defined or conflicting. Although aliases are not allowed by GitHub Pages, it seems you can use one alias, but not more.
+- Redirects the root directory to one of the branches or copy one of the brnaches to root.
 
 The [TeachBooks template book](https://github.com/TeachBooks/template) uses this functionality for example: The workflow `call-deploy-book.yml` calls the `deploy-book.yml` workflow, which builds the Jupyter books at the calling repository for all branches, and deploys them via GitHub Pages.
 
@@ -34,19 +35,25 @@ This workflow is used in `TeachBooks/template`. Feel free to juse it for your Te
 
 You can adapt the behaviour by setting repository variables as explained [here](https://docs.github.com/en/actions/learn-github-actions/variables#creating-configuration-variables-for-a-repository) or using the [VS Code Extension GitHub Actions](https://marketplace.visualstudio.com/items?itemName=GitHub.vscode-github-actions). Define the following repository variables:
 - `PRIMARY_BRANCH` which is set to `main` whenever it's not defined in the repository variables.
-  - This sets the branch which is hosted on root.
-  - It is advised to make it `published` to start using draft-publish-workflow
+  - This sets the branch which is shown on root.
+  - It is advised to show your most recent branch on root.
+- `BEHAVIOR_PRIMARY` which is set to `redirect` whenever it's not defined in the repository variables.
+  - This indicates whether to copy the PRIMARY_BRANCH to root ('copy') or redirect from root to the PRIMARY_BRANCH ('redirect')
+  - Advised to use redirect if you expect to archive a version in the future so that the URL doesn't change for the reader.
 - `BRANCH_ALIASES` which is set to ` `(space) whenever it's not defined in the repository variables.
-  - This defines an alias for a branch
-  - It should be an alias-rule, e.g. 'alias:really-long-branch-name`
+  - This defines an alias (custom URL) for a branch
+  - Variable should be an Space-separated list of branch names, e.g. 'alias:really-long-branch-name`
   - If no alias is wanted, `BRANCH_ALIASES` may be set to ' ' (space).
 - `BRANCHES_TO_DEPLOY`  which is set to `*` (all branches) whenever it's not defined in the repository variables.
   - This defines the branches to deploy.
   - It should be a space-separated list of branch names, e.g. 'main second third'.
 - `BRANCHES_TO_PREPROCESS` which is to to ` ` (space, no branch) whenever it's not defined in the repository variables
-  - This defines the branches to preprocess with the `TeachBooks` package, this removed book-pages defined with `# START REMOVE FROM PUBLISH` and `# END REMOVE FROM PUBLISH`
+  - This defines the branches to preprocess with the [`TeachBooks` package](https://teachbooks.github.io/TeachBooks/cli/cli.html#cmdoption-teachbooks-build-publish), which removed book-pages and config lines defined with `# START REMOVE FROM PUBLISH` and `# END REMOVE FROM PUBLISH`
   - It should be a space-separated list of branch names, e.g. 'main second third'.
   - If no preprocessing is required, `BRANCH_TO_PREPROCESS` may be set to ' ' (space).
+- `BRANCHES_ARCHIVED` which is set to ` ` (space, no branch) whenever it's not defined in the repository varibles
+  - This adds a banner to the published branch: You are viewing an archived version of the book. Click here for the latest version.
+  - It should be a space-separate list of branch names, e.g. 'main second third'.
 
 In `call-deploy-book.yml` itself you can specify the trigger for this workflow. By default, a push to any branch trigger the workflow. You can limit the branches or subdirectories.
 
@@ -75,7 +82,7 @@ Here's an example for a summary for the template book:
 > ⭕ `Build failed [2]` - build failure, no previous version reused.
 >
 > #### Primary book at root
-> The book at the website root <https://teachbooks.github.io/testable-template/> is from the primary branch `main` (status: `Published`).
+> The book at the website root <https://teachbooks.github.io/testable-template/> redirects to the primary branch `main` (status: ✅ `Published`).
 > 
 > ### Aliases
 > | Alias ➡️ | Target 🎯 | Link 🔗 |  Build status ☑️ |
@@ -103,4 +110,6 @@ Here's an example for a summary for the template book:
 > BRANCH_ALIASES=draft:main
 > BRANCHES_TO_DEPLOY=* (default value used)
 > BRANCHES_TO_PREPROCESS=main
+> BEHAVIOR_PRIMARY=redirect (default value used)
+> BRANCHES_ARCHIVED= (default value used)
 > ```
