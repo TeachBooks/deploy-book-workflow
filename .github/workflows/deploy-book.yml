@@ -17,7 +17,6 @@ env:
   PRIMARY_BRANCH: ${{ vars.PRIMARY_BRANCH != '' && vars.PRIMARY_BRANCH || 'main' }}
 
   # If to copy the PRIMARY_BRANCH to root ('copy') or redirect from root to the PRIMARY_BRANCH ('redirect')
-  # 'redirect' or 'copy'
   # By default, redirects to PRIMARY_BRANCH ('redirect')
   BEHAVIOR_PRIMARY: ${{ vars.BEHAVIOR_PRIMARY != '' && vars.BEHAVIOR_PRIMARY || 'redirect' }}
 
