@@ -21,7 +21,7 @@ env:
   # By default, deploy all branches. This is indicated by '*'.
   BRANCHES_TO_DEPLOY: ${{ vars.BRANCHES_TO_DEPLOY != '' && vars.BRANCHES_TO_DEPLOY || '*' }}
   # Space-separated list of branch names, e.g. 'main second third'.
-  # By default, preprocess no branches ('').
+  # By default, preprocess (as described here: https://teachbooks.github.io/TeachBooks/cli/cli.html#cmdoption-teachbooks-build-publish) no branches ('').
   # Preprocessing no branches can also be set by ' '.
   BRANCHES_TO_PREPROCESS: ${{ vars.BRANCHES_TO_PREPROCESS }}
 
