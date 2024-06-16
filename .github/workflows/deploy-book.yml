@@ -16,8 +16,9 @@ env:
   # `main` as primary by default, advised to make it `published` to start using draft-publish-workflow
   PRIMARY_BRANCH: ${{ vars.PRIMARY_BRANCH != '' && vars.PRIMARY_BRANCH || 'main' }}
 
-  # If to copy the primary page to root
-  # By default, copies no branches ('false')
+  # If to copy the PRIMARY_BRANCH to root ('copy') or redirect from root to the PRIMARY_BRANCH ('redirect')
+  # 'redirect' or 'copy'
+  # By default, redirects to PRIMARY_BRANCH ('redirect')
   BEHAVIOR_PRIMARY: ${{ vars.BEHAVIOR_PRIMARY != '' && vars.BEHAVIOR_PRIMARY || 'redirect' }}
 
   # Publish branch to custom url with an alias
