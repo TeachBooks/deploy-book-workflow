@@ -141,7 +141,7 @@ jobs:
       name: Cache virtualenv
       uses: actions/cache@v4
       with:
-        key: venv-${{ runner.os }}-${{ steps.setup-python.outputs.python-version }}-${{ hashFiles('requirements.txt') }}-week${{ env.WEEK }}
+        key: venv-${{ runner.os }}-${{ steps.setup-python.outputs.python-version }}-${{ hashFiles('requirements.txt') }}-week${{ env.WEEK }}-${{ github.repository }}
         path: .venv
 
     - if: ${{ steps.cache-html.outputs.cache-hit != 'true' }}
