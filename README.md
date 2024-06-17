@@ -86,7 +86,7 @@ Here's an example for a summary for the template book:
 > ⭕ `Build failed [2]` - build failure, no previous version reused.
 >
 > #### Primary book at root
-> The book at the website root <https://teachbooks.github.io/testable-template/> redirects to the primary branch `main` (status: ✅ `Published`).
+> The book at the website root <https://teachbooks.github.io/template/> redirects to the primary branch `main` (status: ✅ `Published`).
 > 
 > ### Aliases
 > | Alias ➡️ | Target 🎯 | Link 🔗 |  Build status ☑️ |
@@ -107,7 +107,7 @@ Here's an example for a summary for the template book:
 > ```
 >
 > ### Repository configuration variables
-> Variables can be set at [https://github.com/TeachBooks/template/settings/variables/actions](https://github.com/TeachBooks/template/settings/variables/actions)
+> Variables can be set at <https://github.com/TeachBooks/template/settings/variables/actions>
 >
 > ```
 > PRIMARY_BRANCH=main (default value used)
