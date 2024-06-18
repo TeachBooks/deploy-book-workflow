@@ -388,7 +388,7 @@ jobs:
           echo "Status: $primary_status"
         } >> summary.md
 
-    - name: Symlink branch aliases
+    - name: Symlink and summarise branch aliases
       id: symlink-aliases
       run: |
         echo "### Aliases" >> summary.md
@@ -499,10 +499,9 @@ jobs:
     - name: Summarize
       run: |
 
-        echo "${{ needs.get-branches.outputs.summary }}" >> $GITHUB_STEP_SUMMARY
         echo "${{ needs.deploy-books.outputs.summary }}" >> $GITHUB_STEP_SUMMARY
 
-        if [[ "${{ needs.get-branches.outputs.summary }}" == "" || "${{ needs.deploy-books.outputs.summary }}" == "" ]]; then
+        if [[ "${{ needs.deploy-books.outputs.summary }}" == "" ]]; then
           {
             echo "An unknown error has occurred, cannot display summary. It may be there were too many errors or warnings in the book build process."
             echo
