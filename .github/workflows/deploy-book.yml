@@ -523,7 +523,7 @@ jobs:
           echo "Variables can be set at ${{ format('{0}/{1}/settings/variables/actions', github.server_url, github.repository) }}"
           echo '```'
           echo "PRIMARY_BRANCH=$PRIMARY_BRANCH $(isdefault ${{ vars.PRIMARY_BRANCH }})"
-          echo "BEHAVIOR_PRIMARY=$BEHAVIOR_PRIMARY $(isdefault ${{vars.BRANCHES_TO_PREPROCESS}})"
+          echo "BEHAVIOR_PRIMARY=$BEHAVIOR_PRIMARY $(isdefault ${{vars.BEHAVIOR_PRIMARY}})"
           echo "BRANCH_ALIASES=$BRANCH_ALIASES $(isdefault ${{ vars.BRANCH_ALIASES }})"
           echo "BRANCHES_TO_DEPLOY=$BRANCHES_TO_DEPLOY $(isdefault ${{ vars.BRANCHES_TO_DEPLOY }})"
           echo "BRANCHES_TO_PREPROCESS=$BRANCHES_TO_PREPROCESS $(isdefault ${{ vars.BRANCHES_TO_PREPROCESS }})"
