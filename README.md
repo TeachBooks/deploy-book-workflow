@@ -4,7 +4,7 @@ We developed a workflow which builds the Jupyter Books in your repository for al
 
 It has the following features:
 - Publishing of your [Jupyter Book](https://github.com/executablebooks/jupyter-book)-repository to GitHub Pages
-- Publishes both private (GitHub Pro, GitHub Team, GitHub Enterprise Cloud, or GitHub Enterprise Server required) and public (GitHub Free is enough) repositories.
+- Publishes both private (GitHub Pro, GitHub Team, GitHub Enterprise Cloud, or GitHub Enterprise Server required) and public (GitHub Free is enough) repositories. GitHub Teams is free for teacher as described in the [GitHub documentation](https://docs.github.com/en/education/explore-the-benefits-of-teaching-and-learning-with-github-education/github-education-for-teachers/about-github-education-for-teachers#github-education-features-for-teachers). If you’ve a organization for your book on GitHub, link your GitHub team rights to your organization as described on the [GitHub website](https://github.com/team#organizations).
 - Publishing all or a selection of branches, allowing to build draft version of the book online preventing local builds
 - A summary describing where the book is published, errors in the build process per branch and how the publish step is configured
 - Caching of build books so that it can be reused when another branch is published or the next build contains critical errors
