@@ -388,7 +388,7 @@ jobs:
           echo "Status: $primary_status"
         } >> summary.md
 
-    - name: Symlink branch aliases
+    - name: Symlink and summarise branch aliases
       id: symlink-aliases
       run: |
         echo "### Aliases" >> summary.md
@@ -499,10 +499,9 @@ jobs:
     - name: Summarize
       run: |
 
-        echo "${{ needs.get-branches.outputs.summary }}" >> $GITHUB_STEP_SUMMARY
         echo "${{ needs.deploy-books.outputs.summary }}" >> $GITHUB_STEP_SUMMARY
 
-        if [[ "${{ needs.get-branches.outputs.summary }}" == "" || "${{ needs.deploy-books.outputs.summary }}" == "" ]]; then
+        if [[ "${{ needs.deploy-books.outputs.summary }}" == "" ]]; then
           {
             echo "An unknown error has occurred, cannot display summary. It may be there were too many errors or warnings in the book build process."
             echo
@@ -524,7 +523,7 @@ jobs:
           echo "Variables can be set at ${{ format('{0}/{1}/settings/variables/actions', github.server_url, github.repository) }}"
           echo '```'
           echo "PRIMARY_BRANCH=$PRIMARY_BRANCH $(isdefault ${{ vars.PRIMARY_BRANCH }})"
-          echo "BEHAVIOR_PRIMARY=$BEHAVIOR_PRIMARY $(isdefault ${{vars.BRANCHES_TO_PREPROCESS}})"
+          echo "BEHAVIOR_PRIMARY=$BEHAVIOR_PRIMARY $(isdefault ${{vars.BEHAVIOR_PRIMARY}})"
           echo "BRANCH_ALIASES=$BRANCH_ALIASES $(isdefault ${{ vars.BRANCH_ALIASES }})"
           echo "BRANCHES_TO_DEPLOY=$BRANCHES_TO_DEPLOY $(isdefault ${{ vars.BRANCHES_TO_DEPLOY }})"
           echo "BRANCHES_TO_PREPROCESS=$BRANCHES_TO_PREPROCESS $(isdefault ${{ vars.BRANCHES_TO_PREPROCESS }})"
