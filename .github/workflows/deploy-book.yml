@@ -303,6 +303,7 @@ jobs:
     permissions:
       pages: write
       id-token: write
+      contents: read
     env:
       BRANCHES: ${{ needs.get-branches.outputs.branches }}
     steps:
