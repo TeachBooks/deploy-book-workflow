@@ -126,6 +126,7 @@ jobs:
     permissions:
       pages: write
       id-token: write
+      contents: read
     strategy:
       # If one branch fails, we may still want to deploy the other
       fail-fast: false
@@ -302,6 +303,7 @@ jobs:
     permissions:
       pages: write
       id-token: write
+      contents: read
     env:
       BRANCHES: ${{ needs.get-branches.outputs.branches }}
     steps:
