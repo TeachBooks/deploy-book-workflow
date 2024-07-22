@@ -387,7 +387,11 @@ jobs:
           elif [ ${{ env.BEHAVIOR_PRIMARY  }} == 'redirect' ]; then
             echo "The book at the website root <$url> redirects to the primary branch \\\`$PRIMARY_BRANCH\\\`."
           fi
-          echo "Status: $primary_status"
+
+          if [ -n "$primary_status" ]; then
+            echo "Status: $primary_status"
+          fi
+
         } >> summary.md
 
     - name: Symlink and summarise branch aliases
