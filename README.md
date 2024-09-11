@@ -1,10 +1,5 @@
 # GitHub workflow: publish your book online to GitHub Pages
 
-```{admonition} User types
-:class: tip
-This page is useful for user type 3, 4 and 5.
-```
-
 We developed a workflow which builds your TeachBook in your repository for all branches and publishes them online via GitHub Pages. In simplified terms, it builds the website based on your repository.
 
 The [TeachBooks Template](https://github.com/TeachBooks/template) uses this functionality for example. The workflow `call-deploy-book.yml` calls the `deploy-book.yml` workflow, which builds the Jupyter books at the calling repository for all branches, and deploys them via GitHub Pages.
