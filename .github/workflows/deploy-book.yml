@@ -57,7 +57,7 @@ env:
 
 jobs:
   get-branches:
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, linux]
     outputs:
       branches: ${{ steps.set-branches.outputs.branches }}
     permissions:
@@ -268,7 +268,7 @@ jobs:
     - name: Clean branch name of disallowed characters
       if: always()
       run: |
-        echo "MATRIX_BRANCH_NAME_CLEAN=$(echo ${{ matrix.branch }} | tr '/":<>|*?\/\\' '-')" >> $GITHUB_ENV
+        echo "MATRIX_BRANCH_NAME_CLEAN=$(echo ${{ matrix.branch }} | tr '/":<>|*?\/\\' '-')" >> $GITHUB_ENV # "
 
     - name: Upload summary as an artifact
       if: always()
