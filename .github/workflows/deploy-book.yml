@@ -31,24 +31,24 @@ env:
   # Advised to use redirect if you expect to archive a version in the future so that the URL doesn't change for the reader
   BEHAVIOR_PRIMARY: ${{ vars.BEHAVIOR_PRIMARY != '' && vars.BEHAVIOR_PRIMARY || 'redirect' }}
 
-  # Publish branch to custom url with an alias
+  # Release branch to custom url with an alias
   # Space-separated list of branch names, e.g. 'draft:main'
   # By default, no aliases are defined (''). 
   # If no alias is wanted, BRANCH_ALIASES may be set to ' ' (space).
   BRANCH_ALIASES: ${{ vars.BRANCH_ALIASES }}
 
-  # Which branches to publish
+  # Which branches to release
   # Space-separated list of branch names, e.g. 'main second third'.
   # By default, deploy all branches. This is indicated by '*'.
   BRANCHES_TO_DEPLOY: ${{ vars.BRANCHES_TO_DEPLOY != '' && vars.BRANCHES_TO_DEPLOY || '*' }}
 
-  # Preprocessing is described here: (as described here: https://teachbooks.github.io/TeachBooks/cli/cli.html#cmdoption-teachbooks-build-publish)
+  # Preprocessing is described here: (as described here: https://teachbooks.github.io/TeachBooks/cli/cli.html#teachbooks-build)
   # Space-separated list of branch names, e.g. 'main second third'.
   # By default, preprocess no branches ('').
   # Preprocessing no branches can also be set by ' '.
   BRANCHES_TO_PREPROCESS: ${{ vars.BRANCHES_TO_PREPROCESS }}
 
-  # Add banner to published branch: You are viewing an archived version of the book. Click here (link to root) for the latest version.
+  # Add banner to released branch: You are viewing an archived version of the book. Click here (link to root) for the latest version.
   # Space-separated list of branch names, e.g. 'main second third'.
   # By default, archives no branches (' ')
   # Note: does not support '*'
@@ -209,13 +209,13 @@ jobs:
       name: Preprocess & build the book from branch
       run: |
         if [ "$BRANCHES_TO_PREPROCESS" == "*" ] || echo "$BRANCHES_TO_PREPROCESS" | tr ' ' '\n' | grep "^${{ matrix.branch }}$"; then
-          option_publish='--publish'
+          option_release='--release'
         else
-          option_publish=''
+          option_release=''
         fi
         set -o pipefail
         # https://stackoverflow.com/a/692407
-        teachbooks build $option_publish book/ > >(tee stdout.log) 2> >(tee stderr.log >&2)
+        teachbooks build $option_release book/ > >(tee stdout.log) 2> >(tee stderr.log >&2)
         set +o pipefail
 
     - name: If failed, restore a book for this branch from cache
@@ -248,7 +248,7 @@ jobs:
     - name: Record build success
       if: success()
       run: |
-        echo ":white_check_mark: \\\`Published\\\`" >> buildstatus.txt
+        echo ":white_check_mark: \\\`Released\\\`" >> buildstatus.txt
 
     - name: Make summary of errors, if any
       # run even in case of failure
@@ -376,7 +376,7 @@ jobs:
         {
           echo
           echo "#### Legend for build status"
-          echo ":white_check_mark: \\\`Published\\\` - build success, new version published."
+          echo ":white_check_mark: \\\`Released\\\` - build success, new version released."
           echo ":red_circle: \\\`Build failed [1]\\\` - build failure, previous version of the book reused."
           echo ":o: \\\`Build failed [2]\\\` - build failure, no previous version reused."
 
