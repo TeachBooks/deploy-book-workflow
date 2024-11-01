@@ -1,4 +1,4 @@
-# GitHub workflow: Release your book online to GitHub Pages
+# GitHub reusable action: publish your book online to GitHub Pages
 
 We developed a workflow which builds your TeachBook in your repository for all branches and releases them online via GitHub Pages. In simplified terms, it builds the website based on your repository.
 
