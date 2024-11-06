@@ -113,3 +113,6 @@ Here's an example for a summary for the template book:
 > BEHAVIOR_PRIMARY=redirect (default value used)
 > BRANCHES_ARCHIVED= (default value used)
 > ```
+
+## Contribute
+This tool's repository is stored on [GitHub](https://github.com/TeachBooks/deploy-book-workflow). The `README.md` of the branch `manual_docs` is also part of the [TeachBooks manual](https://teachbooks.tudelft.nl/jupyter-book-manual/external/deploy-book-workflow/README.html) as a submodule. If you'd like to contribute, you can create a fork and open a pull request on the [GitHub repository](https://github.com/TeachBooks/deploy-book-workflow). To update the `README.md` shown in the TeachBooks manual, create a fork and open a merge request for the [GitLab repository of the manual](https://gitlab.tudelft.nl/interactivetextbooks-citg/jupyter-book-manual). If you intent to clone the manual including its submodules, clone using: `git clone --recurse-submodules git@gitlab.tudelft.nl:interactivetextbooks-citg/jupyter-book-manual.git`.
