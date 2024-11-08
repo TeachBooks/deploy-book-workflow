@@ -503,7 +503,7 @@ jobs:
 
         echo "${{ needs.deploy-books.outputs.summary }}" >> $GITHUB_STEP_SUMMARY
 
-        if [[ "${{ needs.deploy-books.outputs.summary }}" == "" ]]; then
+        if [ "${{ needs.deploy-books.outputs.summary }}" == "" ]; then
           {
             echo "An unknown error has occurred, cannot display summary. It may be there were too many errors or warnings in the book build process."
             echo
