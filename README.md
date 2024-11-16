@@ -5,7 +5,7 @@ We developed a workflow which builds your TeachBook in your repository for all b
 The [TeachBooks Template](https://github.com/TeachBooks/template) uses this functionality for example. The workflow `call-deploy-book.yml` calls the `deploy-book.yml` workflow, which builds the Jupyter books at the calling repository for all branches, and deploys them via GitHub Pages.
 
 The workflow has the following features:
-- Releasing of your [TeachBook](https://teachbooks.tudelft.nl/)-repository (built with [Jupyter Book](https://github.com/executablebooks/jupyter-book)) to GitHub Pages
+- Releasing of your [TeachBook](https://teachbooks.io/)-repository (built with [Jupyter Book](https://github.com/executablebooks/jupyter-book)) to GitHub Pages
 - Ability to release both private (GitHub Pro, GitHub Team, GitHub Enterprise Cloud, or GitHub Enterprise Server required) and public (GitHub Free is enough) repositories.  
 GitHub Teams is free for teachers as described in the [GitHub documentation](https://docs.github.com/en/education/explore-the-benefits-of-teaching-and-learning-with-github-education/github-education-for-teachers/about-github-education-for-teachers#github-education-features-for-teachers).  
 If you have an organization for your TeachBook on GitHub, link your GitHub team rights to your organization as described on the [GitHub website](https://github.com/team#organizations).
@@ -48,7 +48,7 @@ You can adapt the behaviour by setting repository variables as explained [here](
   - This defines the branches to deploy.
   - It should be a space-separated list of branch names, e.g. 'main second third'.
 - `BRANCHES_TO_PREPROCESS` which is to to ` ` (just a space = no branch) whenever it's not defined in the repository variables
-  - This defines the branches to preprocess with the [`TeachBooks` package](https://teachbooks.github.io/TeachBooks/cli/cli.html#cmdoption-teachbooks-build), which removed book-pages and config lines defined with `# START REMOVE FROM RELEASE` and `# END REMOVE FROM RELEASE`
+  - This defines the branches to preprocess with the [`TeachBooks` package](https://teachbooks.io/TeachBooks/cli/cli.html#cmdoption-teachbooks-build), which removed book-pages and config lines defined with `# START REMOVE FROM RELEASE` and `# END REMOVE FROM RELEASE`
   - It should be a space-separated list of branch names, e.g. 'main second third'.
   - If no preprocessing is required, `BRANCH_TO_PREPROCESS` may be set to ' ' (space).
 - `BRANCHES_ARCHIVED` which is set to ` ` (space, no branch) whenever it's not defined in the repository variables
@@ -115,4 +115,4 @@ Here's an example for a summary for the template book:
 > ```
 
 ## Contribute
-This tool's repository is stored on [GitHub](https://github.com/TeachBooks/deploy-book-workflow). The `README.md` of the branch `manual_docs` is also part of the [TeachBooks manual](https://teachbooks.tudelft.nl/jupyter-book-manual/external/deploy-book-workflow/README.html) as a submodule. If you'd like to contribute, you can create a fork and open a pull request on the [GitHub repository](https://github.com/TeachBooks/deploy-book-workflow). To update the `README.md` shown in the TeachBooks manual, create a fork and open a merge request for the [GitLab repository of the manual](https://gitlab.tudelft.nl/interactivetextbooks-citg/jupyter-book-manual). If you intent to clone the manual including its submodules, clone using: `git clone --recurse-submodules git@gitlab.tudelft.nl:interactivetextbooks-citg/jupyter-book-manual.git`.
+This tool's repository is stored on [GitHub](https://github.com/TeachBooks/deploy-book-workflow). The `README.md` of the branch `manual_docs` is also part of the [TeachBooks manual](https://teachbooks.io/manual/external/deploy-book-workflow/README.html) as a submodule. If you'd like to contribute, you can create a fork and open a pull request on the [GitHub repository](https://github.com/TeachBooks/deploy-book-workflow). To update the `README.md` shown in the TeachBooks manual, create a fork and open a merge request for the [GitHub repository of the manual](https://github.com/TeachBooks/manual). If you intent to clone the manual including its submodules, clone using: `git clone --recurse-submodulesgit@github.com:TeachBooks/manual.git`.
