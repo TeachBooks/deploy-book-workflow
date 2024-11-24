@@ -449,6 +449,7 @@ jobs:
         else
           echo "404.html does not exist, generating default.";
           echo "404_exists=false" >> $GITHUB_ENV
+        fi
     
       
     # Is this a redundant step?
