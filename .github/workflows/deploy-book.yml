@@ -456,13 +456,13 @@ jobs:
       
     # Is this a redundant step?
     - name: Use existing 404.html or generate new one
-      if: ${{env.404_exists == 'true'}}
+      if: ${{env['404_exists'] == 'true'}}
       run: |
         cp 404.html final/404.html
         echo "Using the existing 404.html."
     
     - name: Add a custom 404 to redirect
-      if: ${{ env.404_exists =='false' }}
+      if: ${{ env['404_exists'] =='false' }}
       env:
         # https:(0)/(1)/uname.github.io(2)/rname(3)/bname(4) */
         # if urlParts.len < 4, bname is undefined */
