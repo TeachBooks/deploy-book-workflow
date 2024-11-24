@@ -439,9 +439,6 @@ jobs:
         else
           echo "No build errors or warnings encountered." >> summary.md
         fi
-      
-        - name: Checkout code
-        uses: actions/checkout@v2
 
     - name: Check if 404.html exists
       id: check_404
