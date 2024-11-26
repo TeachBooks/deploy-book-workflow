@@ -481,8 +481,42 @@ jobs:
               let newUrl = urlParts.join('/');
               window.location.href = newUrl;
           } else {
-              document.title = "Page Not Found";
-              document.body.innerHTML = "<h1>Page Not Found</h1>";
+            document.title = "Page Not Found";
+            document.body.innerHTML = `
+              <h1>Page Not Found</h1>
+              <p>The page you're looking for doesn't exist. Here are the available branches:</p>
+              <table>
+                <thead>
+                  <tr>
+                    <th>Branch</th>
+                    <th>URL</th>
+                  </tr>
+                </thead>
+                <tbody id="branches-table-body">
+                </tbody>
+              </table>
+            `;
+            
+            #let branches = $BRANCHES; // JSON array of branch names
+            let currentUrl = window.location.href;
+            let urlParts = currentUrl.split('/');
+            let baseUrl = urlParts.slice(0, 4).join('/'); // Root URL
+
+            let tableBody = document.getElementById('branches-table-body');
+            
+            // Populate table with branches and URLs
+            branches.forEach(branch => {
+                let row = document.createElement('tr');
+                let branchCell = document.createElement('td');
+                let urlCell = document.createElement('td');
+                
+                branchCell.textContent = branch;
+                urlCell.innerHTML = `<a href="${baseUrl}/${branch}/">${baseUrl}/${branch}/</a>`;
+                
+                row.appendChild(branchCell);
+                row.appendChild(urlCell);
+                tableBody.appendChild(row);
+            });
           }
           </script>
         # HTML_TEMPLATE_404_TRUE: |
