@@ -497,7 +497,7 @@ jobs:
               </table>
             `;
             
-            #let branches = $BRANCHES; // JSON array of branch names
+            let branches = $BRANCHES; // JSON array of branch names
             let currentUrl = window.location.href;
             let urlParts = currentUrl.split('/');
             let baseUrl = urlParts.slice(0, 4).join('/'); // Root URL
