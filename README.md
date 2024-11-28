@@ -1,4 +1,4 @@
-# TeachBooks GitHub Pages Workflow
+# GitHub reusable action: publish your book online to GitHub Pages
 
 ```{admonition} User types
 :class: tip
