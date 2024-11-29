@@ -1,4 +1,4 @@
-# TeachBooks GitHub Pages Workflow
+# Releasing book online
 
 ```{admonition} User types
 :class: tip
