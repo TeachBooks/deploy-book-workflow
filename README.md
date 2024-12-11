@@ -1,3 +1,4 @@
+(deploy-book-workflow)=
 # Releasing book online
 
 ```{admonition} User types
