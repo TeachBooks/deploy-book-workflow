@@ -7,7 +7,7 @@
 :class: tip
 This page is useful for user type 3, 4 and 5.
 ```
-+++
+
 {bdg-light}`GitHub Reusable Action`
 
 We developed a workflow which builds your TeachBook in your repository for all branches and publishes them online via GitHub Pages. In simplified terms, it builds the website based on your repository.
