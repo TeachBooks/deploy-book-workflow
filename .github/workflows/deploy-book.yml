@@ -80,11 +80,6 @@ jobs:
         
         # Fetch all open pull requests from forks and include their branches
         pr_branches=$(gh pr list --state open --json number,headRefName,isCrossRepository --jq '.[] | select(.isCrossRepository) | "refs/pull/" + (.number|tostring) + "/merge"')
-
-        # Print the pull request branches for debugging
-        echo "Pull request branches:"
-        echo "$pr_branches"
-
         branches=$(echo -e "$branches\n$pr_branches" | grep -E '\S')
         
         # Record branch names (one per line) for alias validation
