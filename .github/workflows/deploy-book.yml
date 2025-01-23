@@ -397,6 +397,8 @@ jobs:
           cat clean.txt | xargs -I{} cat _buildstatus/_buildstatus-{}/buildstatus.txt > status.txt
         fi
         
+        cat status.txt
+
         # Combine raw, clean, and status into pasted.txt
         paste -d ';' raw.txt clean.txt status.txt > pasted.txt
         
