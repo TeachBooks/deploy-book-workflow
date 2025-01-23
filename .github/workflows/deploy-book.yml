@@ -307,7 +307,7 @@ jobs:
         path: "buildstatus.txt"
 
     - name: Upload the built book HTML as an artifact
-      if: always()
+      if: ${{ github.event.pull_request.head.repo.full_name == github.repository && startsWith(matrix.branch, 'refs/pull/') }}
       uses: actions/upload-artifact@v4
       with:
         name: ${{ env.MATRIX_BRANCH_NAME_CLEAN }}
@@ -391,7 +391,11 @@ jobs:
         grep '^refs/pull/' raw.txt | sed 's|refs/pull/\([0-9]\+\)/merge|PR-\1|' >> clean.txt
 
         # Generate status.txt
-        cat clean.txt | xargs -I{} cat _buildstatus/_buildstatus-{}/buildstatus.txt > status.txt
+        if [ "${{ github.event.pull_request.head.repo.full_name }}" != "${{ github.repository }}" ]; then
+          cat clean.txt | xargs -I{} echo "not deployed because of fork" > status.txt
+        else
+          cat clean.txt | xargs -I{} cat _buildstatus/_buildstatus-{}/buildstatus.txt > status.txt
+        fit
         
         # Combine raw, clean, and status into pasted.txt
         paste -d ';' raw.txt clean.txt status.txt > pasted.txt
@@ -410,6 +414,8 @@ jobs:
           echo ":white_check_mark: \\\`Released\\\` - build success, new version released."
           echo ":red_circle: \\\`Build failed [1]\\\` - build failure, previous version of the book reused."
           echo ":o: \\\`Build failed [2]\\\` - build failure, no previous version reused."
+          echo ":no_entry_sign: \\\`Not deployed because of fork\\\` - deployment skipped for forked repository."
+
 
           echo
           echo '#### Primary book at root'
