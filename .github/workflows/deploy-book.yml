@@ -83,6 +83,10 @@ jobs:
         else
           branches=$(echo "$BRANCHES_TO_DEPLOY" | tr ' ' '\n' | grep -E '\S')
         fi
+
+        # Print the branches for debugging
+        echo "branches (raw):"
+        echo "$branches"
         
         # Fetch all open pull requests from forks and include their branches
         if [ "$PULL_REQUESTS_TO_DEPLOY" == '*' ]; then
