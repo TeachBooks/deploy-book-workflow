@@ -79,7 +79,7 @@ jobs:
         # If all (*), query all remote branches
         # If not, read from env var
         if [ "$BRANCHES_TO_DEPLOY" == '*' ]; then
-          branches=$(git branch -r | sed 's,\s*origin/,,g' | grep -v '\->')
+          branches=$(git branch -r | sed 's,\s*origin/,,g' | grep -v '\->' | grep -v 'pull/')
         else
           branches=$(echo "$BRANCHES_TO_DEPLOY" | tr ' ' '\n' | grep -E '\S')
         fi
