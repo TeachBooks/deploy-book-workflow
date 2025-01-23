@@ -395,7 +395,7 @@ jobs:
           cat clean.txt | xargs -I{} echo "not deployed because of fork" > status.txt
         else
           cat clean.txt | xargs -I{} cat _buildstatus/_buildstatus-{}/buildstatus.txt > status.txt
-        fit
+        fi
         
         # Combine raw, clean, and status into pasted.txt
         paste -d ';' raw.txt clean.txt status.txt > pasted.txt
