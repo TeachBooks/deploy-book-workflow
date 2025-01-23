@@ -272,7 +272,12 @@ jobs:
     - name: Clean branch name of disallowed characters
       if: always()
       run: |
-        echo "MATRIX_BRANCH_NAME_CLEAN=$(echo ${{ matrix.branch }} | tr '/":<>|*?\/\\' '-')" >> $GITHUB_ENV
+        if [[ "${{ matrix.branch }}" =~ refs/pull/([0-9]+)/merge ]]; then
+          CLEAN_BRANCH_NAME="PR-${BASH_REMATCH[1]}"
+        else
+          CLEAN_BRANCH_NAME=$(echo "${{ matrix.branch }}" | tr '/":<>|*?\\' '-')
+        fi
+        echo "MATRIX_BRANCH_NAME_CLEAN=${CLEAN_BRANCH_NAME}" >> $GITHUB_ENV
 
     - name: Upload summary as an artifact
       if: always()
