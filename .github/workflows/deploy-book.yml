@@ -391,7 +391,7 @@ jobs:
         grep '^refs/pull/' raw.txt | sed 's|refs/pull/\([0-9]\+\)/merge|PR-\1|' >> clean.txt
 
         # Generate status.txt
-        if [ "${{ github.event.pull_request.head.repo.full_name }}" != "${{ github.repository }}" ]; then
+        if [[ "${{ github.event_name }}" == 'push' || "${{ github.event_name }}" == 'workflow_dispatch' ]]; then
           cat clean.txt | xargs -I{} sh -c 'echo ":no_entry_sign: \\\`Not updated\\\` $(cat _buildstatus/_buildstatus-{}/buildstatus.txt)" >> status.txt'
         else
           cat clean.txt | xargs -I{} cat _buildstatus/_buildstatus-{}/buildstatus.txt > status.txt
@@ -510,13 +510,13 @@ jobs:
         echo "$HTML_TEMPLATE_404_REDIRECT" | envsubst | tee final/404.html
 
     - name: Upload final Pages artifact
-      if: github.event.pull_request.head.repo.full_name == github.repository
+      if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
       uses: actions/upload-pages-artifact@v3
       with:
         path: "final/"
 
     - name: Deploy to GitHub Pages
-      if: github.event.pull_request.head.repo.full_name == github.repository
+      if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
       id: deployment
       uses: actions/deploy-pages@v4
 
