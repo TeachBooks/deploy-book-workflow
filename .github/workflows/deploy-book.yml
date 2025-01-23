@@ -371,10 +371,19 @@ jobs:
         # https://stackoverflow.com/a/76354104
         url=$(gh api "repos/$GITHUB_REPOSITORY/pages" --jq '.html_url')
 
-        # Clean branch names
-        cat raw.txt | tr '/":<>|*?\/\\' '-' > clean.txt
+        # Clean normal branch names
+        grep -v '^refs/pull/' raw.txt | tr '/":<>|*?\\' '-' > clean.txt
+
+        # Include cleaned PR branches
+        grep '^refs/pull/' raw.txt | sed 's|refs/pull/\([0-9]\+\)/merge|PR-\1|' >> clean.txt
+
+        # Generate status.txt
         cat clean.txt | xargs -I{} cat _buildstatus/_buildstatus-{}/buildstatus.txt > status.txt
+        
+        # Combine raw, clean, and status into pasted.txt
         paste -d ';' raw.txt clean.txt status.txt > pasted.txt
+        
+        # Generate summary.md
         cat pasted.txt |
         while IFS=';' read -r raw clean status; do
           echo "| $raw | <$url$clean> | $status |" >> summary.md
