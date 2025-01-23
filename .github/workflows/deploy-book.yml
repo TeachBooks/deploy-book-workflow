@@ -86,12 +86,11 @@ jobs:
         
         # Fetch all open pull requests from forks and include their branches
         if [ "$PULL_REQUESTS_TO_DEPLOY" == '*' ]; then
-          pr_branches=$(gh pr list --state open --json number,headRefName,isCrossRepository --jq 'unique_by(.number) | .[] | select(.isCrossRepository) | "refs/pull/" + (.number|tostring) + "/merge"')
+          pr_branches=$(gh pr list --state open --json number,headRefName,isCrossRepository --jq '.[] | select(.isCrossRepository) | "refs/pull/" + (.number|tostring) + "/merge"')
         elif [ "$PULL_REQUESTS_TO_DEPLOY" == ' ' ]; then
           pr_branches=""
         else
-          pr_branches=$(echo "$PULL_REQUESTS_TO_DEPLOY" | tr ' ' '\n' | xargs -I {} gh pr view {} --json number,headRefName,isCrossRepository --jq 'unique_by(.number) | select(.isCrossRepository) | "refs/pull/" + (.number|tostring) + "/merge"')
-
+          pr_branches=$(echo "$PULL_REQUESTS_TO_DEPLOY" | tr ' ' '\n' | xargs -I {} gh pr view {} --json number,headRefName,isCrossRepository --jq 'select(.isCrossRepository) | "refs/pull/" + (.number|tostring) + "/merge"')
         fi
 
         # Print the pull request branches for debugging
