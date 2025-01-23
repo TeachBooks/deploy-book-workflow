@@ -45,6 +45,7 @@ env:
   # Which pull requests to release
   # Space-separated list of pull request numbers, e.g. '1 2 3'.
   # By default, deploy all pull requests. This is indicated by '*'.
+  # If building of pull request is unwanted, PULL_REQUESTS_TO_DEPLOY may be set to ' ' (space).
   PULL_REQUESTS_TO_DEPLOY: ${{ vars.PULL_REQUESTS_TO_DEPLOY != '' && vars.PULL_REQUESTS_TO_DEPLOY || '*' }}
 
   # Preprocessing is described here: (as described here: https://teachbooks.github.io/TeachBooks/cli/cli.html#teachbooks-build)
@@ -86,6 +87,8 @@ jobs:
         # Fetch all open pull requests from forks and include their branches
         if [ "$PULL_REQUESTS_TO_DEPLOY" == '*' ]; then
           pr_branches=$(gh pr list --state open --json number,headRefName,isCrossRepository --jq '.[] | select(.isCrossRepository) | "refs/pull/" + (.number|tostring) + "/merge"')
+        elif [ "$PULL_REQUESTS_TO_DEPLOY" == ' ' ]; then
+          pr_branches=""
         else
           pr_branches=$(echo "$PULL_REQUESTS_TO_DEPLOY" | tr ' ' '\n' | xargs -I {} gh pr view {} --json number,headRefName,isCrossRepository --jq 'select(.isCrossRepository) | "refs/pull/" + (.number|tostring) + "/merge"')
         fi
