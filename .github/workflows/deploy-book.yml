@@ -265,7 +265,7 @@ jobs:
     - name: Record build success
       if: success()
       run: |
-        echo ":white_check_mark: \\\`Released\\\`" >> buildstatus.txt
+        echo ":white_check_mark: \\\`Build succes\\\`" >> buildstatus.txt
 
     - name: Make summary of errors, if any
       # run even in case of failure
@@ -413,7 +413,7 @@ jobs:
         {
           echo
           echo "#### Legend for build status"
-          echo ":white_check_mark: \\\`Released\\\` - build success, new version released."
+          echo ":white_check_mark: \\\`Build success\\\` - build success."
           echo ":red_circle: \\\`Build failed [1]\\\` - build failure, previous version of the book reused."
           echo ":o: \\\`Build failed [2]\\\` - build failure, no previous version reused."
           echo ":no_entry_sign: \\\`Not updated\\\` - deployment skipped because triggered from forked repository."
