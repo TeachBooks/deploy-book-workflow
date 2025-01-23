@@ -78,8 +78,8 @@ jobs:
           branches=$(echo "$BRANCHES_TO_DEPLOY" | tr ' ' '\n' | grep -E '\S')
         fi
         
-        # Fetch all open pull requests and include their branches
-        pr_branches=$(gh pr list --state open --json headRefName --jq '.[].headRefName')
+        # Fetch all open pull requests from forks and include their branches
+        pr_branches=$(gh pr list --state open --json headRefName,isCrossRepository --jq '.[] | select(.isCrossRepository) | .headRefName')
         branches=$(echo -e "$branches\n$pr_branches" | grep -E '\S')
         
         # Record branch names (one per line) for alias validation
