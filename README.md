@@ -9,7 +9,7 @@ The workflow has the following features:
 - Ability to release both private (GitHub Pro, GitHub Team, GitHub Enterprise Cloud, or GitHub Enterprise Server required) and public (GitHub Free is enough) repositories.  
 GitHub Teams is free for teachers as described in the [GitHub documentation](https://docs.github.com/en/education/explore-the-benefits-of-teaching-and-learning-with-github-education/github-education-for-teachers/about-github-education-for-teachers#github-education-features-for-teachers).  
 If you have an organization for your TeachBook on GitHub, link your GitHub team rights to your organization as described on the [GitHub website](https://github.com/team#organizations).
-- Releasing all or a selection of branches, allowing to build a draft version of the TeachBook online which reduces the need for local builds of the book
+- Releasing all or a selection of branches and pull requests, allowing to build a draft version of the TeachBook online which reduces the need for local builds of the book
 - Provides a summary describing where the TeachBook is released, errors in the build process per branch and how the release step is configured
 - Caching of already built books so that it can be partially reused when another branch is released or the next build contains critical errors
 - Caching of python environment to speed up the workflow
@@ -47,6 +47,10 @@ You can adapt the behaviour by setting repository variables as explained [here](
 - `BRANCHES_TO_DEPLOY`  which is set to `*` (all branches) whenever it's not defined in the repository variables.
   - This defines the branches to deploy.
   - It should be a space-separated list of branch names, e.g. 'main second third'.
+- `PULL_REQUESTS_TO_DEPLOY` which is set to `*` (all branches) whenver it's not defined in the repository ariables.
+  - This defines the pull requests to deploy
+  - It should be a space-seperated list of pull request numbers, e.g. '1 2 3'
+  - If building of pull request is unwanted, PULL_REQUESTS_TO_DEPLOY may be set to ' ' (space).
 - `BRANCHES_TO_PREPROCESS` which is to to ` ` (just a space = no branch) whenever it's not defined in the repository variables
   - This defines the branches to preprocess with the [`TeachBooks` package](https://teachbooks.io/TeachBooks/cli/cli.html#cmdoption-teachbooks-build), which removed book-pages and config lines defined with `# START REMOVE FROM RELEASE` and `# END REMOVE FROM RELEASE`
   - It should be a space-separated list of branch names, e.g. 'main second third'.
@@ -70,24 +74,26 @@ Here's an example for a summary for the template book:
 > ### Branches deployed
 > | Branch 🎋 | Link 🔗 | Build status ☑️ |
 > | :--- | :--- | :--- |
-> | main | [https://teachbooks.github.io/template/main](https://teachbooks.github.io/template/main) | ✅ `Released` |
+> | main | [https://teachbooks.github.io/template/main](https://teachbooks.github.io/template/main) | ✅ `Build successful` |
 > | version2 | [https://teachbooks.github.io/template/version2](https://teachbooks.github.io/template/version2) | 🔴 `Build failed [1]` |
 > | version3 | [https://teachbooks.github.io/template/version3](https://teachbooks.github.io/template/version3) | ⭕ `Build failed [2]` |
 > 
 > #### Legend for build status
-> ✅ `Released` - build success, new version released.
+> ✅ `Build successful` - build success, new version used.
 >
 > 🔴 `Build failed [1]` - build failure, previous version of the book reused.
 >
 > ⭕ `Build failed [2]` - build failure, no previous version reused.
 >
+> 🚫 `Not updated` - deployment skipped because triggered from forked repository.
+>
 > #### Primary book at root
-> The book at the website root <https://teachbooks.github.io/template/> redirects to the primary branch `main` (status: ✅ `Released`).
+> The book at the website root <https://teachbooks.github.io/template/> redirects to the primary branch `main` (status: ✅ `Build successful`).
 > 
 > ### Aliases
 > | Alias ➡️ | Target 🎯 | Link 🔗 |  Build status ☑️ |
 > | :--- | :--- | :--- | :---- |
-> | draft | main | [https://teachbooks.github.io/template/draft](https://teachbooks.github.io/template/draft) | ✅ `Released` |
+> | draft | main | [https://teachbooks.github.io/template/draft](https://teachbooks.github.io/template/draft) | ✅ `Build successful` |
 > 
 > ### Preview of build errors & warnings
 > For more details please see the corresponding `build-books` jobs in the left pane.

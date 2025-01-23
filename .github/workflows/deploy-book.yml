@@ -41,6 +41,12 @@ env:
   # Space-separated list of branch names, e.g. 'main second third'.
   # By default, deploy all branches. This is indicated by '*'.
   BRANCHES_TO_DEPLOY: ${{ vars.BRANCHES_TO_DEPLOY != '' && vars.BRANCHES_TO_DEPLOY || '*' }}
+  
+  # Which pull requests to release
+  # Space-separated list of pull request numbers, e.g. '1 2 3'.
+  # By default, deploy all pull requests. This is indicated by '*'.
+  # If building of pull request is unwanted, PULL_REQUESTS_TO_DEPLOY may be set to ' ' (space).
+  PULL_REQUESTS_TO_DEPLOY: ${{ vars.PULL_REQUESTS_TO_DEPLOY != '' && vars.PULL_REQUESTS_TO_DEPLOY || '*' }}
 
   # Preprocessing is described here: (as described here: https://teachbooks.github.io/TeachBooks/cli/cli.html#teachbooks-build)
   # Space-separated list of branch names, e.g. 'main second third'.
@@ -73,11 +79,22 @@ jobs:
         # If all (*), query all remote branches
         # If not, read from env var
         if [ "$BRANCHES_TO_DEPLOY" == '*' ]; then
-          branches=$(git branch -r | sed 's,\s*origin/,,g' | grep -v '\->')
+          branches=$(git branch -r | sed 's,\s*origin/,,g' | grep -v '\->' | grep -v 'pull/')
         else
           branches=$(echo "$BRANCHES_TO_DEPLOY" | tr ' ' '\n' | grep -E '\S')
         fi
+        
+        # Fetch all open pull requests from forks and include their branches
+        if [ "$PULL_REQUESTS_TO_DEPLOY" == '*' ]; then
+          pr_branches=$(gh pr list --state open --json number,headRefName,isCrossRepository --jq '.[] | select(.isCrossRepository) | "refs/pull/" + (.number|tostring) + "/merge"')
+        elif [ "$PULL_REQUESTS_TO_DEPLOY" == ' ' ]; then
+          pr_branches=""
+        else
+          pr_branches=$(echo "$PULL_REQUESTS_TO_DEPLOY" | tr ' ' '\n' | xargs -I {} gh pr view {} --json number,headRefName,isCrossRepository --jq 'select(.isCrossRepository) | "refs/pull/" + (.number|tostring) + "/merge"')
+        fi
 
+        branches=$(echo -e "$branches\n$pr_branches" | grep -E '\S')
+        
         # Record branch names (one per line) for alias validation
         echo "$branches" | tr ' ' '\n' > branches.txt
 
@@ -248,7 +265,7 @@ jobs:
     - name: Record build success
       if: success()
       run: |
-        echo ":white_check_mark: \\\`Released\\\`" >> buildstatus.txt
+        echo ":white_check_mark: \\\`Build successful\\\`" >> buildstatus.txt
 
     - name: Make summary of errors, if any
       # run even in case of failure
@@ -268,7 +285,12 @@ jobs:
     - name: Clean branch name of disallowed characters
       if: always()
       run: |
-        echo "MATRIX_BRANCH_NAME_CLEAN=$(echo ${{ matrix.branch }} | tr '/":<>|*?\/\\' '-')" >> $GITHUB_ENV
+        if [[ "${{ matrix.branch }}" =~ refs/pull/([0-9]+)/merge ]]; then
+          CLEAN_BRANCH_NAME="PR-${BASH_REMATCH[1]}"
+        else
+          CLEAN_BRANCH_NAME=$(echo "${{ matrix.branch }}" | tr '/":<>|*?\\' '-')
+        fi
+        echo "MATRIX_BRANCH_NAME_CLEAN=${CLEAN_BRANCH_NAME}" >> $GITHUB_ENV
 
     - name: Upload summary as an artifact
       if: always()
@@ -362,10 +384,23 @@ jobs:
         # https://stackoverflow.com/a/76354104
         url=$(gh api "repos/$GITHUB_REPOSITORY/pages" --jq '.html_url')
 
-        # Clean branch names
-        cat raw.txt | tr '/":<>|*?\/\\' '-' > clean.txt
-        cat clean.txt | xargs -I{} cat _buildstatus/_buildstatus-{}/buildstatus.txt > status.txt
+        # Clean normal branch names
+        grep -v '^refs/pull/' raw.txt | tr '/":<>|*?\\' '-' > clean.txt
+
+        # Include cleaned PR branches
+        grep '^refs/pull/' raw.txt | sed 's|refs/pull/\([0-9]\+\)/merge|PR-\1|' >> clean.txt
+
+        # Generate status.txt
+        if [[ "${{ github.event_name }}" != 'push' && "${{ github.event_name }}" != 'workflow_dispatch' ]]; then
+          cat clean.txt | xargs -I{} sh -c 'echo ":no_entry_sign: \\\`Not updated\\\` $(cat _buildstatus/_buildstatus-{}/buildstatus.txt)" >> status.txt'
+        else
+          cat clean.txt | xargs -I{} cat _buildstatus/_buildstatus-{}/buildstatus.txt > status.txt
+        fi
+        
+        # Combine raw, clean, and status into pasted.txt
         paste -d ';' raw.txt clean.txt status.txt > pasted.txt
+        
+        # Generate summary.md
         cat pasted.txt |
         while IFS=';' read -r raw clean status; do
           echo "| $raw | <$url$clean> | $status |" >> summary.md
@@ -376,9 +411,11 @@ jobs:
         {
           echo
           echo "#### Legend for build status"
-          echo ":white_check_mark: \\\`Released\\\` - build success, new version released."
-          echo ":red_circle: \\\`Build failed [1]\\\` - build failure, previous version of the book reused."
-          echo ":o: \\\`Build failed [2]\\\` - build failure, no previous version reused."
+          echo ":white_check_mark: \\\`Build successful\\\` - build is successful, new version used."
+          echo ":red_circle: \\\`Build failed [1]\\\` - build has failed, previous version of the book reused."
+          echo ":o: \\\`Build failed [2]\\\` - build has failed, no previous version reused."
+          echo ":no_entry_sign: \\\`Not updated\\\` - deployment is skipped because it's triggered from a forked repository."
+
 
           echo
           echo '#### Primary book at root'
@@ -473,11 +510,13 @@ jobs:
         echo "$HTML_TEMPLATE_404_REDIRECT" | envsubst | tee final/404.html
 
     - name: Upload final Pages artifact
+      if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
       uses: actions/upload-pages-artifact@v3
       with:
         path: "final/"
 
     - name: Deploy to GitHub Pages
+      if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
       id: deployment
       uses: actions/deploy-pages@v4
 
