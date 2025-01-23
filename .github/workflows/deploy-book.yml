@@ -93,8 +93,16 @@ jobs:
           pr_branches=$(echo "$PULL_REQUESTS_TO_DEPLOY" | tr ' ' '\n' | xargs -I {} gh pr view {} --json number,headRefName,isCrossRepository --jq 'select(.isCrossRepository) | "refs/pull/" + (.number|tostring) + "/merge"')
         fi
 
+        # Print the pull request branches for debugging
+        echo "Pull request branches (raw):"
+        echo "$pr_branches"
+
         branches=$(echo -e "$branches\n$pr_branches" | grep -E '\S')
         
+        # Print the combined branches for debugging
+        echo "Combined branches:"
+        echo "$branches"
+
         # Record branch names (one per line) for alias validation
         echo "$branches" | tr ' ' '\n' > branches.txt
 
