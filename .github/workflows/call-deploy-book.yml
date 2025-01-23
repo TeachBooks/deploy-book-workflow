@@ -12,6 +12,13 @@ on:
     - book/**
     - requirements.txt
     - .github/workflows/call-deploy-book.yml
+  pull_request:
+    branches:
+    - '**'
+    paths:
+    - book/**
+    - requirements.txt
+    - .github/workflows/call-deploy-book.yml
   workflow_dispatch:
 
 jobs: 
