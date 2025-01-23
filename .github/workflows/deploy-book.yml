@@ -41,6 +41,11 @@ env:
   # Space-separated list of branch names, e.g. 'main second third'.
   # By default, deploy all branches. This is indicated by '*'.
   BRANCHES_TO_DEPLOY: ${{ vars.BRANCHES_TO_DEPLOY != '' && vars.BRANCHES_TO_DEPLOY || '*' }}
+  
+  # Which pull requests to release
+  # Space-separated list of pull request numbers, e.g. '1 2 3'.
+  # By default, deploy all pull requests. This is indicated by '*'.
+  PULL_REQUESTS_TO_DEPLOY: ${{ vars.PULL_REQUESTS_TO_DEPLOY != '' && vars.PULL_REQUESTS_TO_DEPLOY || '*' }}
 
   # Preprocessing is described here: (as described here: https://teachbooks.github.io/TeachBooks/cli/cli.html#teachbooks-build)
   # Space-separated list of branch names, e.g. 'main second third'.
@@ -79,7 +84,12 @@ jobs:
         fi
         
         # Fetch all open pull requests from forks and include their branches
-        pr_branches=$(gh pr list --state open --json number,headRefName,isCrossRepository --jq '.[] | select(.isCrossRepository) | "refs/pull/" + (.number|tostring) + "/merge"')
+        if [ "$PULL_REQUESTS_TO_DEPLOY" == '*' ]; then
+          pr_branches=$(gh pr list --state open --json number,headRefName,isCrossRepository --jq '.[] | select(.isCrossRepository) | "refs/pull/" + (.number|tostring) + "/merge"')
+        else
+          pr_branches=$(echo "$PULL_REQUESTS_TO_DEPLOY" | tr ' ' '\n' | xargs -I {} gh pr view {} --json number,headRefName,isCrossRepository --jq 'select(.isCrossRepository) | "refs/pull/" + (.number|tostring) + "/merge"')
+        fi
+
         branches=$(echo -e "$branches\n$pr_branches" | grep -E '\S')
         
         # Record branch names (one per line) for alias validation
