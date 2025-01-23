@@ -97,7 +97,9 @@ jobs:
         echo "Pull request branches (raw):"
         echo "$pr_branches"
 
-        branches=$(echo -e "$branches\n$pr_branches" | grep -E '\S')
+        # Combine branches and pr_branches, trimming any leading/trailing spaces and removing duplicates
+        branches=$(echo -e "$branches\n$pr_branches" | grep -E '\S' | sed 's/^[[:space:]]*//;s/[[:space:]]*$//' | sort | uniq)
+
         
         # Print the combined branches for debugging
         echo "Combined branches:"
