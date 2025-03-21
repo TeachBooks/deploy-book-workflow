@@ -26,9 +26,12 @@ env:
   # `main` as primary by default, advised to use branch with most recent content.
   PRIMARY_BRANCH: ${{ vars.PRIMARY_BRANCH != '' && vars.PRIMARY_BRANCH || 'main' }}
 
-  # If to copy the PRIMARY_BRANCH to root ('copy') or redirect from root to the PRIMARY_BRANCH ('redirect')
-  # By default, redirects to PRIMARY_BRANCH ('redirect')
-  # Advised to use redirect if you expect to archive a version in the future so that the URL doesn't change for the reader
+  # Determines how the PRIMARY_BRANCH is handled at the root of the website:
+  # - 'copy': Copies the contents of the PRIMARY_BRANCH to the root directory.
+  # - 'redirect': Redirects the root URL to the PRIMARY_BRANCH (default behavior).
+  # - 'move': Moves the contents of the PRIMARY_BRANCH to the root directory and removes it from its branch-specific URL.
+  # By default, redirects to PRIMARY_BRANCH ('redirect').
+  # Use 'redirect' if you expect to archive a version in the future so that the URL doesn't change for the reader.
   BEHAVIOR_PRIMARY: ${{ vars.BEHAVIOR_PRIMARY != '' && vars.BEHAVIOR_PRIMARY || 'redirect' }}
 
   # Release branch to custom url with an alias
@@ -346,6 +349,16 @@ jobs:
           cp -irv final/"$PRIMARY_BRANCH"/* final/
         fi
 
+    - name: Move primary book to root
+      timeout-minutes: 1
+      if: ${{ env.BEHAVIOR_PRIMARY == 'move' }}
+      run: |
+        GLOBIGNORE=".:.."
+        if [ -d final/"$PRIMARY_BRANCH" ]; then
+          mv -v final/"$PRIMARY_BRANCH"/* final/
+          rm -rf final/"$PRIMARY_BRANCH"
+        fi
+
     - name: Include overview summary
       run: |
         # Restore "raw" branch names
@@ -368,7 +381,12 @@ jobs:
         paste -d ';' raw.txt clean.txt status.txt > pasted.txt
         cat pasted.txt |
         while IFS=';' read -r raw clean status; do
-          echo "| $raw | <$url$clean> | $status |" >> summary.md
+          if [ "$raw" == "$PRIMARY_BRANCH" ] && [ ${{ env.BEHAVIOR_PRIMARY }} == 'move' ]; then
+            # Set the clean URL to the root URL for the primary branch if behavior is 'move'
+            echo "| $raw | <$url> | $status |" >> summary.md
+          else
+            echo "| $raw | <$url$clean> | $status |" >> summary.md
+          fi
         done
 
         primary_status=$(grep "^$PRIMARY_BRANCH;" pasted.txt | cut -d ';' -f3)
@@ -386,6 +404,8 @@ jobs:
             echo "The book at the website root <$url> is from the primary branch \\\`$PRIMARY_BRANCH\\\`."
           elif [ ${{ env.BEHAVIOR_PRIMARY  }} == 'redirect' ]; then
             echo "The book at the website root <$url> redirects to the primary branch \\\`$PRIMARY_BRANCH\\\`."
+          elif [ ${{ env.BEHAVIOR_PRIMARY }} == 'move' ]; then
+            echo "The book at the website root <$url> is from the primary branch \\\`$PRIMARY_BRANCH\\\`. It's deleted from the branch URL."
           fi
           echo "Status: $primary_status"
         } >> summary.md
