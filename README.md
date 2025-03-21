@@ -18,7 +18,7 @@ If you have an organization for your TeachBook on GitHub, link your GitHub team 
 - Optionally preprocess branches using the [`teachbooks` package](https://github.com/TeachBooks/TeachBooks).
 - Converting branch-names to well-defined URLs
 - Customizable settings on where the books should be deployed including alias for branch-names and selection of one branch to be deployed on root. The workflow will gives warnings if these settings are ill-defined or conflicting. Although aliases are not allowed by GitHub Pages, it seems you can use one alias, but not more.
-- Redirects the root directory to one of the branches or copies one of the branches to root.
+- Redirects the root directory to one of the branches or copying or moving one of the branches to root.
 - Adds an 'archived'-banner to old branches / branches of previous years.
 
 ## How to start using this workflow
@@ -38,7 +38,7 @@ You can adapt the behaviour by setting repository variables as explained [here](
   - This sets the branch or alias (when using 'redirect' for `BEHAVIOR_PRIMARY`) which is shown on root.
   - It is advised to show your most recent branch on root.
 - `BEHAVIOR_PRIMARY` which is set to `redirect` whenever it's not defined in the repository variables.
-  - This indicates whether to copy the PRIMARY_BRANCH to root ('copy') or redirect from root to the PRIMARY_BRANCH ('redirect')
+  - This indicates whether to copy the PRIMARY_BRANCH to root ('copy'), move the PRIMARY_BRANCH to root ('move') or redirect from root to the PRIMARY_BRANCH ('redirect')
   - Advised to use 'redirect' if you expect to archive a version in the future so that the URL doesn't change for the reader.
 - `BRANCH_ALIASES` which is set to ` ` (just a space) whenever it's not defined in the repository variables.
   - This defines an alias (custom URL) for a branch
