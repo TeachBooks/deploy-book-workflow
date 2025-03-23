@@ -94,6 +94,18 @@ Assume for this example that we are working in the "my_organization" GitHub Orga
 - draft version of the book is at `my_organization.github.io/my_book/draft/`
 - the work of each author can be found at `my_organization.github.io/my_book/author_1/`, etc.
 
+To create this behavior, do the following:
+
+- Create a branch for each author as well as `release` and `draft` branches
+- Set `draft` to the default branch
+- Set `PRIMARY_BRANCH` to `release`
+- Set `BEHAVIOR_PRIMARY` to `copy`
+
+Note that in this situation we strongly recommend using the Draft-Release workflow that is incorporated in the TeachBooks Python package, which allows you to restrict specific content from appearing in the `release` book that is already incorporated in the `draft` book. [Find out more in the TeachBooks Manual](https://teachbooks.io/manual/features/draft-release.html). This is useful, for example, if you would like to review many chapters, but release only one at a time, or use a banner in the draft book (e.g., via `_config.yml`) but not the released book.
+
+#### Why make the draft branch default?
+
+What if you want to make sure the source code for the released book is visible in the repository, rather than the draft version (e.g., you want to make sure external visitors see this version of the material)? You can do this by making `release` your default branch instead of `draft`. However, this also means that Pull Requests will be default be made into the `release` branch instead of `draft`, which may alter the working method of your team in an undesirable way (e.g., not being able to use a `draft` branch, accidentally releasing material before checking on `draft`, or having to manually adjust every PR that is created by GitHub to merge into `draft` instead of `release`).
 
 ## Additional GitHub settings
 We advise  you to enable two options in the general repository setting regarding pull requests in GitHub:
