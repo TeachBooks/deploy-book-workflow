@@ -11,9 +11,9 @@ on:
 # https://docs.github.com/en/actions/learn-github-actions/variables#creating-configuration-variables-for-a-repository
 env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  # Relevant and required for Private repositories only!
+  # Relevant and required for private submodules only!
   # 1. First, create a Personal Access Token (Classic) as in https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens
-  #    with at least the scopes `repo`, `read:org`, and `gist`.
+  #    with at least the scope `repo`.
   # 2. Then, make a secret GH_PAT in `Settings` > `Secrets and variables` > `Actions` > `Repository secrets` or `Organization secrets`.
   #    Copy & paste the PAT from step 1.
   #
