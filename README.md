@@ -18,7 +18,7 @@ If you have an organization for your TeachBook on GitHub, link your GitHub team 
 - Optionally preprocess branches using the [`teachbooks` package](https://github.com/TeachBooks/TeachBooks) (e.g., Draft-Release Worklflow).
 - Converting branch-names to well-defined URLs
 - Customizable settings on where the books should be deployed including alias for branch-names and selection of one branch to be deployed on root. The workflow will gives warnings if these settings are ill-defined or conflicting. Although aliases are generally not allowed by GitHub Pages, it seems you can use one alias, but not more.
-- Customizable behavior of book URL root directory, either by redirecting the root to one of the branches and/or by copying or moving one of the branches to root.
+- Customizable behavior of book URL root directory, either by redirecting the root to one of the branches or by copying or moving one of the branches to root.
 - Adds an 'archived'-banner to old branches / branches of previous years.
 
 ## How to start using this workflow
