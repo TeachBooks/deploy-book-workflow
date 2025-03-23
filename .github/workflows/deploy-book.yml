@@ -23,15 +23,18 @@ env:
   GH_TOKEN: ${{ secrets.GH_PAT != '' && secrets.GH_PAT || secrets.GITHUB_TOKEN }}
   
   # Branch shown on root (eg. teachbooks.github.io/template/).
-  # `main` as primary by default, advised to use branch with most recent content.
+  # - `main` as primary by default (eg. teachbooks.github.io/template/main/)
+  # Advised to use default branch or that with which active users (eg. students) read.
   PRIMARY_BRANCH: ${{ vars.PRIMARY_BRANCH != '' && vars.PRIMARY_BRANCH || 'main' }}
 
   # Determines how the PRIMARY_BRANCH is handled at the root of the website:
-  # - 'copy': Copies the contents of the PRIMARY_BRANCH to the root directory.
   # - 'redirect': Redirects the root URL to the PRIMARY_BRANCH (default behavior).
+  # - 'copy': Copies the contents of the PRIMARY_BRANCH to the root directory.
   # - 'move': Moves the contents of the PRIMARY_BRANCH to the root directory and removes it from its branch-specific URL.
   # By default, redirects to PRIMARY_BRANCH ('redirect').
   # Use 'redirect' if you expect to archive a version in the future so that the URL doesn't change for the reader.
+  # Use 'copy' or 'move' if you plan to use the root URL only and don't need the URL containing the branch or alias name.
+  # Use 'move' instead of 'copy' to avoid saving build artifact unnecessarily.
   BEHAVIOR_PRIMARY: ${{ vars.BEHAVIOR_PRIMARY != '' && vars.BEHAVIOR_PRIMARY || 'redirect' }}
 
   # Release branch to custom url with an alias
