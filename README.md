@@ -1,8 +1,8 @@
 # GitHub reusable action: publish your book online to GitHub Pages
 
-We developed a workflow which builds your TeachBook in your repository for all branches and releases them online via GitHub Pages. In simplified terms, it builds the website based on your repository.
+We developed a workflow which builds your TeachBook in your repository for all branches and releases them online via GitHub Pages. In simplified terms, it automatically builds the book website based on updates to your repository, creates multiple instances of your book (defined by each branch) and provides the ability to customize the URL's at which each instance of the book can be accessed. This tool is designed specifically for educational contexts, for example, when you may want to preserve book versions from multiple academic years so that students are able to access it later. The [TeachBooks Template](https://github.com/TeachBooks/template) uses this functionality for example.
 
-The [TeachBooks Template](https://github.com/TeachBooks/template) uses this functionality for example. The workflow `call-deploy-book.yml` calls the `deploy-book.yml` workflow, which builds the Jupyter books at the calling repository for all branches, and deploys them via GitHub Pages.
+The workflow `call-deploy-book.yml` calls the `deploy-book.yml` workflow, which builds a Jupyter Book at the calling repository for all branches, and deploys them via GitHub Pages. It is currently configured to create a Jupyter Book using the TeachBooks Python package (i.e., `teachbooks build book`), although this may be adapted in the future to make it easier to use in other applications (e.g., to build books with other software or any static website in general).
 
 The workflow has the following features:
 - Releasing of your [TeachBook](https://teachbooks.io/)-repository (built with [Jupyter Book](https://github.com/executablebooks/jupyter-book)) to GitHub Pages
@@ -13,12 +13,12 @@ If you have an organization for your TeachBook on GitHub, link your GitHub team 
 - Provides a summary describing where the TeachBook is released, errors in the build process per branch and how the release step is configured
 - Caching of already built books so that it can be partially reused when another branch is released or the next build contains critical errors
 - Caching of python environment to speed up the workflow
-- Allowing to use submodules within your book
+- Allowing use of submodules within your book
 - Customizable trigger for the workflow itself
-- Optionally preprocess branches using the [`teachbooks` package](https://github.com/TeachBooks/TeachBooks).
+- Optionally preprocess branches using the [`teachbooks` package](https://github.com/TeachBooks/TeachBooks) (e.g., Draft-Release Worklflow).
 - Converting branch-names to well-defined URLs
-- Customizable settings on where the books should be deployed including alias for branch-names and selection of one branch to be deployed on root. The workflow will gives warnings if these settings are ill-defined or conflicting. Although aliases are not allowed by GitHub Pages, it seems you can use one alias, but not more.
-- Redirects the root directory to one of the branches or copying or moving one of the branches to root.
+- Customizable settings on where the books should be deployed including alias for branch-names and selection of one branch to be deployed on root. The workflow will gives warnings if these settings are ill-defined or conflicting. Although aliases are generally not allowed by GitHub Pages, it seems you can use one alias, but not more.
+- Customizable behavior of book URL root directory, either by redirecting the root to one of the branches or by copying or moving one of the branches to root.
 - Adds an 'archived'-banner to old branches / branches of previous years.
 
 ## How to start using this workflow
@@ -36,10 +36,11 @@ As previously mentioned, this workflow is used in `TeachBooks/template`. Feel fr
 You can adapt the behaviour by setting repository variables as explained [here](https://docs.github.com/en/actions/learn-github-actions/variables#creating-configuration-variables-for-a-repository) or using the [VS Code Extension GitHub Actions](https://marketplace.visualstudio.com/items?itemName=GitHub.vscode-github-actions). Define the following repository variables:
 - `PRIMARY_BRANCH` which is set to `main` whenever it's not defined in the repository variables.
   - This sets the branch or alias (when using 'redirect' for `BEHAVIOR_PRIMARY`) which is shown on root.
-  - It is advised to show your most recent branch on root.
+  - It is advised to show either your default branch on root, or the branch shared with your primary/active book audience (e.g., your current students).
 - `BEHAVIOR_PRIMARY` which is set to `redirect` whenever it's not defined in the repository variables.
   - This indicates whether to copy the PRIMARY_BRANCH to root ('copy'), move the PRIMARY_BRANCH to root ('move') or redirect from root to the PRIMARY_BRANCH ('redirect')
-  - Advised to use 'redirect' if you expect to archive a version in the future so that the URL doesn't change for the reader.
+  - Advised to use 'redirect' if you expect to archive a version in the future so that the URL doesn't change for the reader (e.g., to preserve URL containing the current academic year shared with students).
+  - Use copy or move when you only expect readers to use the root URL. Move is useful to remove unnecessary build artifacts and if you don't need to visit the URL containing the branch or alias name.
 - `BRANCH_ALIASES` which is set to ` ` (just a space) whenever it's not defined in the repository variables.
   - This defines an alias (custom URL) for a branch
   - Variables should be a space-separated list of branch names, e.g. 'alias:really-long-branch-name`
@@ -56,6 +57,55 @@ You can adapt the behaviour by setting repository variables as explained [here](
   - It should be a space-separate list of branch names, e.g. 'main second third'.
 
 In `call-deploy-book.yml` itself you can specify the trigger for this workflow. By default, a push to any branch triggers the workflow. You can limit the branches or subdirectories.
+
+## Common Usage Examples
+
+Relevant use cases are explained here, along with an explanation for how to set up the workflow accordingly. Note that it is not required to set your `PRIMARY_BRANCH` to the default branch of your GitHub repository; this is a choice that is determined by what version of the source code you want visitors to see (i.e., work in progress, or the most recent "complete" or "released" version of a book).
+
+### Books with active users of different versions (academic years) 
+
+Consider a case where each academic year you would like to create a new book for your students. However, you need to ensure that students from previous years can still access "their" version of the book. 
+
+Assume for this example that we are working in the "my_organization" GitHub Organization in repository "my_book" and that the current academic year is 2025, and that we have one or more books in our repository from previous years. The desired URL structure is thus:
+- students from this year use the book at `my_organization.github.io/my_book/2025/`
+- students from last year use the book at `my_organization.github.io/my_book/2024/`
+- visitors to `my_organization.github.io/my_book/` will automatically be redirected to the book from the current year
+
+To create this behavior, do the following:
+
+- Create a branch for each year: a logical name would have format `YYYY`, (technically it can be anything, as the URL can be set to `YYYY` with `BRANCH_ALIASES`).
+- Set `PRIMARY_BRANCH` to the branch for the current academic year (e.g., `2025`)
+- Set `BEHAVIOR_PRIMARY` to `redirect` (default) 
+
+#### Alternative without redirect to current year
+
+One possible modification to this setup would be if you are progressively releasing content to your current students (e.g., `2025`) but you wanted visitors to `my_organization.github.io/my_book/` to see a complete version of your book. Assuming that the ideal version for such visitors is the completed book from the previous year (`2024`), you could do this:
+- Set `PRIMARY_BRANCH` to `2024`
+- Set `BEHAVIOR_PRIMARY` to `copy`
+
+As your current students may then accidentally go to the older version of the book, we recommend you use a banner to indicate to readers that there is a (partial) new version available, and advise them where to find it. You can add a banner using this workflow (`BRANCHES_ARCHIVED`) or the [standard Jupyter Book banner feature](https://jupyterbook.org/en/stable/web/announcements.html).
+
+### Books with active editors working in parallel
+
+Consider a case where several authors are working on material for a book and you would like to be able to see the work of any author at any time. You also have a branch that is used to share finalized material with your readers (we call this a "release" branch) and a branch that is used to collect and review the work of all authors before releasing it (we call this a "draft" branch).
+
+Assume for this example that we are working in the "my_organization" GitHub Organization in repository "my_book." The released book is on branch `release` the draft book is on branch `draft`; author branches are `author_1`, `author_2`, etc. The desired URL structure is thus:
+- official (released) version of the book is at `my_organization.github.io/my_book/`
+- draft version of the book is at `my_organization.github.io/my_book/draft/`
+- the work of each author can be found at `my_organization.github.io/my_book/author_1/`, etc.
+
+To create this behavior, do the following:
+
+- Create a branch for each author as well as `release` and `draft` branches
+- Set `draft` to the default branch
+- Set `PRIMARY_BRANCH` to `release`
+- Set `BEHAVIOR_PRIMARY` to `copy`
+
+Note that in this situation we strongly recommend using the Draft-Release workflow that is incorporated in the TeachBooks Python package, which allows you to restrict specific content from appearing in the `release` book that is already incorporated in the `draft` book. [Find out more in the TeachBooks Manual](https://teachbooks.io/manual/features/draft-release.html). This is useful, for example, if you would like to review many chapters, but release only one at a time, or use a banner in the draft book (e.g., via `_config.yml`) but not the released book.
+
+#### Why make the draft branch default?
+
+What if you want to make sure the source code for the released book is visible in the repository, rather than the draft version (e.g., you want to make sure external visitors see this version of the material)? You can do this by making `release` your default branch instead of `draft`. However, this also means that Pull Requests will be default be made into the `release` branch instead of `draft`, which may alter the working method of your team in an undesirable way (e.g., not being able to use a `draft` branch, accidentally releasing material before checking on `draft`, or having to manually adjust every PR that is created by GitHub to merge into `draft` instead of `release`).
 
 ## Additional GitHub settings
 We advise  you to enable two options in the general repository setting regarding pull requests in GitHub:
