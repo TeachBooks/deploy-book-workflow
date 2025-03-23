@@ -13,12 +13,12 @@ If you have an organization for your TeachBook on GitHub, link your GitHub team 
 - Provides a summary describing where the TeachBook is released, errors in the build process per branch and how the release step is configured
 - Caching of already built books so that it can be partially reused when another branch is released or the next build contains critical errors
 - Caching of python environment to speed up the workflow
-- Allowing to use submodules within your book
+- Allowing use of submodules within your book
 - Customizable trigger for the workflow itself
-- Optionally preprocess branches using the [`teachbooks` package](https://github.com/TeachBooks/TeachBooks).
+- Optionally preprocess branches using the [`teachbooks` package](https://github.com/TeachBooks/TeachBooks) (e.g., Draft-Release Worklflow).
 - Converting branch-names to well-defined URLs
-- Customizable settings on where the books should be deployed including alias for branch-names and selection of one branch to be deployed on root. The workflow will gives warnings if these settings are ill-defined or conflicting. Although aliases are not allowed by GitHub Pages, it seems you can use one alias, but not more.
-- Redirects the root directory to one of the branches or copying or moving one of the branches to root.
+- Customizable settings on where the books should be deployed including alias for branch-names and selection of one branch to be deployed on root. The workflow will gives warnings if these settings are ill-defined or conflicting. Although aliases are generally not allowed by GitHub Pages, it seems you can use one alias, but not more.
+- Customizable behavior of book URL root directory, either by redirecting the root to one of the branches and/or by copying or moving one of the branches to root.
 - Adds an 'archived'-banner to old branches / branches of previous years.
 
 ## How to start using this workflow
@@ -36,10 +36,11 @@ As previously mentioned, this workflow is used in `TeachBooks/template`. Feel fr
 You can adapt the behaviour by setting repository variables as explained [here](https://docs.github.com/en/actions/learn-github-actions/variables#creating-configuration-variables-for-a-repository) or using the [VS Code Extension GitHub Actions](https://marketplace.visualstudio.com/items?itemName=GitHub.vscode-github-actions). Define the following repository variables:
 - `PRIMARY_BRANCH` which is set to `main` whenever it's not defined in the repository variables.
   - This sets the branch or alias (when using 'redirect' for `BEHAVIOR_PRIMARY`) which is shown on root.
-  - It is advised to show your most recent branch on root.
+  - It is advised to show either your default branch on root, or the branch shared with your primary/active book audience (e.g., your current students).
 - `BEHAVIOR_PRIMARY` which is set to `redirect` whenever it's not defined in the repository variables.
   - This indicates whether to copy the PRIMARY_BRANCH to root ('copy'), move the PRIMARY_BRANCH to root ('move') or redirect from root to the PRIMARY_BRANCH ('redirect')
-  - Advised to use 'redirect' if you expect to archive a version in the future so that the URL doesn't change for the reader.
+  - Advised to use 'redirect' if you expect to archive a version in the future so that the URL doesn't change for the reader (e.g., to preserve URL containing the current academic year shared with students).
+  - Use copy or move when you only expect readers to use the root URL. Move is useful to remove unnecessary build artifacts and if you don't need to visit the URL containing the branch or alias name.
 - `BRANCH_ALIASES` which is set to ` ` (just a space) whenever it's not defined in the repository variables.
   - This defines an alias (custom URL) for a branch
   - Variables should be a space-separated list of branch names, e.g. 'alias:really-long-branch-name`
