@@ -58,6 +58,43 @@ You can adapt the behaviour by setting repository variables as explained [here](
 
 In `call-deploy-book.yml` itself you can specify the trigger for this workflow. By default, a push to any branch triggers the workflow. You can limit the branches or subdirectories.
 
+## Common Usage Examples
+
+Relevant use cases are explained here, along with an explanation for how to set up the workflow accordingly. Note that it is not required to set your `PRIMARY_BRANCH` to the default branch of your GitHub repository; this is a choice that is determined by what version of the source code you want visitors to see (i.e., work in progress, or the most recent "complete" or "released" version of a book).
+
+### Books with active users of different versions (academic years) 
+
+Consider a case where each academic year you would like to create a new book for your students. However, you need to ensure that students from previous years can still access "their" version of the book. 
+
+Assume for this example that we are working in the "my_organization" GitHub Organization in repository "my_book" and that the current academic year is 2025, and that we have one or more books in our repository from previous years. The desired URL structure is thus:
+- students from this year use the book at `my_organization.github.io/my_book/2025/`
+- students from last year use the book at `my_organization.github.io/my_book/2024/`
+- visitors to `my_organization.github.io/my_book/` will automatically be redirected to the book from the current year
+
+To create this behavior, do the following:
+
+- Create a branch for each year: a logical name would have format `YYYY`, (technically it can be anything, as the URL can be set to `YYYY` with `BRANCH_ALIASES`).
+- Set `PRIMARY_BRANCH` to the branch for the current academic year (e.g., `2025`)
+- Set `BEHAVIOR_PRIMARY` to `redirect` (default) 
+
+#### Alternative without redirect to current year
+
+One possible modification to this setup would be if you are progressively releasing content to your current students (e.g., `2025`) but you wanted visitors to `my_organization.github.io/my_book/` to see a complete version of your book. Assuming that the ideal version for such visitors is the completed book from the previous year (`2024`), you could do this:
+- Set `PRIMARY_BRANCH` to `2024`
+- Set `BEHAVIOR_PRIMARY` to `copy`
+
+As your current students may then accidentally go to the older version of the book, we recommend you use a banner to indicate to readers that there is a (partial) new version available, and advise them where to find it. You can add a banner using this workflow (`BRANCHES_ARCHIVED`) or the [standard Jupyter Book banner feature](https://jupyterbook.org/en/stable/web/announcements.html).
+
+### Books with active editors working in parallel
+
+Consider a case where several authors are working on material for a book and you would like to be able to see the work of any author at any time. You also have a branch that is used to share finalized material with your readers (we call this a "release" branch) and a branch that is used to collect and review the work of all authors before releasing it (we call this a "draft" branch).
+
+Assume for this example that we are working in the "my_organization" GitHub Organization in repository "my_book." The released book is on branch `release` the draft book is on branch `draft`; author branches are `author_1`, `author_2`, etc. The desired URL structure is thus:
+- official (released) version of the book is at `my_organization.github.io/my_book/`
+- draft version of the book is at `my_organization.github.io/my_book/draft/`
+- the work of each author can be found at `my_organization.github.io/my_book/author_1/`, etc.
+
+
 ## Additional GitHub settings
 We advise  you to enable two options in the general repository setting regarding pull requests in GitHub:
 - Enable `Always suggest updating pull request branches`, suggesting a merge from the default branch into any separate branch before merging into main.
