@@ -1,6 +1,6 @@
 # GitHub reusable action: publish your book online to GitHub Pages
 
-We developed a workflow which builds your TeachBook in your repository for all branches and releases them online via GitHub Pages. In simplified terms, it builds the website based on your repository.
+We developed a workflow which builds your TeachBook in your repository for all branches and releases them online via GitHub Pages. In simplified terms, it automatically builds the website based on your repository and creates multiple instances of your book (defined by each branch). It also provides the ability to customize the URL's at which each instance of the book can be accessed. This tool is designed specifically for educational contexts, for example, when you may want to preserve book versions from multiple academic years so that students are able to access it later.
 
 The [TeachBooks Template](https://github.com/TeachBooks/template) uses this functionality for example. The workflow `call-deploy-book.yml` calls the `deploy-book.yml` workflow, which builds the Jupyter books at the calling repository for all branches, and deploys them via GitHub Pages.
 
