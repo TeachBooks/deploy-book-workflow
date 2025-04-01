@@ -1,6 +1,4 @@
-(deploy-book-workflow)=
-# Releasing book online
- 
+````{margin}
 ```{attributiongrey} Attribution
 :class: attribution
 This page reuses BSD 3-Clause License content from {cite:t}`deploy_book`. {fa}`quote-left`{ref}`Find out more here.<external_resources>`
@@ -12,6 +10,10 @@ This page is useful for user type 3, 4 and 5.
 ```
 
 {bdg-light}`GitHub Reusable Action`
+````
+
+(deploy-book-workflow)=
+# Releasing book online
 
 We developed a workflow which builds your TeachBook in your repository for all branches and releases them online via GitHub Pages. In simplified terms, it automatically builds the book website based on updates to your repository, creates multiple instances of your book (defined by each branch) and provides the ability to customize the URL's at which each instance of the book can be accessed. This tool is designed specifically for educational contexts, for example, when you may want to preserve book versions from multiple academic years so that students are able to access it later. The [TeachBooks Template](https://github.com/TeachBooks/template) uses this functionality for example.
 
