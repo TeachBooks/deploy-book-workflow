@@ -171,9 +171,29 @@ Here's an example for a summary for the template book:
 > BRANCHES_ARCHIVED= (default value used)
 > ```
 
-## Environments and Caching
+## Caching
 
-_Work in progress._
+The GitHub Action [Cache](https://github.com/actions/cache) is used to save the Python virtual environment (only the Python standard library, not the Python packages) and the build artifact (the contents of `book/_build/html`) for any branch.
+
+A primary purpose of the Deploy Book Workflow is to build many versions of a book based on each branch, and each build process will in principle create a Python virtual environment from the `requirements.txt` file in the repository. This is necessary to test changes to book dependencies and configuration in an isolated way, but can dramatically increase the time required to build all versions of the book. It of course, also takes time to build the book itself. For this reason, both of these sets of files are cached. However, note that at the moment the time savings is primarily from the cached build artifact.
+
+Each cache is defined by hashing a specific set of files and including that in the filename of the cache. After the workflow is triggered, a hashed filename is created and if a cached file already exists, it is reused. Cached files can be found in GitHub under the Actions tab, then looking for the "Cahces" section under the "Management" pane on the left hand side of the screen. Here are the [caches for the TeachBooks Manual](https://github.com/TeachBooks/manual/actions/caches), to illustrate. If needed, caches can be deleted manually from this page.
+
+A cache will expire if unused for longer than 1 week or if the maximum allowed disk space for all cached files is exceeded (both are GitHub policies).
+
+### Chached Environment
+
+Once created during a successful build action, an existing cached environment is reused unless two specific criteria are met: 1) a book build is required (replacing the cached build artifact), _and_ 2) the `requirements.txt` file is changed. Requirements for a "book build" are described in the next section.
+
+Note that any change to the `requirements.txt` file will trigger a new environment, not necessarily one that specifies the version number of a package.
+
+In addition, if package versions are not specified ...
+
+### Cached Build Artifacts
+
+Once created during a successful build action, an existing cached build artifact is reused unless _any_ of three specific criteria are met: 1) a change is made to a file in `book/`, 2) the `requirements.txt` file is changed, or 3) the status of a branch as archive or preprocess has changed (`BRANCHES_TO_PREPROCESS` of `BRANCHES_ARCHIVED`).
+
+Unlike the virtual environments, caches of the book build do not influence subsequent builds of the book, as this artifact is replaced whenever a commit to a specific branch triggers a new build process. As described above, old cached build artifacts are used if the build process from a new commit fails, ensuring that the URL remains active and does not return a 404 page.
 
 ## Contribute
 This tool's repository is stored on [GitHub](https://github.com/TeachBooks/deploy-book-workflow). The `README.md` of the branch `manual_docs` is also part of the [TeachBooks manual](https://teachbooks.io/manual/external/deploy-book-workflow/README.html) as a submodule. If you'd like to contribute, you can create a fork and open a pull request on the [GitHub repository](https://github.com/TeachBooks/deploy-book-workflow). To update the `README.md` shown in the TeachBooks manual, create a fork and open a merge request for the [GitHub repository of the manual](https://github.com/TeachBooks/manual). If you intent to clone the manual including its submodules, clone using: `git clone --recurse-submodulesgit@github.com:TeachBooks/manual.git`.
