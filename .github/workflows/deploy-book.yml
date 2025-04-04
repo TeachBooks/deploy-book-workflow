@@ -201,6 +201,13 @@ jobs:
     # Either cache situation addressed with: python -m venv .venv
     #  - If a cached environment was loaded, .venv will be reused;
     #  - If not loaded, a new venv is created
+    # Note that for an existing cached venv when using: pip install -r requirements.txt
+    #  - Packages will be checked for compatability and updated if a new package was added to requirements.txt
+    #  - If no new packages are added, or the new package is compatible with the other packages,
+    #      UPDATES TO EXISTING PACKAGES WILL NOT BE MADE AUTOMATICALLY, EVEN IF A NEW VERSION EXISTS
+    #  - The significance of the last point is that, when compared to the venv on a newer branch, a 
+    #      frequently used branch (where the cache has not expired) may retain old and out of date packages
+    #      long after an updated version is available. Recommendation is to specifically pin version numbers.
     - if: ${{ steps.cache-html.outputs.cache-hit != 'true' }}
       name: Install dependencies
       run: |

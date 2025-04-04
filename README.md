@@ -185,7 +185,11 @@ This works by hashing a specific set of files and including that in the filename
 
 Cached files can be found in GitHub under the Actions tab, then looking for the "Caches" section under the "Management" pane on the left hand side of the screen. For example, this link shows the [caches for the TeachBooks Manual](https://github.com/TeachBooks/manual/actions/caches). If needed, caches can be deleted manually from this page. A cache will expire if unused for longer than 1 week or if the maximum allowed disk space for all cached files is exceeded (both are GitHub policies).
 
-The cache settings lead to several considerations for the building and maintenance of a book, which are explained below, after the criteria for each cache type are described.
+Files created during a GitHub Action are called [artifacts](https://docs.github.com/en/actions/writing-workflows/choosing-what-your-workflow-does/storing-and-sharing-data-from-a-workflow). Although this is _not_ the same thing as a cache, the files in a specific cache or artifact are identical. Artifacts have their own expiration period, which is possible to [customize in the repository settings](https://docs.github.com/en/organizations/managing-organization-settings/configuring-the-retention-period-for-github-actions-artifacts-and-logs-in-your-organization) (default is 90 days). Unexpired artifacts can be viewed at the bottom of any workflow run summary that is available on the Actions tab of a GitHub repository.
+
+To add even more confusion to the situation, if an artifact built during an Action is a set of HTML files (a website) that are used to create a GitHub Pages website, the files served when visiting the URL for that are stored on a webserver; they are _not_ the artifact files, but are identical. Fortunately webserver files are preserved indefinitely (or until GitHub changes this policy), meaning that even though your cache or artifact may be deleted, the website will still remain active.
+
+The cache is a key component of the DBW and leads to several considerations for the building and maintenance of a book, which are explained below, after the criteria for each cache type are described.
 
 ### Cached Environment
 
@@ -201,27 +205,24 @@ Build artifacts are the HTML files that define the website (i.e., the book) and 
 
 Once created during a successful build action, an existing cached build artifact will be found and reused unless _any_ of three specific criteria are met: 1) a change is made to a file in `book/`, 2) the `requirements.txt` file is changed, or 3) the status of a branch as archive or preprocess has changed (`BRANCHES_TO_PREPROCESS` of `BRANCHES_ARCHIVED`).
 
-Note that the build artifact preserved in the cache is identical to the HTML files used to serve the book webiste, but the cache should be considered a copy of these files. The book website files are a [GitHub Action artifact](https://docs.github.com/en/actions/writing-workflows/choosing-what-your-workflow-does/storing-and-sharing-data-from-a-workflow) (_not_ a cache!) and have their own expiration period, which is possible to [customize in the repository settings](https://docs.github.com/en/organizations/managing-organization-settings/configuring-the-retention-period-for-github-actions-artifacts-and-logs-in-your-organization). The artifact itself is also a copy of the files that are actually served by GitHub when visiting the URL of the book website; this means that while the artifact may expire after 90 days, the website will remain active indefinitely (or until this policy is changed by GitHub). Unexpired artifacts can be viewed at the bottomw of any workflow run summary that is available on the Actions tab of a GitHub repository. 
+Immediately after a successful build action, the book website files exist in three places: cache, artifact and on a GitHub webserver. However, as described at the beginning of this section, the cache will be automatically deleted after 1 week, if unused, and the artifact will be deleted based on the setting in your repository (90 days by default). 
 
 ### Effect of Caching on Book Workflow
 
-The implementation of the DBW has several characteristics that should be noted which could help understand certain behaviors. These points may be useful to consider if you are experiencing undesired behavior in your Actions builds and/or your actual book websites. The key characteristics to be aware of (described in detail above) are:
+Implementation of the DBW has several characteristics that should be noted which could help understand certain behaviors of the book build and website deployment process. These points may be useful to consider if you are experiencing undesired behavior in your Actions builds and/or your actual book websites.
 
-_WIP: LAST SUB-SECTION TO FINISH_
+- Remember that the DBW action will only run if a commit is made that changes `requirements.txt` or contents of `book/`
+- When first creating a repository, the action may not run, or may run and fail; occasionally it is needed to make a new commit to get the workflow to run for the first time (remember to modify something in `book/`) or you may try to re-run the job from the Actions tab
 - when using multiple branches, only the branch that is edited will be updated
-- the website for each branch may be built with a different Python environment (different package versions)
-- 
-When working on a single branch:
-- the website for each branch 
+- the website for each branch may be built with a different Python environments (different package versions)
 
-When working on multiple branches (i.e., multiple versions of a book), note the following:
-- environments may be different for each branch based on the `requirements.txt` file and if the cache is expire 
+Unlike the virtual environments (next subsection), caches of the book build do not influence subsequent builds of the book, as this artifact is replaced whenever a commit to a specific branch triggers a new build process. As described above, old cached build artifacts are used if the build process from a new commit fails, ensuring that the URL of a website does not return a 404 page.
 
-Unlike the virtual environments, caches of the book build do not influence subsequent builds of the book, as this artifact is replaced whenever a commit to a specific branch triggers a new build process. As described above, old cached build artifacts are used if the build process from a new commit fails, ensuring that the URL remains active and does not return a 404 page.
+### Effect of Caching on Virtual Environment
 
-Best practice would be to pin version numbers explicitly if you want book build to remain consistent and a feature like dependabot to automatically notify you when an update is made.
-
-Future improvements to the DBW may include the ability for a user to specify additional aspects of the build process, for example, the Python version or the specific book build commands (e.g., `teachbooks build` or `jupyter-book build`). If this is something that interests you, please create an Issue in the repository (perhaps with "feature request" in the title).
+In particular, note that older branches may have been built with cached environments that are different than those in a newer branch, leading to (undesired) differences in book appearance or functionality---often without the author being aware! This occurs if a package in `requirements.txt` is updated in the time between the creation of environments on different branches, as `pip` will use the newest version when downloading a package (the first time a venv cache is created in the DBW), but it will not always automatically update a package if `pip install -r requirements.txt` is used on an existing environment (this happens every time an existing cache is used!). This means that, when compared to the venv on a newer branch, a frequently used branch (where the cache has not expired) may retain old and out of date packages long after an updated version is available. A best practice to avoid this situation is to pin version numbers explicitly (e.g., `teachbooks==0.2.0`) if you want book builds to remain consistent. In addition, a feature like dependabot can be used to automatically notify you when an update is made; this is [described in the TeachBooks Manual](https://teachbooks.io/manual/features/update_env.html).
 
 ## Contribute
 This tool's repository is stored on [GitHub](https://github.com/TeachBooks/deploy-book-workflow). The `README.md` of the branch `manual_docs` is also part of the [TeachBooks manual](https://teachbooks.io/manual/external/deploy-book-workflow/README.html) as a submodule. If you'd like to contribute, you can create a fork and open a pull request on the [GitHub repository](https://github.com/TeachBooks/deploy-book-workflow). To update the `README.md` shown in the TeachBooks manual, create a fork and open a merge request for the [GitHub repository of the manual](https://github.com/TeachBooks/manual). If you intent to clone the manual including its submodules, clone using: `git clone --recurse-submodulesgit@github.com:TeachBooks/manual.git`.
+
+Future improvements to the DBW may address the ability for a user to specify additional aspects of the build process, for example, the Python version or the specific book build commands (e.g., `teachbooks build` or `jupyter-book build`). If this is something that interests you, please create an Issue in the repository (perhaps with "feature request" in the title).
