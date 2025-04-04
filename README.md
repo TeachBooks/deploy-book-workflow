@@ -171,6 +171,10 @@ Here's an example for a summary for the template book:
 > BRANCHES_ARCHIVED= (default value used)
 > ```
 
+## Book Build
+
+_WIP_
+
 ## Caching
 
 The GitHub Action [Cache](https://github.com/actions/cache) is used in the Deploy Book Workflow (DBW) to save time when building the book. This is accompliched by caching two sets of files for each branch: 1) the Python virtual environment, and 2) the build artifact (the HTML files forming each book website).
