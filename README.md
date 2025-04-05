@@ -173,7 +173,21 @@ Here's an example for a summary for the template book:
 
 ## Book Build
 
-_WIP_
+The Jupyter Book is built using the TeachBooks Python package `teachbooks`, which is a wrapper around the `jupyter-book` command line tool that makes it easier to customize the build and deploy workflow. The package is documented at [teachbooks.readthedocs.io/](https://teachbooks.readthedocs.io/) for those interested in the package implementation and API; for those interested in a higher level overview and how-to, see the [package overview page in the TeachBooks Manual](https://teachbooks.io/manual/features/overview.html#teachbooks-python-package).
+
+By default the book is built using the following command:
+
+```
+teachbooks build book/
+```
+
+The Draft-Release workflow allows tagged lines of code to be removed from `yml` files (for example, if some pages of a book must be removed from a specific version). This is activated in the Deploy Book Workflow using the `BRANCHES_TO_PREPROCESS` variable, which will then execute the following command:
+
+```
+teachbooks build --release book/
+```
+
+More information about the Draft-Release workflow can be found [here](https://teachbooks.io/manual/external-content-teachbooks-v0.2.0/features/draft-release.html).
 
 ## Caching
 
