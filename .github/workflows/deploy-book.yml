@@ -188,6 +188,7 @@ jobs:
 
     # If a build is required, load the cached venv, if available
     # A cached environment is loaded if the requirements.txt file is unchanged, as this is checked by the file hash.
+    # A new cache is created if the old one is more than a week old, as the week number is included in the file hash.
     # Note: an id is not required here because no check for the cached environment is needed; this is because a new environment
     #  is only required if a build is required and this is already checked with id: cache-html, as described above.
     - if: ${{ steps.cache-html.outputs.cache-hit != 'true' }}
@@ -206,8 +207,9 @@ jobs:
     #  - If no new packages are added, or the new package is compatible with the other packages,
     #      UPDATES TO EXISTING PACKAGES WILL NOT BE MADE AUTOMATICALLY, EVEN IF A NEW VERSION EXISTS
     #  - The significance of the last point is that, when compared to the venv on a newer branch, a 
-    #      frequently used branch (where the cache has not expired) may retain old and out of date packages
-    #      long after an updated version is available. Recommendation is to specifically pin version numbers.
+    #      frequently used branch (where the cache has not expired) may retain old and out of date packages.
+    #      Since the week number is included in the cache hash, this will be 1 week max.
+    #  - Recommendation is to specifically pin version numbers and update automatically with Dependabot.
     - if: ${{ steps.cache-html.outputs.cache-hit != 'true' }}
       name: Install dependencies
       run: |
