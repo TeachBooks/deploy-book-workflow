@@ -165,6 +165,9 @@ jobs:
         cat EXTRA_CACHE_VARS.txt
 
     - name: Cache page build
+      # An id is created here to check if build is required for later steps with: if steps.cache-html.outputs.cache-hit != 'true'
+      # A build is required if a change is made to the book contents, requirements file or the status of
+      #  a branch as archive or preprocess has changed (`BRANCHES_TO_PREPROCESS` of `BRANCHES_ARCHIVED`).
       id: cache-html
       uses: actions/cache@v4
       with:
@@ -183,6 +186,11 @@ jobs:
       run: |
         echo "WEEK=$(date +%V)" >> $GITHUB_ENV
 
+    # If a build is required, load the cached venv, if available
+    # A cached environment is loaded if the requirements.txt file is unchanged, as this is checked by the file hash.
+    # A new cache is created if the old one is more than a week old, as the week number is included in the file hash.
+    # Note: an id is not required here because no check for the cached environment is needed; this is because a new environment
+    #  is only required if a build is required and this is already checked with id: cache-html, as described above.
     - if: ${{ steps.cache-html.outputs.cache-hit != 'true' }}
       name: Cache virtualenv
       uses: actions/cache@v4
@@ -190,6 +198,18 @@ jobs:
         key: venv-${{ runner.os }}-${{ steps.setup-python.outputs.python-version }}-${{ hashFiles('requirements.txt') }}-week${{ env.WEEK }}-${{ github.repository }}
         path: .venv
 
+    # Dependencies are always checked if a build is required, regardless of whether a cached environment is used
+    # Either cache situation addressed with: python -m venv .venv
+    #  - If a cached environment was loaded, .venv will be reused;
+    #  - If not loaded, a new venv is created
+    # Note that for an existing cached venv when using: pip install -r requirements.txt
+    #  - Packages will be checked for compatability and updated if a new package was added to requirements.txt
+    #  - If no new packages are added, or the new package is compatible with the other packages,
+    #      UPDATES TO EXISTING PACKAGES WILL NOT BE MADE AUTOMATICALLY, EVEN IF A NEW VERSION EXISTS
+    #  - The significance of the last point is that, when compared to the venv on a newer branch, a 
+    #      frequently used branch (where the cache has not expired) may retain old and out of date packages.
+    #      Since the week number is included in the cache hash, this will be 1 week max.
+    #  - Recommendation is to specifically pin version numbers and update automatically with Dependabot.
     - if: ${{ steps.cache-html.outputs.cache-hit != 'true' }}
       name: Install dependencies
       run: |
@@ -215,7 +235,7 @@ jobs:
       name: Preprocess & build the book from branch
       run: |
         if [ "$BRANCHES_TO_PREPROCESS" == "*" ] || echo "$BRANCHES_TO_PREPROCESS" | tr ' ' '\n' | grep "^${{ matrix.branch }}$"; then
-          option_release='--publish'
+          option_release='--release'
         else
           option_release=''
         fi
