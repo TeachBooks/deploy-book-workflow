@@ -235,7 +235,7 @@ jobs:
       name: Preprocess & build the book from branch
       run: |
         if [ "$BRANCHES_TO_PREPROCESS" == "*" ] || echo "$BRANCHES_TO_PREPROCESS" | tr ' ' '\n' | grep "^${{ matrix.branch }}$"; then
-          option_release='--publish'
+          option_release='--release'
         else
           option_release=''
         fi
