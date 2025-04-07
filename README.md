@@ -239,4 +239,9 @@ In particular, note that older branches may have been built with cached environm
 ## Contribute
 This tool's repository is stored on [GitHub](https://github.com/TeachBooks/deploy-book-workflow). The `README.md` of the branch `manual_docs` is also part of the [TeachBooks manual](https://teachbooks.io/manual/external/deploy-book-workflow/README.html) as a submodule. If you'd like to contribute, you can create a fork and open a pull request on the [GitHub repository](https://github.com/TeachBooks/deploy-book-workflow). To update the `README.md` shown in the TeachBooks manual, create a fork and open a merge request for the [GitHub repository of the manual](https://github.com/TeachBooks/manual). If you intent to clone the manual including its submodules, clone using: `git clone --recurse-submodulesgit@github.com:TeachBooks/manual.git`.
 
+To test changes to the deploy book workflow do the following:
+1. Create a fork of the repository and make a commit to `deploy-book.yml`
+2. Using a book repository (e.g., a book created from the TeachBooks Template), edit the `call-deploy-book..yml` file such that `TeachBooks/deploy-book-workflow/.github/workflows/deploy-book.yml@main` is replaced with the repository and branch path to your modified file `deploy-book.yml`
+3. Make a commit in the book repository that triggers the workflow and confirm that the job runs successfully.
+
 Future improvements to the DBW may address the ability for a user to specify additional aspects of the build process, for example, the Python version or the specific book build commands (e.g., `teachbooks build` or `jupyter-book build`). If this is something that interests you, please create an Issue in the repository (perhaps with "feature request" in the title).
