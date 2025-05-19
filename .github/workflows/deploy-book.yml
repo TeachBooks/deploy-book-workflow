@@ -215,10 +215,10 @@ jobs:
       run: |
         python -m venv .venv
         source .venv/bin/activate
+        sudo apt-get update && sudo apt-get install -y libcairo2-dev libpango1.0-dev
         python -m pip install -r requirements.txt
         echo "$VIRTUAL_ENV/bin" >> $GITHUB_PATH
         echo "VIRTUAL_ENV=$VIRTUAL_ENV" >> $GITHUB_ENV
-        sudo apt-get update && sudo apt-get install -y libcairo2-dev libpango1.0-dev
 
     - if: ${{ steps.cache-html.outputs.cache-hit != 'true' }}
       name: Insert banner if archived
