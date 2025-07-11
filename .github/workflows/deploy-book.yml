@@ -149,7 +149,7 @@ jobs:
     - name: Record extra cache info
       run: |
         # Record filenames listing -- this updates the cache on filename change
-        find book/ -type f >> EXTRA_CACHE_VARS.txt
+        find . -type f -not -path './.git/*' -not -path './.github/*' -not -path './_build/*' >> EXTRA_CACHE_VARS.txt
         # Record if branch is preprocessed
         if [ "$BRANCHES_TO_PREPROCESS" == "*" ] || echo "$BRANCHES_TO_PREPROCESS" | tr ' ' '\n' | grep "^${{ matrix.branch }}$"; then
           echo true >> EXTRA_CACHE_VARS.txt
@@ -171,8 +171,8 @@ jobs:
       id: cache-html
       uses: actions/cache@v4
       with:
-        path: "book/_build/html"
-        key: html-build-${{ matrix.branch }}-${{ hashFiles('book/**', 'requirements.txt', 'EXTRA_CACHE_VARS.txt') }}
+        path: "_build/html"
+        key: html-build-${{ matrix.branch }}-${{ hashFiles('./**', 'requirements.txt', 'EXTRA_CACHE_VARS.txt', '!./.git/**', '!./.github/**', '!./_build/**') }}
 
     - if: ${{ steps.cache-html.outputs.cache-hit != 'true' }}
       name: Set up Python 3.11
@@ -227,8 +227,8 @@ jobs:
             url=$(gh api "repos/$GITHUB_REPOSITORY/pages" --jq '.html_url')
             echo 'html:'
             echo "  announcement: 'You are viewing an archived version of the book. Click <a href=\"$url$PRIMARY_BRANCH\">here</a> for the latest version.'"
-          } >> book/_config.yml
-          cat book/_config.yml
+          } >> _config.yml
+          cat _config.yml
         fi
 
     - if: ${{ steps.cache-html.outputs.cache-hit != 'true' }}
@@ -241,7 +241,7 @@ jobs:
         fi
         set -o pipefail
         # https://stackoverflow.com/a/692407
-        teachbooks build $option_release book/ > >(tee stdout.log) 2> >(tee stderr.log >&2)
+        teachbooks build $option_release . > >(tee stdout.log) 2> >(tee stderr.log >&2)
         set +o pipefail
 
     - name: If failed, restore a book for this branch from cache
@@ -250,7 +250,7 @@ jobs:
       uses: actions/cache/restore@v4
       with:
         key: none
-        path: "book/_build/html"
+        path: "_build/html"
         restore-keys: html-build-${{ matrix.branch }}
 
     - name: Debug cache attempt output
@@ -315,7 +315,7 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: ${{ env.MATRIX_BRANCH_NAME_CLEAN }}
-        path: "book/_build/html"
+        path: "_build/html"
 
   deploy-books:
     # Run after build-books, even if it failed
