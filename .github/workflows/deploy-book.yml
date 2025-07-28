@@ -494,7 +494,7 @@ jobs:
               <meta charset="UTF-8">
               <meta name="viewport" content="width=device-width, initial-scale=1.0">
               <title>Page Not Found</title>
-              <link rel="icon" href="favicon.ico" type="image/x-icon">
+              <link rel="icon" href="https://teachbooks.io/wp-content/uploads/2024/12/cropped-TB_favicon-32x32.png" type="image/png">
               <style>
                   body {
                       font-family: Arial, sans-serif;
@@ -527,13 +527,54 @@ jobs:
                   .logo:hover {
                       transform: scale(1.02);
                   }
+                  @media (max-width: 768px) {
+                      .container {
+                          margin: 20px;
+                          padding: 20px;
+                          padding-top: 40px;
+                      }
+                      .logo {
+                          position: static;
+                          display: block;
+                          margin: 0 auto 20px auto;
+                          width: 150px;
+                      }
+                      .button-container .btn {
+                          display: block !important;
+                          margin: 15px auto !important;
+                          max-width: 250px;
+                          width: 90%;
+                      }
+                  }
+                  @media (max-width: 480px) {
+                      .logo {
+                          width: 120px;
+                      }
+                      .error-code {
+                          font-size: 3em;
+                      }
+                      h1 {
+                          font-size: 2em;
+                      }
+                      .button-container .btn {
+                          display: block !important;
+                          margin: 20px auto !important;
+                          max-width: 200px;
+                          width: 80%;
+                      }
+                      .button-container {
+                          margin: 40px 0;
+                      }
+                  }
                   h1 {
+                      font-family: 'Courier New', monospace, Arial, sans-serif;
                       color: #85A5FF;
                       font-size: 2.5em;
                       margin-bottom: 20px;
                       text-align: center;
                   }
                   .error-code {
+                      font-family: 'Courier New', monospace, Arial, sans-serif;
                       font-size: 4em;
                       color: #FFD400;
                       text-align: center;
