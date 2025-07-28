@@ -602,7 +602,7 @@ jobs:
                       <div class="button-container">
                           <a href="#" id="root-link" class="btn">Go to Homepage</a>
                           <a href="javascript:history.back()" class="btn btn-secondary">Go Back</a>
-                          <a href="#" id="github-link" class="btn btn-github">View Source Code</a>
+                          <a href="#" id="github-link" class="btn btn-github">Go to Source Code</a>
                       </div>
                   </div>
               </div>
