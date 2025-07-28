@@ -488,26 +488,173 @@ jobs:
         # https:(0)/(1)/uname.github.io(2)/rname(3)/bname(4) */
         # if urlParts.len < 4, bname is undefined */
         HTML_TEMPLATE_404_REDIRECT: |
-          <!DOCTYPE html><title>Redirecting...</title>
-          <body></body>
-          <script>
-          let currentUrl = window.location.href;
-          let urlParts = currentUrl.split('/');
-          console.log("urlParts before", urlParts);
-          let bname = urlParts[4];
-          console.log("bname", bname);
-          let branches = $BRANCHES;
-          console.log("branches", branches);
-          if (!branches.includes(bname)) {
-              urlParts.splice(4, 0, '$PRIMARY_BRANCH');
-              console.log("urlParts after", urlParts);
-              let newUrl = urlParts.join('/');
-              window.location.href = newUrl;
-          } else {
-              document.title = "Page Not Found";
-              document.body.innerHTML = "<h1>Page Not Found</h1>";
-          }
-          </script>
+          <!DOCTYPE html>
+          <html lang="en">
+          <head>
+              <meta charset="UTF-8">
+              <meta name="viewport" content="width=device-width, initial-scale=1.0">
+              <title>Page Not Found</title>
+              <link rel="icon" href="favicon.ico" type="image/x-icon">
+              <style>
+                  body {
+                      font-family: Arial, sans-serif;
+                      margin: 0;
+                      padding: 0;
+                      background-color: #f4f4f4;
+                      color: #333;
+                  }
+                  .container {
+                      max-width: 800px;
+                      margin: 50px auto;
+                      padding: 20px 20px 20px 20px;
+                      padding-top: 100px;
+                      background-color: #fff;
+                      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+                      position: relative;
+                      border-radius: 8px;
+                  }
+                  .logo {
+                      position: absolute;
+                      top: 10px;
+                      right: 10px;
+                      width: 200px;
+                      padding: 10px;
+                      background-color: #fff;
+                      border-radius: 5px;
+                      box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+                      transition: transform 0.2s;
+                  }
+                  .logo:hover {
+                      transform: scale(1.02);
+                  }
+                  h1 {
+                      color: #85A5FF;
+                      font-size: 2.5em;
+                      margin-bottom: 20px;
+                      text-align: center;
+                  }
+                  .error-code {
+                      font-size: 4em;
+                      color: #FFD400;
+                      text-align: center;
+                      margin: 20px 0;
+                      font-weight: bold;
+                      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+                  }
+                  p {
+                      font-size: 1.1em;
+                      line-height: 1.6;
+                      margin-bottom: 20px;
+                      text-align: center;
+                      color: #3B60E4;
+                  }
+                  .button-container {
+                      text-align: center;
+                      margin: 30px 0;
+                  }
+                  .btn {
+                      display: inline-block;
+                      background-color: #85A5FF;
+                      color: white;
+                      padding: 12px 24px;
+                      text-decoration: none;
+                      border-radius: 5px;
+                      margin: 0 10px;
+                      transition: background-color 0.3s;
+                  }
+                  .btn:hover {
+                      background-color: #6B8FFF;
+                      text-decoration: none;
+                  }
+                  .btn-secondary {
+                      background-color: #F0F4FF;
+                      color: #85A5FF;
+                      border: 1px solid #85A5FF;
+                  }
+                  .btn-secondary:hover {
+                      background-color: #E1EBFF;
+                      color: #6B8FFF;
+                  }
+                  .btn-github {
+                      background-color: #3B60E4;
+                      color: white;
+                      border: 1px solid #3B60E4;
+                  }
+                  .btn-github:hover {
+                      background-color: #2A4BC7;
+                      color: white;
+                  }
+                  .redirecting {
+                      display: none;
+                      text-align: center;
+                      font-style: italic;
+                      color: #3B60E4;
+                      font-weight: 500;
+                  }
+                  .spinner {
+                      border: 2px solid #f3f3f3;
+                      border-top: 2px solid #FFD400;
+                      border-radius: 50%;
+                      width: 20px;
+                      height: 20px;
+                      animation: spin 1s linear infinite;
+                      display: inline-block;
+                      margin-right: 10px;
+                  }
+                  @keyframes spin {
+                      0% { transform: rotate(0deg); }
+                      100% { transform: rotate(360deg); }
+                  }
+              </style>
+          </head>
+          <body>
+              <div class="container">
+                  <a href="https://teachbooks.io/" target="_blank">
+                      <img src="https://teachbooks.io/wp-content/uploads/2024/12/TeachBooks_logo_notext.svg" alt="TeachBooks Logo" class="logo">
+                  </a>
+                  <div class="error-code">404</div>
+                  <h1 id="page-title">Page Not Found</h1>
+                  <div id="content">
+                      <p>The page you're looking for doesn't exist.</p>
+                      <div class="button-container">
+                          <a href="#" id="root-link" class="btn">Go to Homepage</a>
+                          <a href="javascript:history.back()" class="btn btn-secondary">Go Back</a>
+                          <a href="#" id="github-link" class="btn btn-github">View Source Code</a>
+                      </div>
+                  </div>
+                  <div id="redirecting" class="redirecting">
+                      <div class="spinner"></div>
+                      Redirecting you to the correct page...
+                  </div>
+              </div>
+              <script>
+              let currentUrl = window.location.href;
+              let urlParts = currentUrl.split('/');
+              console.log("urlParts before", urlParts);
+              let bname = urlParts[4];
+              console.log("bname", bname);
+              let branches = $BRANCHES;
+              console.log("branches", branches);
+              let rootUrl = urlParts.slice(0, 4).join('/') + '/';
+              let githubUrl = 'https://github.com/$GITHUB_REPOSITORY';
+              document.getElementById('root-link').href = rootUrl;
+              document.getElementById('github-link').href = githubUrl;
+              
+              if (!branches.includes(bname)) {
+                  document.getElementById('page-title').textContent = 'Redirecting...';
+                  document.getElementById('content').style.display = 'none';
+                  document.getElementById('redirecting').style.display = 'block';
+                  
+                  setTimeout(function() {
+                      urlParts.splice(4, 0, '$PRIMARY_BRANCH');
+                      console.log("urlParts after", urlParts);
+                      let newUrl = urlParts.join('/');
+                      window.location.href = newUrl;
+                  }, 2000);
+              }
+              </script>
+          </body>
+          </html>
         # HTML_TEMPLATE_404_TRUE: |
         #   <!DOCTYPE html><title>404 Not Found</title>
         #   404 Not Found
