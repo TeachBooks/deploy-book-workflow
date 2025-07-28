@@ -584,23 +584,6 @@ jobs:
                       background-color: #2A4BC7;
                       color: white;
                   }
-                  .redirecting {
-                      display: none;
-                      text-align: center;
-                      font-style: italic;
-                      color: #3B60E4;
-                      font-weight: 500;
-                  }
-                  .spinner {
-                      border: 2px solid #f3f3f3;
-                      border-top: 2px solid #FFD400;
-                      border-radius: 50%;
-                      width: 20px;
-                      height: 20px;
-                      animation: spin 1s linear infinite;
-                      display: inline-block;
-                      margin-right: 10px;
-                  }
                   @keyframes spin {
                       0% { transform: rotate(0deg); }
                       100% { transform: rotate(360deg); }
@@ -610,7 +593,7 @@ jobs:
           <body>
               <div class="container">
                   <a href="https://teachbooks.io/" target="_blank">
-                      <img src="https://teachbooks.io/wp-content/uploads/2024/12/TeachBooks_logo_notext.svg" alt="TeachBooks Logo" class="logo">
+                      <img src="https://teachbooks.io/wp-content/uploads/2025/01/GIF_TeachBooks_01_Square_800x800_Alpha.gif" alt="TeachBooks Logo" class="logo">
                   </a>
                   <div class="error-code">404</div>
                   <h1 id="page-title">Page Not Found</h1>
@@ -621,10 +604,6 @@ jobs:
                           <a href="javascript:history.back()" class="btn btn-secondary">Go Back</a>
                           <a href="#" id="github-link" class="btn btn-github">View Source Code</a>
                       </div>
-                  </div>
-                  <div id="redirecting" class="redirecting">
-                      <div class="spinner"></div>
-                      Redirecting you to the correct page...
                   </div>
               </div>
               <script>
@@ -641,16 +620,10 @@ jobs:
               document.getElementById('github-link').href = githubUrl;
               
               if (!branches.includes(bname)) {
-                  document.getElementById('page-title').textContent = 'Redirecting...';
-                  document.getElementById('content').style.display = 'none';
-                  document.getElementById('redirecting').style.display = 'block';
-                  
-                  setTimeout(function() {
-                      urlParts.splice(4, 0, '$PRIMARY_BRANCH');
-                      console.log("urlParts after", urlParts);
-                      let newUrl = urlParts.join('/');
-                      window.location.href = newUrl;
-                  }, 2000);
+                  urlParts.splice(4, 0, '$PRIMARY_BRANCH');
+                  console.log("urlParts after", urlParts);
+                  let newUrl = urlParts.join('/');
+                  window.location.href = newUrl;
               }
               </script>
           </body>
