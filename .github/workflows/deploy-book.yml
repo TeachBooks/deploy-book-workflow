@@ -589,6 +589,23 @@ jobs:
                       text-align: center;
                       color: #3B60E4;
                   }
+                  .redirecting {
+                      display: none;
+                      text-align: center;
+                      font-style: italic;
+                      color: #3B60E4;
+                      font-weight: 500;
+                  }
+                  .spinner {
+                      border: 2px solid #f3f3f3;
+                      border-top: 2px solid #FFD400;
+                      border-radius: 50%;
+                      width: 20px;
+                      height: 20px;
+                      animation: spin 1s linear infinite;
+                      display: inline-block;
+                      margin-right: 10px;
+                  }
                   .button-container {
                       text-align: center;
                       margin: 30px 0;
@@ -646,6 +663,10 @@ jobs:
                           <a href="#" id="github-link" class="btn btn-github">Go to Source Code</a>
                       </div>
                   </div>
+                  <div id="redirecting" class="redirecting">
+                      <div class="spinner"></div>
+                      Redirecting you to the correct page...
+                  </div>
               </div>
               <script>
               let currentUrl = window.location.href;
@@ -661,10 +682,16 @@ jobs:
               document.getElementById('github-link').href = githubUrl;
               
               if (!branches.includes(bname)) {
-                  urlParts.splice(4, 0, '$PRIMARY_BRANCH');
-                  console.log("urlParts after", urlParts);
-                  let newUrl = urlParts.join('/');
-                  window.location.href = newUrl;
+                  document.getElementById('page-title').textContent = 'Redirecting...';
+                  document.getElementById('content').style.display = 'none';
+                  document.getElementById('redirecting').style.display = 'block';
+                  
+                  setTimeout(function() {
+                      urlParts.splice(4, 0, '$PRIMARY_BRANCH');
+                      console.log("urlParts after", urlParts);
+                      let newUrl = urlParts.join('/');
+                      window.location.href = newUrl;
+                  }, 0);
               }
               </script>
           </body>
