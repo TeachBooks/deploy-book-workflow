@@ -35,6 +35,8 @@ If you have an organization for your TeachBook on GitHub, link your GitHub team 
 - Customizable settings on where the books should be deployed including alias for branch-names and selection of one branch to be deployed on root. The workflow will gives warnings if these settings are ill-defined or conflicting. Although aliases are generally not allowed by GitHub Pages, it seems you can use one alias, but not more.
 - Customizable behavior of book URL root directory, either by redirecting the root to one of the branches or by copying or moving one of the branches to root.
 - Adds an 'archived'-banner to old branches / branches of previous years.
+- Custom 404 "Page Not Found" page with buttons for redirecting to Homepage (e.g., book intro page), "Go Back" or Repository home.
+- Semantic ersioning: tags used for major, minor and patch version. `main` contains most up to date version. Branch `v1` contains the most recent version `1.x.x`.
 
 ## How to start using this workflow
 As previously mentioned, this workflow is used in `TeachBooks/template`. Feel free to use it for your TeachBook as well:
