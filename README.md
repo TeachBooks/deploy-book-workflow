@@ -178,7 +178,7 @@ Here's an example for a summary for the template book:
 
 ## Book Build
 
-The Jupyter Book is built using the TeachBooks Python package `teachbooks`, which is a wrapper around the `jupyter-book` command line tool that makes it easier to customize the build and deploy workflow. The package is documented at [teachbooks.readthedocs.io/](https://teachbooks.readthedocs.io/) for those interested in the package implementation and API; for those interested in a higher level overview and how-to, see the [package overview page in the TeachBooks Manual](https://teachbooks.io/manual/features/overview.html#teachbooks-python-package).
+The Jupyter Book is built using the TeachBooks Python package `teachbooks`, which is a wrapper around the `jupyter-book` command line tool that makes it easier to customize the build and deploy workflow. The package is documented at [teachbooks.readthedocs.io/](https://teachbooks.readthedocs.io/) for those interested in the package implementation and API; for those interested in a higher level overview and how-to, see the [package overview page](https://teachbooks.io/manual/features/teachbooks_intro.html).
 
 By default the book is built using the following command:
 
