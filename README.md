@@ -13,7 +13,7 @@ This page is useful for user type 3, 4 and 5.
 ````
 
 (deploy-book-workflow)=
-# Releasing book online
+# Deploy Book workflow
 
 We developed a workflow (Deploy Book Workflow) which builds your TeachBook in your repository for all branches and releases them online via GitHub Pages. In simplified terms, it automatically builds the book website based on updates to your repository, creates multiple instances of your book (defined by each branch) and provides the ability to customize the URL's at which each instance of the book can be accessed. This tool is designed specifically for educational contexts, for example, when you may want to preserve book versions from multiple academic years so that students are able to access it later. 
 
