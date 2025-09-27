@@ -247,6 +247,21 @@ Unlike the virtual environments (next subsection), caches of the book build do n
 
 In particular, note that older branches may have been built with cached environments that are different than those in a newer branch, leading to (undesired) differences in book appearance or functionality---often without the author being aware! This occurs if a package in `requirements.txt` is updated in the time between the creation of environments on different branches, as `pip` will use the newest version when downloading a package (the first time a venv cache is created in the DBW), but it will not always automatically update a package if `pip install -r requirements.txt` is used on an existing environment (this happens every time an existing cache is used!). This means that, when compared to the venv on a newer branch, a frequently used branch (where the cache has not expired) may retain old and out of date packages long after an updated version is available; however, since the week number is included in the venv file hash, this will last for a maximum of 1 week. A best practice to avoid this situation is to pin version numbers explicitly (e.g., `teachbooks==0.2.0`) if you want book builds to remain consistent. In addition, a feature like dependabot can be used to automatically notify you when an update is made; this is [described in the TeachBooks Manual](https://teachbooks.io/manual/features/update_env.html).
 
+## Related features
+
+A list of tools and features that are dependent on, or related to, the Deploy Book Workflow (DBW) is provided here:
+
+- [TeachBooks template](https://github.com/TeachBooks/template): books created from the Template include DBW by default
+- [Draft-release workflow](https://teachbooks.io/manual/favourites/features/draft-release.html): can be configured directly using the DBW
+- [Auto-updating packages](https://teachbooks.io/manual/favourites/features/update_env.html): behaviors of this tool may influence the DBW
+- [TeachBooks package](https://github.com/Teachbooks/teachbooks): included by default in the DBW
+- [TeachBook recombiner](https://teachbooks.io/recombiner/): works best with books published with the DBW
+- [Sharing content between books in table of contents](https://teachbooks.readthedocs.io/latest/external.html): is included by defualt in the DBW because of the use of the TeachBooks package
+- [Sharing content between books using submodules](https://teachbooks.io/manual/favourites/external/Nested-Books/README.html): is supported by DBW.
+- [Build pull requests from forks](https://teachbooks.io/manual/favourites/features/pull_request_build.html): created to provide DBW-like behavior for PR's from forked repositories
+- [APA references](https://teachbooks.io/manual/favourites/features/apa.html): a temporary fix is included in `teachbooks` to enable use in the DBW
+
+
 ## Contribute
 This tool's repository is stored on [GitHub](https://github.com/TeachBooks/deploy-book-workflow). The `README.md` of the branch `manual_docs` is also part of the [TeachBooks manual](https://teachbooks.io/manual/external/deploy-book-workflow/README.html) as a submodule. If you'd like to contribute, you can create a fork and open a pull request on the [GitHub repository](https://github.com/TeachBooks/deploy-book-workflow). To update the `README.md` shown in the TeachBooks manual, create a fork and open a merge request for the [GitHub repository of the manual](https://github.com/TeachBooks/manual). If you intent to clone the manual including its submodules, clone using: `git clone --recurse-submodulesgit@github.com:TeachBooks/manual.git`.
 
