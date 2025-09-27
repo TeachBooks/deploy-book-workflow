@@ -10,6 +10,8 @@ This page is useful for user type 3, 4 and 5.
 ```
 
 {bdg-light}`GitHub Reusable Action`
+{bdg-link-light}`Included in TeachBooks Template <https://teachbooks.io/manual/external/template/README.html>`
+{bdg-link-secondary}`Uses TeachBooks package <https://teachbooks.io/manual/features/teachbooks_intro.html>`
 ````
 
 (deploy-book-workflow)=
