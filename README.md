@@ -1,6 +1,8 @@
 # GitHub reusable action: publish your book online to GitHub Pages
 
-We developed a workflow which builds your TeachBook in your repository for all branches and releases them online via GitHub Pages. In simplified terms, it automatically builds the book website based on updates to your repository, creates multiple instances of your book (defined by each branch) and provides the ability to customize the URL's at which each instance of the book can be accessed. This tool is designed specifically for educational contexts, for example, when you may want to preserve book versions from multiple academic years so that students are able to access it later. The [TeachBooks Template](https://github.com/TeachBooks/template) uses this functionality for example.
+We developed a workflow (Deploy Book Workflow) which builds your TeachBook in your repository for all branches and releases them online via GitHub Pages. In simplified terms, it automatically builds the book website based on updates to your repository, creates multiple instances of your book (defined by each branch) and provides the ability to customize the URL's at which each instance of the book can be accessed. This tool is designed specifically for educational contexts, for example, when you may want to preserve book versions from multiple academic years so that students are able to access it later. 
+
+The Deploy Book Workflow is by default incorporated into any book that has been created using the [TeachBooks Template](https://github.com/TeachBooks/template). We also strongly encourage anyone to consider this tool as an alternative to the "standard" workflow provided by Jupyter Book because of it's additional features.
 
 The workflow `call-deploy-book.yml` calls the `deploy-book.yml` workflow, which builds a Jupyter Book at the calling repository for all branches, and deploys them via GitHub Pages. It is currently configured to create a Jupyter Book using the TeachBooks Python package (i.e., `teachbooks build book`), although this may be adapted in the future to make it easier to use in other applications (e.g., to build books with other software or any static website in general).
 
@@ -21,7 +23,7 @@ If you have an organization for your TeachBook on GitHub, link your GitHub team 
 - Customizable behavior of book URL root directory, either by redirecting the root to one of the branches or by copying or moving one of the branches to root.
 - Adds an 'archived'-banner to old branches / branches of previous years.
 - Custom 404 "Page Not Found" page with buttons for redirecting to Homepage (e.g., book intro page), "Go Back" or Repository home.
-- Semantic ersioning: tags used for major, minor and patch version. `main` contains most up to date version. Branch `v1` contains the most recent version `1.x.x`.
+- Semantic versioning: tags used for major, minor and patch version. `main` contains most up to date version. Branch `v1` contains the most recent version `1.x.x`.
 
 ## How to start using this workflow
 As previously mentioned, this workflow is used in `TeachBooks/template`. Feel free to use it for your TeachBook as well:
@@ -216,7 +218,11 @@ The DBW uses [Python virtual environments](https://docs.python.org/3/library/ven
 
 Once created during a successful build action, an existing cached environment will be found and reused unless two specific criteria are met: 1) a book build is required (replacing the cached build artifact), _and_ 2) the `requirements.txt` file is changed. Requirements for a "book build" are described in the next section.
 
-Note that any change to the `requirements.txt` file will trigger creation a new environment, not necessarily one that specifies the version number of a package.
+Note that any change to the `requirements.txt` file will trigger creation of a new environment, not necessarily one that specifies the version number of a package.
+
+Note that Specifying package version numbers explicitly and updating them via [Dependabot](https://teachbooks.io/manual/favourites/features/update_env.html) is an excellent way to ensure that environments in the DBW are always up to date and this issue is avoided.
+
+If you are _not_ using Dependabot and are not able to get your packages updated when the DBW is running, delete the cache manually and rerun your GitHub Actions job (go to Actions tab, then looking for the "Caches" section under the "Management" pane on the left hand side of the screen).
 
 ### Cached Build Artifacts
 
