@@ -15,7 +15,7 @@ This page is useful for user type 3, 4 and 5.
 (deploy-book-workflow)=
 # Deploy Book workflow
 
-The Deploy Book Workflow is a GitHub Reuseable Action which takes all versions of your TeachBooks and shared it online.
+The Deploy Book Workflow is a GitHub Reuseable Action which takes all versions of your TeachBooks and shared it online. The Deploy Book Workflow works for any book created with the Jupyter Books and/or TeachBooks.
 
 The Deploy Book Workflow is by default incorporated into any book that has been created using the [TeachBooks Template](https://github.com/TeachBooks/template). We also strongly encourage anyone to consider this tool as an alternative to the "standard" workflow provided by Jupyter Book because of it's additional features.
 
@@ -26,8 +26,6 @@ The workflow allows you to:
 - [Write book fully in GitHub interface](https://teachbooks.io/manual/features/write_online.html)
 
 The linked pages described those activities in more detail.
-
-It works for any book created with the Jupyter Books and/or TeachBooks.
 
 ## Related features
 
