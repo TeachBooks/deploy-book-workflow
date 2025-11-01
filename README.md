@@ -1,17 +1,32 @@
 ````{margin}
+
 ```{attributiongrey} Attribution
 :class: attribution
 This page reuses BSD 3-Clause License content from {cite:t}`deploy_book`. {fa}`quote-left`{ref}`Find out more here.<external_resources>`
 ```
 
-```{admonition} User types
-:class: tip
+```{note}
+
+{bdg-light}`GitHub Reusable Action`
+
+{bdg-link-light}`Included in TeachBooks Template <../template/README.html>`
+
+{bdg-link-secondary}`Uses TeachBooks package <../../features/teachbooks_intro.html>`
+
+```
+
+```{tip}
 This page is useful for user type 3, 4 and 5.
 ```
 
-{bdg-light}`GitHub Reusable Action`
-{bdg-link-light}`Included in TeachBooks Template <../template/README.html>`
-{bdg-link-secondary}`Uses TeachBooks package <../../features/teachbooks_intro.html>`
+```{seealso}
+
+[{octicon}`mark-github` Repository](https://github.com/TeachBooks/deploy-book-workflow)
+
+[{octicon}`pencil` Exercise](https://teachbooks.io/template/extension_exercises/015.html)
+
+```
+
 ````
 
 (deploy-book-workflow)=
