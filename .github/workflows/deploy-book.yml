@@ -1,7 +1,7 @@
 name: deploy-book
 
 # Based on:
-# https://jupyterbook.org/en/stable/publish/gh-pages.html
+# https://jupyterbook.org/v1/publish/gh-pages.html
 
 on:
   workflow_call:
@@ -64,6 +64,7 @@ env:
 jobs:
   get-branches:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     outputs:
       branches: ${{ steps.set-branches.outputs.branches }}
     permissions:
@@ -127,6 +128,7 @@ jobs:
 
   build-books:
     runs-on: ubuntu-latest
+    timeout-minutes: 60
     needs: get-branches
     if: ${{ needs.get-branches.outputs.branches != '[]' }}
     permissions:
@@ -323,6 +325,7 @@ jobs:
     needs:
     - get-branches
     - build-books
+    timeout-minutes: 30
     outputs:
       summary: ${{ steps.output-summary.outputs.summary }}
     runs-on: ubuntu-latest
@@ -728,6 +731,7 @@ jobs:
       - get-branches
       - deploy-books
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
     - name: Summarize
       run: |
