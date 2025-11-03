@@ -34,9 +34,9 @@ This page is useful for user type 3, 4 and 5.
 
 The Deploy Book Workflow is a GitHub Reuseable Action which takes all versions of your TeachBooks and shared it online. The Deploy Book Workflow works for any book created with the Jupyter Books and/or TeachBooks.
 
-The Deploy Book Workflow is by default incorporated into any book that has been created using the [TeachBooks Template](https://github.com/TeachBooks/template). We also strongly encourage anyone to consider this tool as an alternative to the "standard" workflow provided by Jupyter Book because of it's additional features.
+The Deploy Book Workflow is by default incorporated into any book that has been created using the [TeachBooks Template](https://github.com/TeachBooks/template). We also strongly encourage anyone to consider this tool as an alternative to the "standard" workflow provided by Jupyter Book v1 because of it's additional features.
 
-The workflow `call-deploy-book.yml` calls the `deploy-book.yml` workflow, which builds a Jupyter Book at the calling repository for all branches, and deploys them via GitHub Pages. It is currently configured to create a Jupyter Book using the TeachBooks Python package (i.e., `teachbooks build book`), although this may be adapted in the future to make it easier to use in other applications (e.g., to build books with other software or any static website in general).
+The workflow `call-deploy-book.yml` calls the `deploy-book.yml` workflow, which builds a TeachBook at the calling repository for all branches, and deploys them via GitHub Pages. It is currently configured to create a Jupyter Book using the TeachBooks Python package (i.e., `teachbooks build book`), although this may be adapted in the future to make it easier to use in other applications (e.g., to build books with other software or any static website in general).
 
 The workflow allows you to:
 - [Release all versions your TeachBook-repository to GitHub Pages](../../features/release_book_online.md)
