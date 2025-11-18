@@ -734,14 +734,12 @@ jobs:
     timeout-minutes: 10
     steps:
     - name: Summarize
-      env:
-        SUMMARY: ${{ needs.deploy-books.outputs.summary }}
       run: |
+        # Write summary to a temp file to avoid shell/env var size limits
+        echo "${{ needs.deploy-books.outputs.summary }}" > summary_tmp.md
+        cat summary_tmp.md >> "$GITHUB_STEP_SUMMARY"
 
-        # Write summary safely without interpreting backticks or quotes
-        printf '%s\n' "$SUMMARY" >> "$GITHUB_STEP_SUMMARY"
-
-        if [ -z "$SUMMARY" ]; then
+        if [ ! -s summary_tmp.md ]; then
           {
             echo "An unknown error has occurred, cannot display summary. It may be there were too many errors or warnings in the book build process."
             echo
