@@ -326,8 +326,6 @@ jobs:
     - get-branches
     - build-books
     timeout-minutes: 30
-    outputs:
-      summary: ${{ steps.output-summary.outputs.summary }}
     runs-on: ubuntu-latest
     permissions:
       pages: write
@@ -715,15 +713,11 @@ jobs:
       id: deployment
       uses: actions/deploy-pages@v4
 
-    # source: https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#example-of-a-multiline-string
-    - name: Output summary
-      id: output-summary
-      run: |
-        {
-          echo 'summary<<EOF'
-          cat summary.md
-          echo EOF
-        } >> "$GITHUB_OUTPUT"
+    - name: Upload summary as artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: _final-summary
+        path: summary.md
 
   summarize:
     if: always()
@@ -733,15 +727,17 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
+    - name: Download final summary artifact
+      uses: actions/download-artifact@v4
+      with:
+        name: _final-summary
+        path: ./
     - name: Summarize
-      env:
-        SUMMARY: ${{ needs.deploy-books.outputs.summary }}
       run: |
-
-        # Write summary safely without interpreting backticks or quotes
-        printf '%s\n' "$SUMMARY" >> "$GITHUB_STEP_SUMMARY"
-
-        if [ -z "$SUMMARY" ]; then
+        # Append the aggregated summary to Actions summary
+        if [ -f summary.md ]; then
+          cat summary.md >> "$GITHUB_STEP_SUMMARY"
+        else
           {
             echo "An unknown error has occurred, cannot display summary. It may be there were too many errors or warnings in the book build process."
             echo
