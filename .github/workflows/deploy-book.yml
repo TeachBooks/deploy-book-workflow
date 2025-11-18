@@ -734,16 +734,19 @@ jobs:
     timeout-minutes: 10
     steps:
     - name: Summarize
+      env:
+        SUMMARY: ${{ needs.deploy-books.outputs.summary }}
       run: |
 
-        echo "${{ needs.deploy-books.outputs.summary }}" >> $GITHUB_STEP_SUMMARY
+        # Write summary safely without interpreting backticks or quotes
+        printf '%s\n' "$SUMMARY" >> "$GITHUB_STEP_SUMMARY"
 
-        if [ "${{ needs.deploy-books.outputs.summary }}" == "" ]; then
+        if [ -z "$SUMMARY" ]; then
           {
             echo "An unknown error has occurred, cannot display summary. It may be there were too many errors or warnings in the book build process."
             echo
             echo "- You can try building the books locally, or inspecting the workflow run logs to troubleshoot the issue."
-          } >> $GITHUB_STEP_SUMMARY
+          } >> "$GITHUB_STEP_SUMMARY"
         fi
 
         isdefault() {
