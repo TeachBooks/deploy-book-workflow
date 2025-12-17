@@ -147,6 +147,7 @@ jobs:
         ref: ${{ matrix.branch }}
         token: ${{ env.GH_TOKEN }}
         submodules: 'true'
+        fetch-depth: 0
 
     - name: Record extra cache info
       run: |
