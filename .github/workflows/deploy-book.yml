@@ -707,7 +707,7 @@ jobs:
         echo "$HTML_TEMPLATE_404_REDIRECT" | envsubst | tee final/404.html
 
     - name: Upload final Pages artifact
-      uses: actions/upload-pages-artifact@v4
+      uses: Tom-van-Woudenberg/upload-pages-artifact@patch-1 # awaiting merge of https://github.com/actions/upload-pages-artifact/pull/139
       with:
         path: "final/"
 
