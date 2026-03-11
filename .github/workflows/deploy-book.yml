@@ -172,7 +172,7 @@ jobs:
       # A build is required if a change is made to the book contents, requirements file or the status of
       #  a branch as archive or preprocess has changed (`BRANCHES_TO_PREPROCESS` of `BRANCHES_ARCHIVED`).
       id: cache-html
-      uses: actions/cache@v4
+      uses: actions/cache@v6
       with:
         path: "book/_build/html"
         key: html-build-${{ matrix.branch }}-${{ hashFiles('book/**', 'requirements.txt', 'EXTRA_CACHE_VARS.txt') }}
@@ -196,7 +196,7 @@ jobs:
     #  is only required if a build is required and this is already checked with id: cache-html, as described above.
     - if: ${{ steps.cache-html.outputs.cache-hit != 'true' }}
       name: Cache virtualenv
-      uses: actions/cache@v4
+      uses: actions/cache@v6
       with:
         key: venv-${{ runner.os }}-${{ steps.setup-python.outputs.python-version }}-${{ hashFiles('requirements.txt') }}-week${{ env.WEEK }}-${{ github.repository }}
         path: .venv
