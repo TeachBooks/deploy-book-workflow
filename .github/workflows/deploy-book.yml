@@ -343,7 +343,7 @@ jobs:
         mkdir final/
 
     - name: Download all artifacts
-      uses: actions/download-artifact@v4
+      uses: actions/download-artifact@v6
       with:
         path: "final/"
 
@@ -712,7 +712,7 @@ jobs:
 
     - name: Deploy to GitHub Pages
       id: deployment
-      uses: actions/deploy-pages@v4
+      uses: actions/deploy-pages@v5
 
     - name: Upload summary as artifact
       uses: actions/upload-artifact@v6
@@ -729,7 +729,7 @@ jobs:
     timeout-minutes: 10
     steps:
     - name: Download final summary artifact
-      uses: actions/download-artifact@v4
+      uses: actions/download-artifact@v6
       with:
         name: _final-summary
         path: ./
