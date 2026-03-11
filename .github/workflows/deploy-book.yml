@@ -10,6 +10,7 @@ on:
 # Configuration variables may be set as explained here:
 # https://docs.github.com/en/actions/learn-github-actions/variables#creating-configuration-variables-for-a-repository
 env:
+  
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   # Relevant and required for private submodules only!
   # 1. First, create a Personal Access Token (Classic) as in https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens
@@ -70,7 +71,7 @@ jobs:
     permissions:
       contents: read
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v6
       with:
         fetch-depth: 0
 
@@ -142,7 +143,7 @@ jobs:
         branch: ${{ fromJson(needs.get-branches.outputs.branches) }}
     steps:
     - name: Checkout to branch
-      uses: actions/checkout@v4
+      uses: actions/checkout@v6
       with:
         ref: ${{ matrix.branch }}
         token: ${{ env.GH_TOKEN }}
@@ -172,14 +173,14 @@ jobs:
       # A build is required if a change is made to the book contents, requirements file or the status of
       #  a branch as archive or preprocess has changed (`BRANCHES_TO_PREPROCESS` of `BRANCHES_ARCHIVED`).
       id: cache-html
-      uses: actions/cache@v4
+      uses: actions/cache@v5
       with:
         path: "book/_build/html"
         key: html-build-${{ matrix.branch }}-${{ hashFiles('book/**', 'requirements.txt', 'EXTRA_CACHE_VARS.txt') }}
 
     - if: ${{ steps.cache-html.outputs.cache-hit != 'true' }}
       name: Set up Python 3.11
-      uses: actions/setup-python@v5
+      uses: actions/setup-python@v6
       id: setup-python
       with:
         python-version: 3.11
@@ -196,7 +197,7 @@ jobs:
     #  is only required if a build is required and this is already checked with id: cache-html, as described above.
     - if: ${{ steps.cache-html.outputs.cache-hit != 'true' }}
       name: Cache virtualenv
-      uses: actions/cache@v4
+      uses: actions/cache@v5
       with:
         key: venv-${{ runner.os }}-${{ steps.setup-python.outputs.python-version }}-${{ hashFiles('requirements.txt') }}-week${{ env.WEEK }}-${{ github.repository }}
         path: .venv
@@ -301,21 +302,21 @@ jobs:
 
     - name: Upload summary as an artifact
       if: always()
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v7
       with:
         name: _summary-${{ env.MATRIX_BRANCH_NAME_CLEAN }}
         path: "summary.md"
 
     - name: Upload build status as an artifact
       if: always()
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v7
       with:
         name: _buildstatus-${{ env.MATRIX_BRANCH_NAME_CLEAN }}
         path: "buildstatus.txt"
 
     - name: Upload the built book HTML as an artifact
       if: always()
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v7
       with:
         name: ${{ env.MATRIX_BRANCH_NAME_CLEAN }}
         path: "book/_build/html"
@@ -335,7 +336,7 @@ jobs:
     env:
       BRANCHES: ${{ needs.get-branches.outputs.branches }}
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v6
       with:
         token: ${{ env.GH_TOKEN }}
 
@@ -343,7 +344,7 @@ jobs:
         mkdir final/
 
     - name: Download all artifacts
-      uses: actions/download-artifact@v4
+      uses: actions/download-artifact@v8
       with:
         path: "final/"
 
@@ -355,12 +356,12 @@ jobs:
         mv final/_buildstatus-* _buildstatus
 
     - name: Clean artifacts (1)
-      uses: GeekyEggo/delete-artifact@v5.0.0
+      uses: Tom-van-Woudenberg/delete-artifact@patch-1 #awaiting merge of https://github.com/GeekyEggo/delete-artifact/pull/31
       with:
         name: "_summary-*"
 
     - name: Clean artifacts (2)
-      uses: GeekyEggo/delete-artifact@v5.0.0
+      uses: Tom-van-Woudenberg/delete-artifact@patch-1 #awaiting merge of https://github.com/GeekyEggo/delete-artifact/pull/31
       with:
         name: "_buildstatus-*"
 
@@ -706,16 +707,16 @@ jobs:
         echo "$HTML_TEMPLATE_404_REDIRECT" | envsubst | tee final/404.html
 
     - name: Upload final Pages artifact
-      uses: actions/upload-pages-artifact@v3
+      uses: actions/upload-pages-artifact@v4
       with:
         path: "final/"
 
     - name: Deploy to GitHub Pages
       id: deployment
-      uses: actions/deploy-pages@v4
+      uses: Tom-van-Woudenberg/deploy-pages@patch-1 # awaiting merge of https://github.com/actions/deploy-pages/pull/409
 
     - name: Upload summary as artifact
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v7
       with:
         name: _final-summary
         path: summary.md
@@ -729,7 +730,7 @@ jobs:
     timeout-minutes: 10
     steps:
     - name: Download final summary artifact
-      uses: actions/download-artifact@v4
+      uses: actions/download-artifact@v8
       with:
         name: _final-summary
         path: ./
