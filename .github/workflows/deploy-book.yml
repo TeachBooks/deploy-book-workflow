@@ -356,12 +356,12 @@ jobs:
         mv final/_buildstatus-* _buildstatus
 
     - name: Clean artifacts (1)
-      uses: Tom-van-Woudenberg/delete-artifact@patch-1
+      uses: Tom-van-Woudenberg/delete-artifact@patch-1 #awaiting merge of https://github.com/GeekyEggo/delete-artifact/pull/31
       with:
         name: "_summary-*"
 
     - name: Clean artifacts (2)
-      uses: Tom-van-Woudenberg/delete-artifact@patch-1
+      uses: Tom-van-Woudenberg/delete-artifact@patch-1 #awaiting merge of https://github.com/GeekyEggo/delete-artifact/pull/31
       with:
         name: "_buildstatus-*"
 
@@ -713,7 +713,7 @@ jobs:
 
     - name: Deploy to GitHub Pages
       id: deployment
-      uses: Tom-van-Woudenberg/deploy-pages@patch-1
+      uses: Tom-van-Woudenberg/deploy-pages@patch-1 # awaiting merge of https://github.com/actions/deploy-pages/pull/409
 
     - name: Upload summary as artifact
       uses: actions/upload-artifact@v7
