@@ -10,8 +10,6 @@ on:
 # Configuration variables may be set as explained here:
 # https://docs.github.com/en/actions/learn-github-actions/variables#creating-configuration-variables-for-a-repository
 env:
-  # Enforce Node24 for those actions that are not yet transfered
-  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
   
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   # Relevant and required for private submodules only!
@@ -336,6 +334,9 @@ jobs:
       id-token: write
       contents: read
     env:
+      # Enforce Node24 for those actions that are not yet transfered
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+  
       BRANCHES: ${{ needs.get-branches.outputs.branches }}
     steps:
     - uses: actions/checkout@v6
