@@ -334,9 +334,6 @@ jobs:
       id-token: write
       contents: read
     env:
-      # Enforce Node24 for those actions that are not yet transfered
-      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
-  
       BRANCHES: ${{ needs.get-branches.outputs.branches }}
     steps:
     - uses: actions/checkout@v6
