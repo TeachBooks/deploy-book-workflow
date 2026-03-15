@@ -356,12 +356,12 @@ jobs:
         mv final/_buildstatus-* _buildstatus
 
     - name: Clean artifacts (1)
-      uses: Tom-van-Woudenberg/delete-artifact@patch-1 #awaiting merge of https://github.com/GeekyEggo/delete-artifact/pull/31
+      uses: geekyeggo/delete-artifact@v6
       with:
         name: "_summary-*"
 
     - name: Clean artifacts (2)
-      uses: Tom-van-Woudenberg/delete-artifact@patch-1 #awaiting merge of https://github.com/GeekyEggo/delete-artifact/pull/31
+      uses: geekyeggo/delete-artifact@v6
       with:
         name: "_buildstatus-*"
 
