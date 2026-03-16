@@ -251,7 +251,7 @@ jobs:
     - name: If failed, restore a book for this branch from cache
       if: failure()
       id: attempt-restore
-      uses: actions/cache/restore@v4
+      uses: actions/cache/restore@v5
       with:
         key: none
         path: "book/_build/html"
