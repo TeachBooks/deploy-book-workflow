@@ -713,7 +713,7 @@ jobs:
 
     - name: Deploy to GitHub Pages
       id: deployment
-      uses: Tom-van-Woudenberg/deploy-pages@patch-1 # awaiting merge of https://github.com/actions/deploy-pages/pull/409
+      uses: actions/deploy-pages@v5
 
     - name: Upload summary as artifact
       uses: actions/upload-artifact@v7
