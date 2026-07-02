@@ -247,7 +247,7 @@ jobs:
     - name: If failed, restore a book for this branch from cache
       if: failure()
       id: attempt-restore
-      uses: actions/cache/restore@v4
+      uses: actions/cache/restore@v5
       with:
         key: none
         path: "_build/html"
@@ -353,12 +353,12 @@ jobs:
         mv final/_buildstatus-* _buildstatus
 
     - name: Clean artifacts (1)
-      uses: GeekyEggo/delete-artifact@v6.0.0
+      uses: GeekyEggo/delete-artifact@v6
       with:
         name: "_summary-*"
 
     - name: Clean artifacts (2)
-      uses: GeekyEggo/delete-artifact@v6.0.0
+      uses: GeekyEggo/delete-artifact@v6
       with:
         name: "_buildstatus-*"
 
@@ -516,7 +516,7 @@ jobs:
         echo "$HTML_TEMPLATE_404_REDIRECT" | envsubst | tee final/404.html
 
     - name: Upload final Pages artifact
-      uses: actions/upload-pages-artifact@v3
+      uses: actions/upload-pages-artifact@v5
       with:
         path: "final/"
 
