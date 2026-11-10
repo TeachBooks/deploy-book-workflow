@@ -328,6 +328,12 @@ jobs:
     - get-branches
     - build-books
     timeout-minutes: 30
+    # Queue deployments instead of failing when another deployment is in progress.
+    # Never cancel a running deployment; a newer queued run replaces older pending ones,
+    # which is fine because every run builds all branches.
+    concurrency:
+      group: pages-deploy-${{ github.repository }}
+      cancel-in-progress: false
     runs-on: ubuntu-latest
     permissions:
       pages: write
@@ -730,15 +736,28 @@ jobs:
     timeout-minutes: 10
     steps:
     - name: Download final summary artifact
+      # The artifact is missing if deploy-books was cancelled or failed early
+      continue-on-error: true
       uses: actions/download-artifact@v8
       with:
         name: _final-summary
         path: ./
     - name: Summarize
+      env:
+        DEPLOY_RESULT: ${{ needs.deploy-books.result }}
       run: |
         # Append the aggregated summary to Actions summary
         if [ -f summary.md ]; then
           cat summary.md >> "$GITHUB_STEP_SUMMARY"
+        elif [ "$DEPLOY_RESULT" == 'cancelled' ]; then
+          {
+            echo "### Deployment cancelled"
+            echo "The deployment job of this workflow run was cancelled, so no summary is available."
+            echo "This usually happens when a newer run was queued while another deployment was still in progress; the newer run replaces this one."
+            echo
+            echo "- Check the logs of individual brances for the built log."
+            echo "- Check the latest workflow run for the deployment status."
+          } >> "$GITHUB_STEP_SUMMARY"
         else
           {
             echo "An unknown error has occurred, cannot display summary. It may be there were too many errors or warnings in the book build process."
