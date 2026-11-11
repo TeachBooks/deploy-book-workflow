@@ -121,6 +121,9 @@ We advise  you to enable two options in the general repository setting regarding
 - Enable `Always suggest updating pull request branches`, suggesting a merge from the default branch into any separate branch before merging into main.
 - Enable `Automatically delete head branches` to delete branches after they are merged (you'll still be able to restore those).
 
+## Prevent conflicting deployments
+If a workflow run is triggered while a previous run is still deploying, GitHub Pages can reject the new deployment. The workflow therefore handles runs one at a time, in the order they were triggered, using a `concurrency` group (`deploy-book-workflow-<repository>`). A running deployment is never cancelled; if several runs are waiting, only the newest one is kept (and the replaced run is shown as cancelled). This is safe because every run builds the latest version of all branches. No setup is needed, but do not use a concurrency group with this name in your calling workflow.
+
 ## View the workflow progress and summary
 
 Whenever the workflow is triggered, its progress and a summary can be seen under the <svg aria-hidden="true" height="16" viewBox="0 0 16 16" version="1.1" width="16" data-view-component="true" class="octicon octicon-play UnderlineNav-octicon d-none d-sm-inline">    <path d="M8 0a8 8 0 1 1 0 16A8 8 0 0 1 8 0ZM1.5 8a6.5 6.5 0 1 0 13 0 6.5 6.5 0 0 0-13 0Zm4.879-2.773 4.264 2.559a.25.25 0 0 1 0 .428l-4.264 2.559A.25.25 0 0 1 6 10.559V5.442a.25.25 0 0 1 .379-.215Z"></path></svg>`Actions`- `All workflows` -  `call-deploy-book` in GitHub! It shows you a descriptive summary:

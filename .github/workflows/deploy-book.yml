@@ -6,6 +6,16 @@ name: deploy-book
 on:
   workflow_call:
 
+# Handle runs one at a time, in the order in which they were triggered, to prevent GitHub Pages
+# rejecting a deployment because another one is still in progress.
+# - A running deployment is never cancelled; of several waiting runs only the newest is kept,
+#   which is fine because every run builds the latest version of all branches.
+# - The group name must differ from any concurrency group used in the calling workflow,
+#   otherwise caller and called workflow block each other.
+concurrency:
+  group: deploy-book-workflow-${{ github.repository }}
+  cancel-in-progress: false
+
 # Inherit configuration variables in the environment, or assign default values.
 # Configuration variables may be set as explained here:
 # https://docs.github.com/en/actions/learn-github-actions/variables#creating-configuration-variables-for-a-repository
