@@ -189,11 +189,11 @@ jobs:
         key: html-build-${{ matrix.branch }}-${{ hashFiles('book/**', 'requirements.txt', 'EXTRA_CACHE_VARS.txt') }}
 
     - if: ${{ steps.cache-html.outputs.cache-hit != 'true' }}
-      name: Set up Python 3.11
+      name: Set up Python 3.13
       uses: actions/setup-python@v6
       id: setup-python
       with:
-        python-version: 3.11
+        python-version: 3.13
 
     - if: ${{ steps.cache-html.outputs.cache-hit != 'true' }}
       name: Record current date for cache
