@@ -54,6 +54,9 @@ You can adapt the behaviour by setting repository variables as explained [here](
 - `BRANCHES_TO_DEPLOY`  which is set to `*` (all branches) whenever it's not defined in the repository variables.
   - This defines the branches to deploy.
   - It should be a space-separated list of branch names, e.g. 'main second third'.
+- `BRANCHES_NOT_TO_DEPLOY` which is empty whenever it's not defined in the repository variables.
+  - This excludes branches from the deployment list, including when `BRANCHES_TO_DEPLOY` is `*`.
+  - It should be a space-separated list of branch names, e.g. 'draft experiment'.
 - `BRANCHES_TO_PREPROCESS` which is set to ` ` (just a space = no branch) whenever it's not defined in the repository variables
   - This defines the branches to preprocess with the [`TeachBooks` package](https://teachbooks.io/TeachBooks/cli/cli.html#cmdoption-teachbooks-build), which removed book-pages and config lines defined with `# START REMOVE-FROM-RELEASE` and `# END REMOVE-FROM-RELEASE`
   - It should be a space-separated list of branch names, e.g. 'main second third'.
