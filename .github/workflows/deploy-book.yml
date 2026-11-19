@@ -112,7 +112,7 @@ jobs:
         printf '%s\n' "$branches" | tr ' ' '\n' | awk 'NF' > branches.txt
 
         # Convert to a JSON list
-        branches=$(jq -Rn '[inputs]' < branches.txt)
+        branches=$(jq -Rnc '[inputs]' < branches.txt)
         echo "branches=$branches" >> "$GITHUB_OUTPUT"
 
     - name: Validate aliases
