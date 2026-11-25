@@ -721,6 +721,19 @@ jobs:
       with:
         path: "final/"
 
+    # The uploaded artifact can take a moment to become visible to deploy-pages
+    - name: Wait for Pages artifact
+      run: |
+        for i in $(seq 1 24); do
+          if gh api "repos/${{ github.repository }}/actions/runs/${{ github.run_id }}/artifacts" \
+              --paginate -q '.artifacts[].name' | grep -qx github-pages; then
+            exit 0
+          fi
+          sleep 5
+        done
+        echo "::error::github-pages artifact not visible after 120 s"
+        exit 1
+
     - name: Deploy to GitHub Pages
       id: deployment
       uses: actions/deploy-pages@v5
