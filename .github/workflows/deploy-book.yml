@@ -143,8 +143,6 @@ jobs:
     needs: get-branches
     if: ${{ needs.get-branches.outputs.branches != '[]' }}
     permissions:
-      pages: write
-      id-token: write
       contents: read
     strategy:
       # If one branch fails, we may still want to deploy the other
@@ -324,6 +322,13 @@ jobs:
         name: _buildstatus-${{ env.MATRIX_BRANCH_NAME_CLEAN }}
         path: "buildstatus.txt"
 
+    # Artifact naming convention:
+    # - _summary-{branch}: Build errors/warnings for this branch
+    # - _buildstatus-{branch}: Build status indicator (✓ Released, ✗ Failed, etc.)
+    # - {branch}: Built HTML book for this branch
+    # These prefixes with underscores (_summary-*, _buildstatus-*) are used to identify and extract
+    # metadata artifacts that need special handling in the upload-books job, while the main book
+    # artifacts are organized directly by branch name in the final deployment directory.
     - name: Upload the built book HTML as an artifact
       if: always()
       uses: actions/upload-artifact@v7
@@ -331,9 +336,9 @@ jobs:
         name: ${{ env.MATRIX_BRANCH_NAME_CLEAN }}
         path: "book/_build/html"
 
-  deploy-books:
+  upload-books:
     # Run after build-books, even if it failed
-    if: always()
+    if: ${{ always() && needs.get-branches.outputs.branches != '[]' }}
     needs:
     - get-branches
     - build-books
@@ -721,28 +726,23 @@ jobs:
       with:
         path: "final/"
 
-    # The uploaded artifact can take a moment to become visible to deploy-pages
-    - name: Wait for Pages artifact
-      run: |
-        for i in $(seq 1 24); do
-          if gh api "repos/${{ github.repository }}/actions/runs/${{ github.run_id }}/artifacts" \
-              --paginate -q '.artifacts[].name' | grep -qx github-pages; then
-            exit 0
-          fi
-          sleep 5
-        done
-        echo "::error::github-pages artifact not visible after 120 s"
-        exit 1
-
-    - name: Deploy to GitHub Pages
-      id: deployment
-      uses: actions/deploy-pages@v5
-
     - name: Upload summary as artifact
       uses: actions/upload-artifact@v7
       with:
         name: _final-summary
         path: summary.md
+
+  deploy-books:
+    if: ${{ always() && needs.get-branches.outputs.branches != '[]' }}
+    needs: upload-books
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    steps:
+    - name: Deploy to GitHub Pages
+      id: deployment
+      uses: actions/deploy-pages@v5
 
   summarize:
     if: always()
@@ -752,6 +752,9 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
+    # Note: The _final-summary artifact may not exist if upload-books was skipped (e.g., no branches)
+    # or if all build/upload steps failed. The summarize step handles this gracefully by checking
+    # if the summary.md file exists before attempting to append it.
     - name: Download final summary artifact
       uses: actions/download-artifact@v8
       with:
